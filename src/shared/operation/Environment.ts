@@ -58,14 +58,10 @@ export class Environment {
 		this.#instance = value;
 	}
 
-	public static getInstanceUndefined(): Environment | undefined {
-		return this.#instance;
-	}
-
 	public static setup() {
 		const envFile: Env = {
 			JWT_USERS_SECRET: process.env.JWT_USERS_SECRET || "",
-			JWT_GATEWAY_SECRET: process.env.JWT_SERVICES_SECRET || "",
+			JWT_GATEWAY_SECRET: process.env.JWT_GATEWAY_SECRET || "",
 			SERVICES_API_KEY: process.env.SERVICES_API_KEY || "",
 			IMAGGA_API_KEY: process.env.IMAGGA_API_KEY || "",
 			IMAGGA_API_SECRET: process.env.IMAGGA_API_SECRET || "",

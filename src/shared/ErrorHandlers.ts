@@ -25,12 +25,17 @@ export function isDev(req: Request) {
 }
 
 export const convertToHttpError: ErrorRequestHandler = (err: Error, req, res, next) => {
-	const zodErrorParsed = zodErrorSchema.safeParse(err);
-	if (zodErrorParsed.success) {
-		return next(createHttpError(422, err));
+	const errorParsingResult = httpErrorSchema.safeParse(err);
+	if (errorParsingResult.success) {
+		return next(err);
 	}
 
-	let createdError = createHttpError(err);
+	const zodErrorParsed = zodErrorSchema.safeParse(err);
+	if (zodErrorParsed.success) {
+		return next(createHttpError(422, { internalError: err }));
+	}
+
+	let createdError = createHttpError({ internalError: err });
 
 	return next(createdError);
 }

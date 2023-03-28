@@ -9,7 +9,7 @@ export type ServiceStatus = typeof serviceStatus[number];
 
 export interface ResponseBody<DataT = unknown> {
 	status: ServiceStatus;
-	data: DataT
+	data: DataT | null
 }
 
 export const statusCodeStatusMessage: Map<number, ServiceStatus> = new Map([

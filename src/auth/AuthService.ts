@@ -143,7 +143,7 @@ export class AuthService {
 	 * @throws {CustomError}
 	 */
 	public async getMatchingUser(payload: UserJwtPayload): Promise<User> {
-		const foundUser = users.find((value, index, obj) => {
+		const foundUser = users.find((value) => {
 			return value.customIid == payload.sub;
 		});
 
@@ -155,7 +155,7 @@ export class AuthService {
 	}
 
 	public login(loginForm: LoginForm): string | undefined {
-		const foundUser = users.find((value, index, obj) => {
+		const foundUser = users.find((value) => {
 			return value.username == loginForm.username;
 		});
 

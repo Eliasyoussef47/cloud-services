@@ -1,10 +1,10 @@
-import { RequestHandler, RouteParameters } from "express-serve-static-core";
+import { RequestHandler } from "express-serve-static-core";
 import { AuthService, LoginForm } from "@/auth/AuthService.js";
 import { loginFormSchema } from "@/auth/validation/LoginForm.js";
 import createHttpError from "http-errors";
-import express from "express";
+import { ResponseBody } from "@/shared/types/Response.js";
 
-export const loginPost: RequestHandler = (req, res, next) => {
+export const loginPost: RequestHandler = (req, res) => {
 	const loginForm: LoginForm = loginFormSchema.parse(req.body);
 
 	const loginJwt = AuthService.getInstance().login(loginForm);
@@ -18,9 +18,7 @@ export const loginPost: RequestHandler = (req, res, next) => {
 		data: {
 			token: loginJwt,
 		},
-	};
+	} satisfies ResponseBody;
 
 	res.json(responseBody);
 };
-
-

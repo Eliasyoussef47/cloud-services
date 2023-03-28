@@ -4,6 +4,8 @@ import multer from "multer";
 import { AuthService } from "@/auth/AuthService.js";
 import express from "express";
 import cors from "cors";
+import { setupGatewayAuthenticationMiddlewares } from "@/auth/middlewares/authentication.js";
+import { attachErrorHandlers } from "@/shared/operation/errorHandling.js";
 
 dotenv.config();
 Environment.setup();
@@ -19,3 +21,13 @@ app.set("env", process.env.NODE_ENV);
 app.use(cors())
 app.use(express.json());
 app.use(upload.fields([]));
+
+setupGatewayAuthenticationMiddlewares(app, AuthService.getInstance());
+
+// TODO: Add routes.
+
+attachErrorHandlers(app);
+
+app.listen(port, () => {
+	console.log('Server is up on port ' + port)
+});
