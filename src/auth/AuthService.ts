@@ -1,13 +1,13 @@
 import crypto from "crypto";
 import { ExtractJwt, Strategy as JwtStrategy, StrategyOptions } from "passport-jwt";
 import { CustomError } from "@/shared/types/errors/CustomError.js";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { Environment } from "@/shared/operation/Environment.js";
 import createHttpError from "http-errors";
 
 export interface User {
 	id: string;
-	customIid: string;
+	customId: string;
 	username: string;
 	password: string;
 }
@@ -18,19 +18,17 @@ export interface LoginForm {
 }
 
 // TODO: Add expiration date.
-export interface UserJwtPayload {
-	sub: string;
-}
+export type UserJwtPayload = Pick<JwtPayload, "iat" | "exp" | "sub">
 
-export interface GatewayJwtPayload {
+export type GatewayJwtPayload = {
 	key: string;
-}
+} & Pick<JwtPayload, "iat">;
 
 // TODO: Remove temp database.
 const users: Array<User> = [
 	{
 		id: "420",
-		customIid: "456",
+		customId: "456",
 		username: "elias",
 		password: "jeff"
 	}
@@ -57,7 +55,10 @@ export class AuthService {
 
 	private readonly _authenticateGatewayStrategy: JwtStrategy;
 
+	private readonly jwtExpiresIn: number = 10800;
+
 	constructor(userJwtOptions: StrategyOptions, gatewayJwtOptions: StrategyOptions) {
+		this.jwtExpiresIn = Environment.getInstance().envFile.JWT_EXPIRES_IN;
 		this._userJwtOptions = userJwtOptions;
 		this._gatewayJwtOptions = gatewayJwtOptions;
 
@@ -144,7 +145,7 @@ export class AuthService {
 	 */
 	public async getMatchingUser(payload: UserJwtPayload): Promise<User> {
 		const foundUser = users.find((value) => {
-			return value.customIid == payload.sub;
+			return value.customId == payload.sub;
 		});
 
 		if (!foundUser) {
@@ -167,12 +168,13 @@ export class AuthService {
 			return undefined;
 		}
 
-		foundUser.customIid = crypto.randomUUID();
+		foundUser.customId = crypto.randomUUID();
 
-		const jwtPayload: UserJwtPayload = {
-			sub: foundUser.customIid
-		};
-
-		return jwt.sign(jwtPayload, <string> this.userJwtOptions.secretOrKey);
+		return jwt.sign({}, <string> this.userJwtOptions.secretOrKey,
+			{
+				noTimestamp: false,
+				expiresIn: this.jwtExpiresIn,
+				subject: foundUser.customId
+			});
 	}
 }

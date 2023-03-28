@@ -13,6 +13,7 @@ export interface Env {
 	TARGETS_SERVICE_URL: string;
 	SUBMISSIONS_SERVICE_URL: string;
 	IMAGE_RECOGNITION_SERVICE_URL: string;
+	JWT_EXPIRES_IN: number;
 }
 
 export const stringWithValueSchema = z.string().min(1);
@@ -28,6 +29,7 @@ export const envFileSchema: toZod<Env> = z.object({
 	TARGETS_SERVICE_URL: stringWithValueSchema.url(),
 	SUBMISSIONS_SERVICE_URL: stringWithValueSchema.url(),
 	IMAGE_RECOGNITION_SERVICE_URL: stringWithValueSchema.url(),
+	JWT_EXPIRES_IN: z.coerce.number()
 });
 
 export class Environment {
@@ -70,6 +72,7 @@ export class Environment {
 			TARGETS_SERVICE_URL: process.env.TARGETS_SERVICE_URL || "",
 			SUBMISSIONS_SERVICE_URL: process.env.SUBMISSIONS_SERVICE_URL || "",
 			IMAGE_RECOGNITION_SERVICE_URL: process.env.IMAGE_RECOGNITION_SERVICE_URL || "",
+			JWT_EXPIRES_IN: Number(process.env.JWT_EXPIRES_IN) || 10800
 		}
 
 		envFileSchema.parse(envFile);
