@@ -25,6 +25,8 @@ function forInput(entryAlias: string, inputPath: string) {
 }
 
 export default defineConfig([
+	forInput("createPasswordCli", "src/auth/createPasswordCli.ts"),
+	forInput("verifyPasswordCli", "src/auth/verifyPasswordCli.ts"),
 	forInput("apiGateway", "src/apiGateway/index.ts"),
 	forInput("imageRecognitionService", "src/imageRecognitionService/index.ts"),
 	forInput("submissionsService", "src/submissionsService/index.ts"),
