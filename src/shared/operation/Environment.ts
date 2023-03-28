@@ -4,7 +4,7 @@ import z from "zod";
 
 export interface Env {
 	JWT_USERS_SECRET: string;
-	JWT_SERVICES_SECRET: string;
+	JWT_GATEWAY_SECRET: string;
 	SERVICES_API_KEY: string;
 	IMAGGA_API_KEY: string;
 	IMAGGA_API_SECRET: string;
@@ -19,7 +19,7 @@ export const stringWithValueSchema = z.string().min(1);
 
 export const envFileSchema: toZod<Env> = z.object({
 	JWT_USERS_SECRET: stringWithValueSchema,
-	JWT_SERVICES_SECRET: stringWithValueSchema,
+	JWT_GATEWAY_SECRET: stringWithValueSchema,
 	SERVICES_API_KEY: stringWithValueSchema,
 	IMAGGA_API_KEY: stringWithValueSchema,
 	IMAGGA_API_SECRET: stringWithValueSchema,
@@ -42,6 +42,10 @@ export class Environment {
 		return new URL(this.#envFile.API_GATEWAY_URL);
 	}
 
+	public get targetServiceUrl(): URL {
+		return new URL(this.#envFile.TARGETS_SERVICE_URL);
+	}
+
 	public get envFile(): Env {
 		return this.#envFile;
 	}
@@ -61,7 +65,7 @@ export class Environment {
 	public static setup() {
 		const envFile: Env = {
 			JWT_USERS_SECRET: process.env.JWT_USERS_SECRET || "",
-			JWT_SERVICES_SECRET: process.env.JWT_SERVICES_SECRET || "",
+			JWT_GATEWAY_SECRET: process.env.JWT_SERVICES_SECRET || "",
 			SERVICES_API_KEY: process.env.SERVICES_API_KEY || "",
 			IMAGGA_API_KEY: process.env.IMAGGA_API_KEY || "",
 			IMAGGA_API_SECRET: process.env.IMAGGA_API_SECRET || "",

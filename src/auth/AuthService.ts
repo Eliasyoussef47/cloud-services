@@ -1,8 +1,9 @@
 import crypto from "crypto";
-import { ExtractJwt, StrategyOptions } from "passport-jwt";
+import { ExtractJwt, Strategy as JwtStrategy, StrategyOptions } from "passport-jwt";
 import { CustomError } from "@/shared/types/errors/CustomError.js";
 import jwt from "jsonwebtoken";
 import { Environment } from "@/shared/operation/Environment.js";
+import createHttpError from "http-errors";
 
 export interface User {
 	id: string;
@@ -21,7 +22,7 @@ export interface UserJwtPayload {
 	sub: string;
 }
 
-export interface ServicesJwtPayload {
+export interface GatewayJwtPayload {
 	key: string;
 }
 
@@ -48,14 +49,51 @@ export class AuthService {
 
 	private static readonly _encoding = "hex";
 
-	private readonly _jwtOptions: StrategyOptions;
+	private readonly _userJwtOptions: StrategyOptions;
 
-	constructor(jwtOptions: StrategyOptions) {
-		this._jwtOptions = jwtOptions;
+	private readonly _gatewayJwtOptions: StrategyOptions;
+
+	private readonly _authenticateUserStrategy: JwtStrategy;
+
+	private readonly _authenticateGatewayStrategy: JwtStrategy;
+
+	constructor(userJwtOptions: StrategyOptions, gatewayJwtOptions: StrategyOptions) {
+		this._userJwtOptions = userJwtOptions;
+		this._gatewayJwtOptions = gatewayJwtOptions;
+
+		this._authenticateUserStrategy = new JwtStrategy(this.userJwtOptions, (payload, done) => {
+			this.getMatchingUser(payload)
+				.then((value) => {
+					return done(null, value);
+				})
+				.catch((e) => {
+					done(createHttpError(401, e), false);
+				});
+		});
+
+		this._authenticateGatewayStrategy = new JwtStrategy(this.gatewayJwtOptions, (payload, done) => {
+			const verificationResult = this.verifyGatewayToken(payload);
+
+			if (!verificationResult) {
+				done(createHttpError(401), false);
+			}
+		});
 	}
 
-	public get jwtOptions(): StrategyOptions {
-		return this._jwtOptions;
+	public get userJwtOptions(): StrategyOptions {
+		return this._userJwtOptions;
+	}
+
+	public get gatewayJwtOptions(): StrategyOptions {
+		return this._gatewayJwtOptions;
+	}
+
+	public get authenticateUserStrategy(): JwtStrategy {
+		return this._authenticateUserStrategy;
+	}
+
+	public get authenticateGatewayStrategy(): JwtStrategy {
+		return this._authenticateGatewayStrategy;
 	}
 
 	public static getInstance(): AuthService {
@@ -66,17 +104,18 @@ export class AuthService {
 		this.#instance = value;
 	}
 
-	public static getInstanceUndefined(): AuthService | undefined {
-		return this.#instance;
-	}
-
 	public static setup() {
-		const jwtOptions = {
+		const userJwtOptions = {
 			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 			secretOrKey: Environment.getInstance().envFile.JWT_USERS_SECRET
 		} satisfies StrategyOptions;
 
-		this.setInstance(new AuthService(jwtOptions));
+		const gatewayJwtOptions = {
+			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+			secretOrKey: Environment.getInstance().envFile.JWT_GATEWAY_SECRET
+		} satisfies StrategyOptions;
+
+		this.setInstance(new AuthService(userJwtOptions, gatewayJwtOptions));
 	}
 
 	public static createPassword(suppliedPassword: string) {
@@ -92,6 +131,10 @@ export class AuthService {
 		const suppliedPasswordBuf = crypto.pbkdf2Sync(suppliedPassword,
 			salt, this._iterations, this._keyLength, this._digest);
 		return crypto.timingSafeEqual(hashedPasswordBuf, suppliedPasswordBuf);
+	}
+
+	public verifyGatewayToken(payload: GatewayJwtPayload): boolean {
+		return payload.key == Environment.getInstance().envFile.JWT_GATEWAY_SECRET;
 	}
 
 	/**
@@ -130,6 +173,6 @@ export class AuthService {
 			sub: foundUser.customIid
 		};
 
-		return jwt.sign(jwtPayload, <string> this.jwtOptions.secretOrKey);
+		return jwt.sign(jwtPayload, <string> this.userJwtOptions.secretOrKey);
 	}
 }
