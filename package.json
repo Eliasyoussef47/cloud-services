@@ -5,20 +5,24 @@
 	"description": "",
 	"scripts": {
 		"build": "npx rollup --config ./rollup.config.ts --configPlugin typescript",
-		"watch": "npx rollup -w --config ./rollup.config.ts --configPlugin typescript"
+		"watch": "npx rollup -w --config ./rollup.config.ts --configPlugin typescript",
+		"apiGateway:nodemon": "nodemon dist/apiGateway.js --watch dist/apiGateway.js -L",
+		"imageRecognition:nodemon": "nodemon dist/imageRecognitionService.js --watch dist/imageRecognitionService.js -L",
+		"submissions:nodemon": "nodemon dist/submissionsService.js --watch dist/submissionsService.js -L",
+		"targets:nodemon": "nodemon dist/targetsService.js --watch dist/targetsService.js -L"
 	},
 	"dependencies": {
 		"amqplib": "^0.10.3",
 		"connect-roles": "^3.1.2",
 		"cors": "^2.8.5",
-		"dotenv": "^16.0.0",
+		"dotenv": "^16.0.3",
 		"express": "^5.0.0-beta.1",
 		"http-errors": "^2.0.0",
 		"jsonwebtoken": "^9.0.0",
 		"mongoose": "^7.0.2",
+		"opossum": "^7.1.0",
 		"passport": "^0.6.0",
 		"passport-jwt": "^4.0.1",
-		"opossum": "^7.1.0",
 		"zod": "^3.21.4"
 	},
 	"devDependencies": {
@@ -29,9 +33,9 @@
 		"@types/http-errors": "^2.0.1",
 		"@types/jsonwebtoken": "^9.0.1",
 		"@types/node": "^18.15.5",
+		"@types/opossum": "^6.2.3",
 		"@types/passport": "^1.0.12",
 		"@types/passport-jwt": "^3.0.8",
-		"@types/opossum": "^6.2.3",
 		"@types/rollup-plugin-auto-external": "^2.0.2",
 		"nodemon": "^2.0.21",
 		"rollup": "^3.17.2",
