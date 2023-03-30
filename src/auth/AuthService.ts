@@ -5,6 +5,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { Environment } from "@/shared/operation/Environment.js";
 import createHttpError from "http-errors";
 
+// TODO: Use database.
 export interface User {
 	id: string;
 	customId: string;
@@ -23,7 +24,7 @@ export type GatewayJwtPayload = {
 	key: string;
 } & Pick<JwtPayload, "iat">;
 
-// TODO: Remove temp database.
+// TODO: Use database.
 const users: Array<User> = [
 	{
 		id: "420",
@@ -83,9 +84,9 @@ export class AuthService {
 			done(null, {});
 		});
 
-		 const gatewayJwtPayload: GatewayJwtPayload = {
-			 key: Environment.getInstance().envFile.SERVICES_API_KEY
-		 };
+		const gatewayJwtPayload: GatewayJwtPayload = {
+			key: Environment.getInstance().envFile.SERVICES_API_KEY
+		};
 
 		this._gatewayJwt = jwt.sign(gatewayJwtPayload, <string> this.gatewayJwtOptions.secretOrKey);
 	}
@@ -151,6 +152,7 @@ export class AuthService {
 		return payload.key == Environment.getInstance().envFile.SERVICES_API_KEY;
 	}
 
+	// TODO: Use database.
 	/**
 	 *
 	 * @param payload
@@ -168,6 +170,7 @@ export class AuthService {
 		return foundUser;
 	}
 
+	// TODO: Use database.
 	public login(loginForm: LoginForm): string | undefined {
 		const foundUser = users.find((value) => {
 			return value.username == loginForm.username;
