@@ -1,11 +1,11 @@
 import express from "express";
-import { loginPost } from "@/auth/routes/index.js";
+import { targetsRouter } from "@/apiGateway/routes/targets.js";
+import { authenticationRouter } from "@/apiGateway/routes/authentication.js";
 
 export const nonAuthenticatedRouter = express.Router();
-export const loginRouter = express.Router();
-loginRouter.route("/login")
-	.post(loginPost);
 
-nonAuthenticatedRouter.use(loginRouter);
+nonAuthenticatedRouter.use(authenticationRouter);
 
 export const authenticatedRouter = express.Router();
+
+authenticatedRouter.use(targetsRouter);

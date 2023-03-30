@@ -6,13 +6,14 @@ import express from "express";
 import cors from "cors";
 import { setupGatewayAuthenticationMiddlewares } from "@/auth/middlewares/authentication.js";
 import { attachErrorHandlers } from "@/shared/operation/errorHandling.js";
+import { authenticatedRouter } from "@/targetsService/routes/router.js";
 
 dotenv.config();
 Environment.setup();
 const upload = multer({ dest: 'uploads/' });
 AuthService.setup();
 
-const port = Number(Environment.getInstance().apiGatewayUrl.port) || 3001;
+const port = Number(Environment.getInstance().targetServiceUrl.port) || 3001;
 
 const app = express();
 
@@ -25,6 +26,13 @@ app.use(upload.fields([]));
 setupGatewayAuthenticationMiddlewares(app, AuthService.getInstance());
 
 // TODO: Add routes.
+app.use(authenticatedRouter);
+
+// authenticatedRouter.stack.forEach(function(r){
+// 	if (r.route && r.route.path){
+// 		console.log(r.route.path)
+// 	}
+// })
 
 attachErrorHandlers(app);
 

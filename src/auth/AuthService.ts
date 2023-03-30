@@ -17,7 +17,6 @@ export interface LoginForm {
 	password: string;
 }
 
-// TODO: Add expiration date.
 export type UserJwtPayload = Pick<JwtPayload, "iat" | "exp" | "sub">
 
 export type GatewayJwtPayload = {
@@ -57,6 +56,8 @@ export class AuthService {
 
 	private readonly jwtExpiresIn: number = 10800;
 
+	private readonly _gatewayJwt: string;
+
 	constructor(userJwtOptions: StrategyOptions, gatewayJwtOptions: StrategyOptions) {
 		this.jwtExpiresIn = Environment.getInstance().envFile.JWT_EXPIRES_IN;
 		this._userJwtOptions = userJwtOptions;
@@ -78,7 +79,15 @@ export class AuthService {
 			if (!verificationResult) {
 				done(createHttpError(401), false);
 			}
+
+			done(null, {});
 		});
+
+		 const gatewayJwtPayload: GatewayJwtPayload = {
+			 key: Environment.getInstance().envFile.SERVICES_API_KEY
+		 };
+
+		this._gatewayJwt = jwt.sign(gatewayJwtPayload, <string> this.gatewayJwtOptions.secretOrKey);
 	}
 
 	public get userJwtOptions(): StrategyOptions {
@@ -95,6 +104,10 @@ export class AuthService {
 
 	public get authenticateGatewayStrategy(): JwtStrategy {
 		return this._authenticateGatewayStrategy;
+	}
+
+	public get gatewayJwt(): string {
+		return this._gatewayJwt;
 	}
 
 	public static getInstance(): AuthService {
@@ -135,7 +148,7 @@ export class AuthService {
 	}
 
 	public verifyGatewayToken(payload: GatewayJwtPayload): boolean {
-		return payload.key == Environment.getInstance().envFile.JWT_GATEWAY_SECRET;
+		return payload.key == Environment.getInstance().envFile.SERVICES_API_KEY;
 	}
 
 	/**
@@ -172,7 +185,6 @@ export class AuthService {
 
 		return jwt.sign({}, <string> this.userJwtOptions.secretOrKey,
 			{
-				noTimestamp: false,
 				expiresIn: this.jwtExpiresIn,
 				subject: foundUser.customId
 			});

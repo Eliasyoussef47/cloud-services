@@ -1,4 +1,4 @@
-import { ErrorRequestHandler, Request } from "express-serve-static-core";
+import { ErrorRequestHandler, Request, RequestHandler } from "express-serve-static-core";
 import { z } from "zod"
 import createHttpError, { HttpError } from "http-errors";
 import { ResponseBody, toStatusMessage } from "@/shared/types/Response.js";
@@ -20,8 +20,12 @@ export const zodErrorSchema = z.object({
 	name: z.literal("ZodError")
 }).passthrough();
 
-export function isDev(req: Request) {
-	return req.app.get("env") === "development";
+export function isProd(req: Request) {
+	return req.app.get("env") === "production";
+}
+
+export const notFoundHandler: RequestHandler = () => {
+	throw createHttpError(404);
 }
 
 export const convertToHttpError: ErrorRequestHandler = (err: Error, req, res, next) => {
@@ -46,7 +50,7 @@ export const httpErrorHandler: ErrorRequestHandler = (err: HttpError, req, res, 
 		next(err);
 	}
 
-	if (!isDev(req)) {
+	if (isProd(req)) {
 		delete err.stack;
 	}
 
@@ -58,8 +62,8 @@ export const httpErrorHandler: ErrorRequestHandler = (err: HttpError, req, res, 
 	res.status(err.statusCode).json(responseBody);
 }
 
-export const errorHandler: ErrorRequestHandler = (err: Error, req, res, next) => {
-	if (!isDev(req)) {
+export const errorHandler: ErrorRequestHandler = (err: Error, req, res) => {
+	if (isProd(req)) {
 		delete err.stack;
 	}
 

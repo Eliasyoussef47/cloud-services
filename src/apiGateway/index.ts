@@ -29,18 +29,6 @@ setupUserAuthenticationMiddlewares(app, AuthService.getInstance());
 // TODO: Roles and such.
 // app.use(roles.middleware());
 
-authenticatedRouter.get("/protected",
-	(req, res) => {
-		const responseBody = {
-			status: "success",
-			data: {
-				message: "welkom"
-			}
-		};
-
-		res.json(responseBody);
-	});
-
 app.use(authenticatedRouter);
 
 attachErrorHandlers(app);
