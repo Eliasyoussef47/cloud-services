@@ -12,9 +12,9 @@ export class CustomError extends Error {
 		Object.getOwnPropertyNames(this).forEach(function (key) {
 			if (key == "stack") {
 				// @ts-ignore
-				const oldStack = <string>(this)[key];
+				const oldStack = <string> (this)[key];
 				let arrayStack = oldStack.split("\n");
-				arrayStack = arrayStack.map((value, index, array) => {
+				arrayStack = arrayStack.map((value) => {
 					return value.trim();
 				});
 				// @ts-ignore

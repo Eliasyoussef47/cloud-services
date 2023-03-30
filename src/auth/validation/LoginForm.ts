@@ -1,5 +1,5 @@
 import { toZod } from "tozod";
-import { LoginForm } from "@/auth/AuthService.js";
+import { LoginForm } from "@/auth/AuthServiceAlpha.js";
 import z from "zod";
 
 export const loginFormSchema: toZod<LoginForm> = z.object({

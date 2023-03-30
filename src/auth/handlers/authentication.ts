@@ -1,14 +1,15 @@
 import { RequestHandler } from "express-serve-static-core";
-import { AuthService, LoginForm } from "@/auth/AuthService.js";
+import { LoginForm } from "@/auth/AuthServiceAlpha.js";
 import { loginFormSchema } from "@/auth/validation/LoginForm.js";
 import createHttpError from "http-errors";
 import { ResponseBody } from "@/shared/types/Response.js";
+import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
 
 export default class AuthenticationHandler {
 	public static loginPost: RequestHandler = (req, res) => {
 		const loginForm: LoginForm = loginFormSchema.parse(req.body);
 
-		const loginJwt = AuthService.getInstance().login(loginForm);
+		const loginJwt = AuthServiceBeta.getInstance().login(loginForm);
 
 		if (!loginJwt) {
 			throw createHttpError(401);

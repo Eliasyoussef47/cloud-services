@@ -1,9 +1,11 @@
-import crypto from "crypto";
-import { ExtractJwt, Strategy as JwtStrategy, StrategyOptions } from "passport-jwt";
 import { CustomError } from "@/shared/types/errors/CustomError.js";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import crypto from "crypto";
+import jwt from "jsonwebtoken";
+import { GatewayJwtPayload, LoginForm, UserJwtPayload } from "@/auth/AuthServiceAlpha.js";
+import { Strategy as JwtStrategy, StrategyOptions } from "passport-jwt";
 import { Environment } from "@/shared/operation/Environment.js";
 import createHttpError from "http-errors";
+import { AuthServiceBase } from "@/auth/AuthServiceBase.js";
 
 // TODO: Use database.
 export interface User {
@@ -12,17 +14,6 @@ export interface User {
 	username: string;
 	password: string;
 }
-
-export interface LoginForm {
-	username: string;
-	password: string;
-}
-
-export type UserJwtPayload = Pick<JwtPayload, "iat" | "exp" | "sub">
-
-export type GatewayJwtPayload = {
-	key: string;
-} & Pick<JwtPayload, "iat">;
 
 // TODO: Use database.
 const users: Array<User> = [
@@ -34,8 +25,11 @@ const users: Array<User> = [
 	}
 ];
 
-export class AuthService {
-	static #instance: AuthService | undefined;
+/**
+ * Responsible for authentication in the API gateway.
+ */
+export class AuthServiceBeta extends AuthServiceBase {
+	static #instance: AuthServiceBeta | undefined;
 
 	private static readonly _saltSize = 16;
 
@@ -49,20 +43,17 @@ export class AuthService {
 
 	private readonly _userJwtOptions: StrategyOptions;
 
-	private readonly _gatewayJwtOptions: StrategyOptions;
-
 	private readonly _authenticateUserStrategy: JwtStrategy;
-
-	private readonly _authenticateGatewayStrategy: JwtStrategy;
 
 	private readonly jwtExpiresIn: number = 10800;
 
 	private readonly _gatewayJwt: string;
 
-	constructor(userJwtOptions: StrategyOptions, gatewayJwtOptions: StrategyOptions) {
+	constructor(gatewayJwtOptions: StrategyOptions, userJwtOptions: StrategyOptions) {
+		super(gatewayJwtOptions);
+
 		this.jwtExpiresIn = Environment.getInstance().envFile.JWT_EXPIRES_IN;
 		this._userJwtOptions = userJwtOptions;
-		this._gatewayJwtOptions = gatewayJwtOptions;
 
 		this._authenticateUserStrategy = new JwtStrategy(this.userJwtOptions, (payload, done) => {
 			this.getMatchingUser(payload)
@@ -72,16 +63,6 @@ export class AuthService {
 				.catch((e) => {
 					done(createHttpError(401, e), false);
 				});
-		});
-
-		this._authenticateGatewayStrategy = new JwtStrategy(this.gatewayJwtOptions, (payload, done) => {
-			const verificationResult = this.verifyGatewayToken(payload);
-
-			if (!verificationResult) {
-				done(createHttpError(401), false);
-			}
-
-			done(null, {});
 		});
 
 		const gatewayJwtPayload: GatewayJwtPayload = {
@@ -95,42 +76,27 @@ export class AuthService {
 		return this._userJwtOptions;
 	}
 
-	public get gatewayJwtOptions(): StrategyOptions {
-		return this._gatewayJwtOptions;
-	}
-
 	public get authenticateUserStrategy(): JwtStrategy {
 		return this._authenticateUserStrategy;
-	}
-
-	public get authenticateGatewayStrategy(): JwtStrategy {
-		return this._authenticateGatewayStrategy;
 	}
 
 	public get gatewayJwt(): string {
 		return this._gatewayJwt;
 	}
 
-	public static getInstance(): AuthService {
+	public static getInstance(): AuthServiceBeta {
 		return this.#instance!;
 	}
 
-	public static setInstance(value: AuthService) {
+	public static setInstance(value: AuthServiceBeta) {
 		this.#instance = value;
 	}
 
 	public static setup() {
-		const userJwtOptions = {
-			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-			secretOrKey: Environment.getInstance().envFile.JWT_USERS_SECRET
-		} satisfies StrategyOptions;
+		const gatewayJwtOptions = AuthServiceBase.getDefaultGatewayJwtOptions();
+		const userJwtOptions = AuthServiceBase.getDefaultUserJwtOptions();
 
-		const gatewayJwtOptions = {
-			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-			secretOrKey: Environment.getInstance().envFile.JWT_GATEWAY_SECRET
-		} satisfies StrategyOptions;
-
-		this.setInstance(new AuthService(userJwtOptions, gatewayJwtOptions));
+		this.setInstance(new AuthServiceBeta(gatewayJwtOptions, userJwtOptions));
 	}
 
 	public static createPassword(suppliedPassword: string) {
@@ -146,10 +112,6 @@ export class AuthService {
 		const suppliedPasswordBuf = crypto.pbkdf2Sync(suppliedPassword,
 			salt, this._iterations, this._keyLength, this._digest);
 		return crypto.timingSafeEqual(hashedPasswordBuf, suppliedPasswordBuf);
-	}
-
-	public verifyGatewayToken(payload: GatewayJwtPayload): boolean {
-		return payload.key == Environment.getInstance().envFile.SERVICES_API_KEY;
 	}
 
 	// TODO: Use database.

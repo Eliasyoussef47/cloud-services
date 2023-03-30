@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 import { Environment } from "@/shared/operation/Environment.js";
 import multer from "multer";
-import { AuthService } from "@/auth/AuthService.js";
+import { AuthServiceAlpha } from "@/auth/AuthServiceAlpha.js";
 import express from "express";
 import cors from "cors";
 import { setupGatewayAuthenticationMiddlewares } from "@/auth/middlewares/authentication.js";
@@ -10,8 +10,7 @@ import { authenticatedRouter } from "@/targetsService/routes/router.js";
 
 dotenv.config();
 Environment.setup();
-const upload = multer({ dest: 'uploads/' });
-AuthService.setup();
+AuthServiceAlpha.setup();
 
 const port = Number(Environment.getInstance().targetServiceUrl.port) || 3001;
 
@@ -21,9 +20,11 @@ app.set("env", process.env.NODE_ENV);
 
 app.use(cors())
 app.use(express.json());
+// TODO: Use multer correctly.
+const upload = multer({ dest: 'uploads/' });
 app.use(upload.fields([]));
 
-setupGatewayAuthenticationMiddlewares(app, AuthService.getInstance());
+setupGatewayAuthenticationMiddlewares(app, AuthServiceAlpha.getInstance());
 
 // TODO: Add routes.
 app.use(authenticatedRouter);

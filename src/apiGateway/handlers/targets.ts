@@ -1,13 +1,13 @@
-import { AuthService } from "@/auth/AuthService.js";
 import { Environment } from "@/shared/operation/Environment.js";
 import createHttpError from "http-errors";
 import { RequestHandler } from "express-serve-static-core";
+import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
 
 export default class TargetHandler {
 	public static post: RequestHandler = async (req, res) => {
 		const myHeaders = new Headers();
 		myHeaders.append("Content-Type", "application/json");
-		myHeaders.append("Authorization", `Bearer ${AuthService.getInstance().gatewayJwt}`);
+		myHeaders.append("Authorization", `Bearer ${AuthServiceBeta.getInstance().gatewayJwt}`);
 
 		const fetchInit = {
 			method: "post",

@@ -1,10 +1,10 @@
 import * as process from "process";
-import { AuthService } from "@/auth/AuthService.js";
+import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
 
 const args = process.argv;
 
 const suppliedPassword = args[2];
 
-const pass = AuthService.createPassword(suppliedPassword);
+const pass = AuthServiceBeta.createPassword(suppliedPassword);
 
 console.log(pass);
