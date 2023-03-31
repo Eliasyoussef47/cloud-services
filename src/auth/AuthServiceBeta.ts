@@ -105,7 +105,7 @@ export class AuthServiceBeta extends AuthServiceBase {
 	 * @throws {CustomError}
 	 */
 	public async getMatchingUser(payload: UserJwtPayload): Promise<User> {
-		const foundUser = await ServicesRegistry.getInstance().userRepository.get(payload.sub);
+		const foundUser = await ServicesRegistry.getInstance().userRepository.getByUserId(payload.sub);
 
 		if (!foundUser) {
 			throw new CustomError("Invalid user");

@@ -35,11 +35,15 @@ export default class UserRepository implements IUserRepository {
 	}
 
 	public async get(customId: string): Promise<UserPersistent | null> {
-		return await this._model.findOne({ customId: customId }).exec() as MyHydratedDocument<User>;
+		return await this._model.findOne(<Pick<User, "customId">>{ customId: customId }).exec() as MyHydratedDocument<User>;
+	}
+
+	public async getByUserId(userId: string): Promise<UserPersistent | null> {
+		return await this._model.findOne(<Pick<User, "userId">>{ userId: userId }).exec() as MyHydratedDocument<User>;
 	}
 
 	public async getByUsername(username: string): Promise<UserPersistent | null> {
 		// TODO: Check the content of toObject.
-		return await this._model.findOne({ username: username }).exec() as MyHydratedDocument<User>;
+		return await this._model.findOne(<Pick<User, "username">>{ username: username }).exec() as MyHydratedDocument<User>;
 	}
 }
