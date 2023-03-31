@@ -71,7 +71,7 @@ export const errorHandler: ErrorRequestHandler = (err: Error, req, res) => {
 	const responseBody = {
 		status: "failure",
 		data: err,
-	};
+	} as ResponseBody;
 
 	res.status(500).json(responseBody);
 }
