@@ -6,11 +6,10 @@ type MongooseUser = MongooseBase & User;
 export type UserModelType = Model<MongooseUser>;
 
 export const userSchema = new Schema<MongooseUser, UserModelType, User, UserModelType, User, UserModelType, DefaultSchemaOptions, User, User>({
-	_id: { type: SchemaTypes.ObjectId, required: true },
 	// TODO: Set index on customId.
 	customId: { type: SchemaTypes.String, required: true },
-	tempId: { type: SchemaTypes.String, required: true },
-	username: { type: SchemaTypes.String, required: true },
+	userId: { type: SchemaTypes.String, required: true },
+	username: { type: SchemaTypes.String, required: true, unique: true },
 	password: { type: SchemaTypes.String, required: true },
 });
-userSchema.set("toObject", { versionKey: false, useProjection: true })
+userSchema.set("toObject", { versionKey: false, useProjection: true });

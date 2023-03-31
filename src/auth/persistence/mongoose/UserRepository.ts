@@ -22,9 +22,11 @@ export default class UserRepository implements IUserRepository {
 		return UserRepository.#model;
 	}
 
+	// TODO: What happens if this method fails?
 	public async create(createParams: CreateParams): Promise<UserPersistent> {
-		const newUser = new this._model({
+		const newUser = new this._model(<User>{
 			customId: createParams.customId,
+			userId: createParams.tempId,
 			username: createParams.username,
 			password: createParams.password
 		});

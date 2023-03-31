@@ -114,6 +114,15 @@ export class AuthServiceBeta extends AuthServiceBase {
 		return foundUser;
 	}
 
+	public async register(loginForm: LoginForm) {
+		const customId = crypto.randomUUID();
+		const tempId = crypto.randomUUID();
+		const password = AuthServiceBeta.createPassword(loginForm.password);
+
+		// TODO: username must be unique.
+		return await ServicesRegistry.getInstance().userRepository.create({customId, tempId, username: loginForm.username, password});
+	}
+
 	public async login(loginForm: LoginForm): Promise<string | undefined> {
 		const foundUser = await ServicesRegistry.getInstance().userRepository.getByUsername(loginForm.username);
 
@@ -126,14 +135,13 @@ export class AuthServiceBeta extends AuthServiceBase {
 			return undefined;
 		}
 
-		// TODO: Save new tempId
-		foundUser.tempId = crypto.randomUUID();
+		foundUser.userId = crypto.randomUUID();
 		await foundUser.save();
 
 		return jwt.sign({}, <string> this.userJwtOptions.secretOrKey,
 			{
 				expiresIn: this.jwtExpiresIn,
-				subject: foundUser.tempId
+				subject: foundUser.userId
 			});
 	}
 }
