@@ -10,7 +10,8 @@
 		"imageRecognition:nodemon": "nodemon dist/imageRecognitionService.js --watch dist/imageRecognitionService.js -L",
 		"submissions:nodemon": "nodemon dist/submissionsService.js --watch dist/submissionsService.js -L",
 		"targets:nodemon": "nodemon dist/targetsService.js --watch dist/targetsService.js -L",
-		"start": "concurrently \"npm:apiGateway:nodemon\" \"npm:imageRecognition:nodemon\" \"npm:submissions:nodemon\" \"npm:targets:nodemon\""
+		"start": "concurrently \"npm:apiGateway:nodemon\" \"npm:imageRecognition:nodemon\" \"npm:submissions:nodemon\" \"npm:targets:nodemon\"",
+		"dev": "concurrently \"npm:watch\" \"npm:apiGateway:nodemon\" \"npm:imageRecognition:nodemon\" \"npm:submissions:nodemon\" \"npm:targets:nodemon\""
 	},
 	"dependencies": {
 		"amqplib": "^0.10.3",
