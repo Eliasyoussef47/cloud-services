@@ -1,0 +1,21 @@
+name: 'CI'
+on:
+  pull_request:
+    branches:
+      - master
+      - workflows
+  push:
+    branches:
+      - '**'
+    paths:
+      - 'src/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npx rollup --config ./rollup.config.ts --configPlugin typescript
