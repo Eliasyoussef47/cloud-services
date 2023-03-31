@@ -15,6 +15,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      DIR_PATH: '.'
+    defaults:
+      run:
+        working-directory: ${{ env.DIR_PATH }}
     steps:
       - name: Install dependencies
         run: npm ci
