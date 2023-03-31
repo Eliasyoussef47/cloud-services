@@ -1,16 +1,18 @@
+import "@/shared/utils/fixErrors.js";
 import * as dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import { AuthServiceAlpha } from "@/auth/AuthServiceAlpha.js";
 import { Environment } from "@/shared/operation/Environment.js";
-import multer from "multer";
 import { attachErrorHandlers } from "@/shared/operation/errorHandling.js";
 import { setupUserAuthenticationMiddlewares } from "@/auth/middlewares/authentication.js";
 import { authenticatedRouter, nonAuthenticatedRouter } from "@/apiGateway/routes/router.js";
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
+import { setupDependencies } from "@/apiGateway/setup.js";
 
 dotenv.config();
 Environment.setup();
+await setupDependencies();
 AuthServiceAlpha.setup();
 AuthServiceBeta.setup();
 

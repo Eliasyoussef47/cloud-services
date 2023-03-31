@@ -14,9 +14,10 @@ export interface Env {
 	SUBMISSIONS_SERVICE_URL: string;
 	IMAGE_RECOGNITION_SERVICE_URL: string;
 	JWT_EXPIRES_IN: number;
+	AUTH_DATABASE_PATH: string;
 }
 
-export const stringWithValueSchema = z.string().min(1);
+export const stringWithValueSchema = z.string().min(1, "Property doesn't have a value.");
 
 export const envFileSchema: toZod<Env> = z.object({
 	JWT_USERS_SECRET: stringWithValueSchema,
@@ -29,7 +30,8 @@ export const envFileSchema: toZod<Env> = z.object({
 	TARGETS_SERVICE_URL: stringWithValueSchema.url(),
 	SUBMISSIONS_SERVICE_URL: stringWithValueSchema.url(),
 	IMAGE_RECOGNITION_SERVICE_URL: stringWithValueSchema.url(),
-	JWT_EXPIRES_IN: z.coerce.number()
+	JWT_EXPIRES_IN: z.coerce.number(),
+	AUTH_DATABASE_PATH: stringWithValueSchema
 });
 
 export class Environment {
@@ -72,7 +74,8 @@ export class Environment {
 			TARGETS_SERVICE_URL: process.env.TARGETS_SERVICE_URL || "",
 			SUBMISSIONS_SERVICE_URL: process.env.SUBMISSIONS_SERVICE_URL || "",
 			IMAGE_RECOGNITION_SERVICE_URL: process.env.IMAGE_RECOGNITION_SERVICE_URL || "",
-			JWT_EXPIRES_IN: Number(process.env.JWT_EXPIRES_IN) || 10800
+			JWT_EXPIRES_IN: Number(process.env.JWT_EXPIRES_IN) || 10800,
+			AUTH_DATABASE_PATH: process.env.AUTH_DATABASE_PATH || ""
 		}
 
 		envFileSchema.parse(envFile);

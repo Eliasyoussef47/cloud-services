@@ -6,24 +6,8 @@ import { Strategy as JwtStrategy, StrategyOptions } from "passport-jwt";
 import { Environment } from "@/shared/operation/Environment.js";
 import createHttpError from "http-errors";
 import { AuthServiceBase } from "@/auth/AuthServiceBase.js";
-
-// TODO: Use database.
-export interface User {
-	id: string;
-	customId: string;
-	username: string;
-	password: string;
-}
-
-// TODO: Use database.
-const users: Array<User> = [
-	{
-		id: "420",
-		customId: "456",
-		username: "elias",
-		password: "jeff"
-	}
-];
+import { User } from "@/auth/models/User.js";
+import ServicesRegistry from "@/auth/ServicesRegistry.js";
 
 /**
  * Responsible for authentication in the API gateway.
@@ -121,9 +105,7 @@ export class AuthServiceBeta extends AuthServiceBase {
 	 * @throws {CustomError}
 	 */
 	public async getMatchingUser(payload: UserJwtPayload): Promise<User> {
-		const foundUser = users.find((value) => {
-			return value.customId == payload.sub;
-		});
+		const foundUser = await ServicesRegistry.getInstance().userRepository.get(payload.sub);
 
 		if (!foundUser) {
 			throw new CustomError("Invalid user");
@@ -132,26 +114,33 @@ export class AuthServiceBeta extends AuthServiceBase {
 		return foundUser;
 	}
 
-	// TODO: Use database.
-	public login(loginForm: LoginForm): string | undefined {
-		const foundUser = users.find((value) => {
-			return value.username == loginForm.username;
-		});
+	public async register(loginForm: LoginForm) {
+		const customId = crypto.randomUUID();
+		const tempId = crypto.randomUUID();
+		const password = AuthServiceBeta.createPassword(loginForm.password);
+
+		// TODO: username must be unique.
+		return await ServicesRegistry.getInstance().userRepository.create({customId, tempId, username: loginForm.username, password});
+	}
+
+	public async login(loginForm: LoginForm): Promise<string | undefined> {
+		const foundUser = await ServicesRegistry.getInstance().userRepository.getByUsername(loginForm.username);
 
 		if (!foundUser) {
 			return undefined;
 		}
 
-		if (foundUser.password != loginForm.password) {
+		if (!AuthServiceBeta.verifyPassword(foundUser.password, loginForm.password)) {
 			return undefined;
 		}
 
-		foundUser.customId = crypto.randomUUID();
+		foundUser.userId = crypto.randomUUID();
+		await foundUser.save();
 
 		return jwt.sign({}, <string> this.userJwtOptions.secretOrKey,
 			{
 				expiresIn: this.jwtExpiresIn,
-				subject: foundUser.customId
+				subject: foundUser.userId
 			});
 	}
 }

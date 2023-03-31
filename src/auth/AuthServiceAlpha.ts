@@ -9,7 +9,7 @@ export interface LoginForm {
 	password: string;
 }
 
-export type UserJwtPayload = Pick<JwtPayload, "iat" | "exp" | "sub">
+export type UserJwtPayload = Required<Pick<JwtPayload, "iat" | "exp" | "sub">>;
 
 export type GatewayJwtPayload = {
 	key: string;
