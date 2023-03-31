@@ -130,7 +130,6 @@ export class AuthServiceBeta extends AuthServiceBase {
 			return undefined;
 		}
 
-		// TODO: Verify password with hash.
 		if (!AuthServiceBeta.verifyPassword(foundUser.password, loginForm.password)) {
 			return undefined;
 		}
