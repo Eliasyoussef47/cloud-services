@@ -1,3 +1,4 @@
+import "@/shared/utils/fixErrors.js";
 import * as dotenv from "dotenv";
 import { Environment } from "@/shared/operation/Environment.js";
 import multer from "multer";
