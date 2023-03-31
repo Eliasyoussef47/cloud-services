@@ -15,12 +15,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      DIR_PATH: './'
-    defaults:
-      run:
-        working-directory: ${{ env.DIR_PATH }}
     steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3.6.0
+        with:
+          node-version: 16
       - name: Install dependencies
         run: npm install
       - name: Build
