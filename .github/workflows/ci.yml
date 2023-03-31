@@ -6,7 +6,8 @@ on:
       - workflows
   push:
     branches:
-      - '**'
+      - master
+      - workflows
     paths:
       - 'src/**'
   workflow_dispatch:
