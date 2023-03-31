@@ -6,19 +6,11 @@ import { Strategy as JwtStrategy, StrategyOptions } from "passport-jwt";
 import { Environment } from "@/shared/operation/Environment.js";
 import createHttpError from "http-errors";
 import { AuthServiceBase } from "@/auth/AuthServiceBase.js";
-
-// TODO: Use database.
-export interface User {
-	id: string;
-	customId: string;
-	username: string;
-	password: string;
-}
+import { User } from "@/auth/models/User.js";
 
 // TODO: Use database.
 const users: Array<User> = [
 	{
-		id: "420",
 		customId: "456",
 		username: "elias",
 		password: "jeff"

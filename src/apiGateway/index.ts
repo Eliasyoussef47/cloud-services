@@ -8,9 +8,11 @@ import { attachErrorHandlers } from "@/shared/operation/errorHandling.js";
 import { setupUserAuthenticationMiddlewares } from "@/auth/middlewares/authentication.js";
 import { authenticatedRouter, nonAuthenticatedRouter } from "@/apiGateway/routes/router.js";
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
+import AuthDatabase from "@/auth/persistence/mongoose/Database.js";
 
 dotenv.config();
 Environment.setup();
+await AuthDatabase.setup();
 AuthServiceAlpha.setup();
 AuthServiceBeta.setup();
 
