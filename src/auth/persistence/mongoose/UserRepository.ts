@@ -3,14 +3,21 @@ import { User } from "@/auth/models/User.js";
 import NotImplementedError from "@/shared/types/errors/NotImplementedError.js";
 import { UserModelType, userSchema } from "@/auth/persistence/mongoose/models/User.js";
 import Database from "@/auth/persistence/mongoose/Database.js";
-import { HydratedDocument } from "mongoose";
+import { Connection, HydratedDocument } from "mongoose";
 
 export default class UserRepository implements IUserRepository {
 	static #model: UserModelType | undefined;
+	private dbConnection: Connection;
+	public readonly modelName = "User";
+	public readonly collectionName = "users";
+
+	constructor(dbConnection: Connection) {
+		this.dbConnection = dbConnection;
+	}
 
 	private get _model(): UserModelType {
 		if (!UserRepository.#model) {
-			UserRepository.#model = Database.getInstance().connection.model<User, UserModelType>("BlogPost", userSchema, "blogPosts");
+			UserRepository.#model = this.dbConnection.model<User, UserModelType>(this.modelName, userSchema, this.collectionName);
 		}
 
 		return UserRepository.#model;

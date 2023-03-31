@@ -7,15 +7,7 @@ import { Environment } from "@/shared/operation/Environment.js";
 import createHttpError from "http-errors";
 import { AuthServiceBase } from "@/auth/AuthServiceBase.js";
 import { User } from "@/auth/models/User.js";
-
-// TODO: Use database.
-const users: Array<User> = [
-	{
-		customId: "456",
-		username: "elias",
-		password: "jeff"
-	}
-];
+import ServicesRegistry from "@/auth/ServicesRegistry.js";
 
 /**
  * Responsible for authentication in the API gateway.
@@ -113,9 +105,7 @@ export class AuthServiceBeta extends AuthServiceBase {
 	 * @throws {CustomError}
 	 */
 	public async getMatchingUser(payload: UserJwtPayload): Promise<User> {
-		const foundUser = users.find((value) => {
-			return value.customId == payload.sub;
-		});
+		const foundUser = await ServicesRegistry.getInstance().userRepository.get(payload.sub);
 
 		if (!foundUser) {
 			throw new CustomError("Invalid user");
@@ -124,21 +114,20 @@ export class AuthServiceBeta extends AuthServiceBase {
 		return foundUser;
 	}
 
-	// TODO: Use database.
-	public login(loginForm: LoginForm): string | undefined {
-		const foundUser = users.find((value) => {
-			return value.username == loginForm.username;
-		});
+	public async login(loginForm: LoginForm): Promise<string | undefined> {
+		const foundUser = await ServicesRegistry.getInstance().userRepository.getByUsername(loginForm.username);
 
 		if (!foundUser) {
 			return undefined;
 		}
 
+		// TODO: Verify password with hash.
 		if (foundUser.password != loginForm.password) {
 			return undefined;
 		}
 
-		foundUser.customId = crypto.randomUUID();
+		// TODO: Save new tempId
+		foundUser.tempId = crypto.randomUUID();
 
 		return jwt.sign({}, <string> this.userJwtOptions.secretOrKey,
 			{

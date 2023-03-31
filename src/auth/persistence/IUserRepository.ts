@@ -11,4 +11,6 @@ export default interface IUserRepository {
 	getByUsername(username: string): Promise<User | null>
 	// TODO: What errors can this method cause.
 	create(createParams: CreateParams): Promise<User>;
+	// TODO: Convert to model method.
+	updateTempId(newTempId: string): Promise<User>;
 }
