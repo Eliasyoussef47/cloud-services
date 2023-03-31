@@ -6,10 +6,10 @@ import { ResponseBody } from "@/shared/types/Response.js";
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
 
 export default class AuthenticationHandler {
-	public static loginPost: RequestHandler = (req, res) => {
+	public static loginPost: RequestHandler = async (req, res) => {
 		const loginForm: LoginForm = loginFormSchema.parse(req.body);
 
-		const loginJwt = AuthServiceBeta.getInstance().login(loginForm);
+		const loginJwt = await AuthServiceBeta.getInstance().login(loginForm);
 
 		if (!loginJwt) {
 			throw createHttpError(401);

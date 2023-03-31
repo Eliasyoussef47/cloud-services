@@ -128,11 +128,12 @@ export class AuthServiceBeta extends AuthServiceBase {
 
 		// TODO: Save new tempId
 		foundUser.tempId = crypto.randomUUID();
+		await foundUser.save();
 
 		return jwt.sign({}, <string> this.userJwtOptions.secretOrKey,
 			{
 				expiresIn: this.jwtExpiresIn,
-				subject: foundUser.customId
+				subject: foundUser.tempId
 			});
 	}
 }
