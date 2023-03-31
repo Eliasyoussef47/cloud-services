@@ -4,7 +4,11 @@ import { RequestHandler } from "express-serve-static-core";
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
 
 export default class TargetHandler {
-	public static post: RequestHandler = async (req, res) => {
+	public static index: RequestHandler = async (req, res) => {
+
+	};
+
+	public static store: RequestHandler = async (req, res) => {
 		const myHeaders = new Headers();
 		myHeaders.append("Content-Type", "application/json");
 		myHeaders.append("Authorization", `Bearer ${AuthServiceBeta.getInstance().gatewayJwt}`);
@@ -33,7 +37,19 @@ export default class TargetHandler {
 		}
 
 		res.status(fetchResult.status).json(await fetchResult.json());
-	}
+	};
+
+	public static show: RequestHandler = async (req, res) => {
+
+	};
+
+	public static update: RequestHandler = async (req, res) => {
+
+	};
+
+	public static destroy: RequestHandler = async (req, res) => {
+
+	};
 }
 
 
