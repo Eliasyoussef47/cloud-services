@@ -27,4 +27,4 @@ jobs:
       - name: Build
         run: npx rollup --config ./rollup.config.ts --configPlugin typescript
       - name: Run API Gateway
-        run: npm run apiGateway:nodemon
+        run: npm run apiGateway

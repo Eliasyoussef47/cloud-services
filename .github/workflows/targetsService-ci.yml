@@ -27,4 +27,4 @@ jobs:
       - name: Build
         run: npx rollup --config ./rollup.config.ts --configPlugin typescript
       - name: Run Image Targets Service
-        run: npm run targets:nodemon
+        run: npm run targets

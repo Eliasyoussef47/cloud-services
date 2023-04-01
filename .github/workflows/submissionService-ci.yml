@@ -27,4 +27,4 @@ jobs:
       - name: Build
         run: npx rollup --config ./rollup.config.ts --configPlugin typescript
       - name: Run Image Submissions Service
-        run: npm run submissions:nodemon
+        run: npm run submissions
