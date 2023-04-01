@@ -27,3 +27,5 @@ jobs:
       - name: Build
         working-directory: src/imageRecognitionService
         run: npx rollup --config ./rollup.config.ts --configPlugin typescript
+      - name: Run Image Recognition Service
+        run: npm run imageRecognition:nodemon

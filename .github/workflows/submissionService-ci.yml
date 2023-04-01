@@ -1,4 +1,4 @@
-name: 'CI - SubmissionService'
+name: 'CI - Submissions Service'
 on:
   pull_request:
     branches:
@@ -8,7 +8,7 @@ on:
       - master
       - workflows
     paths:
-      - 'src/submissionService/**'
+      - 'src/submissionsService/**'
       - '.github/workflows/**'
   workflow_dispatch:
 
@@ -27,3 +27,5 @@ jobs:
       - name: Build
         working-directory: src/submissionService
         run: npx rollup --config ./rollup.config.ts --configPlugin typescript
+      - name: Run Image Submissions Service
+        run: npm run submissions:nodemon
