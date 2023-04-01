@@ -25,4 +25,4 @@ jobs:
       - name: Npm install
         run: npm ci
       - name: Run Jest code coverage
-        run: npm run test:coverage:ci --passWithNoTests
+        run: npm run test:coverage:ci -- --passWithNoTests
