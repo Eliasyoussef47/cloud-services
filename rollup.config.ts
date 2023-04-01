@@ -29,6 +29,10 @@ export const apiGateway = () => {
 	return forInput("apiGateway", "src/apiGateway/index.ts");
 }
 
+export const targets = () => {
+	return forInput("targetsService", "src/targetsService/index.ts");
+}
+
 // noinspection JSUnusedGlobalSymbols
 export default defineConfig([
 	// forInput("createPasswordCli", "src/auth/createPasswordCli.ts"),
@@ -36,5 +40,5 @@ export default defineConfig([
 	apiGateway(),
 	forInput("imageRecognitionService", "src/imageRecognitionService/index.ts"),
 	forInput("submissionsService", "src/submissionsService/index.ts"),
-	forInput("targetsService", "src/targetsService/index.ts"),
+	targets(),
 ]);

@@ -1,7 +1,6 @@
 import "@/shared/utils/fixErrors.js";
 import * as dotenv from "dotenv";
 import { Environment } from "@/shared/operation/Environment.js";
-import multer from "multer";
 import { AuthServiceAlpha } from "@/auth/AuthServiceAlpha.js";
 import express from "express";
 import cors from "cors";
@@ -21,7 +20,6 @@ app.set("env", process.env.NODE_ENV);
 
 app.use(cors())
 app.use(express.json());
-// TODO: Use multer correctly.
 
 setupGatewayAuthenticationMiddlewares(app, AuthServiceAlpha.getInstance());
 

@@ -6,6 +6,7 @@
 	"scripts": {
 		"build": "npx rollup --config ./rollup.config.ts --configPlugin typescript",
 		"build:apiGateway": "npx rollup --config ./.RollupConfigs/rollup.gateway.configs.ts --configPlugin typescript",
+		"build:targets": "npx rollup --config ./.RollupConfigs/rollup.targets.configs.ts --configPlugin typescript",
 		"watch": "npx rollup -w --config ./rollup.config.ts --configPlugin typescript",
 		"apiGateway": "node dist/apiGateway.js",
 		"imageRecognition": "node dist/imageRecognitionService.js",
@@ -28,6 +29,7 @@
 		"http-errors": "^2.0.0",
 		"http-proxy-middleware": "^2.0.6",
 		"jsonwebtoken": "^9.0.0",
+		"mime-types": "^2.1.35",
 		"mongoose": "^7.0.2",
 		"multer": "^1.4.5-lts.1",
 		"opossum": "^7.1.0",
@@ -43,6 +45,7 @@
 		"@types/express-list-endpoints": "^6.0.0",
 		"@types/http-errors": "^2.0.1",
 		"@types/jsonwebtoken": "^9.0.1",
+		"@types/mime-types": "^2.1.1",
 		"@types/multer": "^1.4.7",
 		"@types/node": "^18.15.5",
 		"@types/opossum": "^6.2.3",
