@@ -1,7 +1,11 @@
 // rollup.config.ts
+// noinspection SpellCheckingInspection
+
 import typescript from "@rollup/plugin-typescript";
-import autoExternal from "rollup-plugin-auto-external";
 import { defineConfig, RollupOptions } from "rollup";
+import nodeResolve from "@rollup/plugin-node-resolve";
+import commonjs from '@rollup/plugin-commonjs';
+import json from "@rollup/plugin-json";
 
 export function forInput(entryAlias: string, inputPath: string) {
 	const configs: RollupOptions = {
@@ -10,15 +14,24 @@ export function forInput(entryAlias: string, inputPath: string) {
 		},
 		output: {
 			dir: "dist",
-			sourcemap: true,
+			entryFileNames: `${entryAlias}.mjs`,
 			format: "esm"
 		},
 		plugins: [
 			// @ts-ignore
 			typescript({}),
-			autoExternal(),
+			// @ts-ignore
+			nodeResolve(),
+			// @ts-ignore
+			commonjs(),
+			// @ts-ignore
+			json()
 		],
-		cache: false
+		cache: false,
+		onwarn: function ( message ) {
+			// @ts-ignore
+			if ( /external dependency/.test( message ) ) return;
+		}
 	};
 
 	return configs;

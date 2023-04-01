@@ -5,6 +5,7 @@
 	"description": "",
 	"scripts": {
 		"build": "npx rollup --config ./rollup.config.ts --configPlugin typescript",
+		"build:prod": "npx rollup --config ./rollup.config.prod.ts --configPlugin typescript",
 		"build:apiGateway": "npx rollup --config ./.RollupConfigs/rollup.gateway.configs.ts --configPlugin typescript",
 		"build:targets": "npx rollup --config ./.RollupConfigs/rollup.targets.configs.ts --configPlugin typescript",
 		"watch": "npx rollup -w --config ./rollup.config.ts --configPlugin typescript",
@@ -38,6 +39,9 @@
 		"zod": "^3.21.4"
 	},
 	"devDependencies": {
+		"@rollup/plugin-commonjs": "^24.0.1",
+		"@rollup/plugin-json": "^6.0.0",
+		"@rollup/plugin-node-resolve": "^15.0.1",
 		"@rollup/plugin-typescript": "^11.0.0",
 		"@types/amqplib": "^0.10.1",
 		"@types/cors": "^2.8.13",

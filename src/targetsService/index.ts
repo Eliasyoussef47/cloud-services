@@ -21,6 +21,8 @@ app.set("env", process.env.NODE_ENV);
 app.use(cors())
 app.use(express.json());
 
+app.use("/uploads/targets", express.static("uploads/targetsService"));
+
 setupGatewayAuthenticationMiddlewares(app, AuthServiceAlpha.getInstance());
 
 // TODO: Add routes.
