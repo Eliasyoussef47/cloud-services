@@ -4,6 +4,7 @@ import { RequestHandler } from "express-serve-static-core";
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
 import { ResponseBody } from "@/shared/types/Response.js";
 
+// TODO: TargetHandler needed?
 export default class TargetHandler {
 	public static index: RequestHandler = async (req, res) => {
 

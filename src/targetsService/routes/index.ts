@@ -2,14 +2,14 @@ import express from "express";
 import TargetHandler from "@/targetsService/handlers/targets.js";
 import multer from "multer";
 
-export const targetsRouter = express.Router();
+export const indexRouter = express.Router();
 
-const upload = multer({ dest: 'uploads/targetsService/' });
-targetsRouter.route("/")
+// const upload = multer({ dest: 'uploads/targetsService/' });
+indexRouter.route("/targets")
 	.get(TargetHandler.index)
-	.post(upload.single("photo"), TargetHandler.store);
+	.post(TargetHandler.store);
 
-targetsRouter.route("/:id")
+indexRouter.route("/targets/:id")
 	.get(TargetHandler.show)
 	.patch(TargetHandler.update)
 	.delete(TargetHandler.destroy);

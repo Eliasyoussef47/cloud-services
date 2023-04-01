@@ -3,7 +3,7 @@ import typescript from "@rollup/plugin-typescript";
 import autoExternal from "rollup-plugin-auto-external";
 import { defineConfig, RollupOptions } from "rollup";
 
-function forInput(entryAlias: string, inputPath: string) {
+export function forInput(entryAlias: string, inputPath: string) {
 	const configs: RollupOptions = {
 		input: {
 			[entryAlias]: inputPath,
@@ -18,17 +18,22 @@ function forInput(entryAlias: string, inputPath: string) {
 			typescript({}),
 			// nodeResolve(),
 			autoExternal(),
-		]
+		],
+		cache: false
 	};
 
 	return configs;
+}
+
+export const apiGateway = () => {
+	return forInput("apiGateway", "src/apiGateway/index.ts");
 }
 
 // noinspection JSUnusedGlobalSymbols
 export default defineConfig([
 	// forInput("createPasswordCli", "src/auth/createPasswordCli.ts"),
 	// forInput("verifyPasswordCli", "src/auth/verifyPasswordCli.ts"),
-	forInput("apiGateway", "src/apiGateway/index.ts"),
+	apiGateway(),
 	forInput("imageRecognitionService", "src/imageRecognitionService/index.ts"),
 	forInput("submissionsService", "src/submissionsService/index.ts"),
 	forInput("targetsService", "src/targetsService/index.ts"),
