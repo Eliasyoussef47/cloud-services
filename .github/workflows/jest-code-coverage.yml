@@ -1,4 +1,4 @@
-name: 'CI'
+name: 'Jest code coverage'
 on:
   pull_request:
     branches:
@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  coverage:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Install dependencies
+      - name: Npm install
         run: npm ci
-      - name: Build
-        run: npx rollup --config ./rollup.config.ts --configPlugin typescript
+      - name: Run Jest code coverage
+        run: npm run test:coverage:ci -- --passWithNoTests
