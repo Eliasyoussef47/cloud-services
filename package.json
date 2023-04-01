@@ -6,6 +6,10 @@
 	"scripts": {
 		"build": "npx rollup --config ./rollup.config.ts --configPlugin typescript",
 		"watch": "npx rollup -w --config ./rollup.config.ts --configPlugin typescript",
+		"apiGateway": "node dist/apiGateway.js",
+		"imageRecognition": "node dist/imageRecognitionService.js",
+		"submissions": "node dist/submissionsService.js",
+		"targets": "node dist/targetsService.js",
 		"apiGateway:nodemon": "nodemon dist/apiGateway.js --watch dist/apiGateway.js -L",
 		"imageRecognition:nodemon": "nodemon dist/imageRecognitionService.js --watch dist/imageRecognitionService.js -L",
 		"submissions:nodemon": "nodemon dist/submissionsService.js --watch dist/submissionsService.js -L",

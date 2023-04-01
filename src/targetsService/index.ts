@@ -22,8 +22,6 @@ app.set("env", process.env.NODE_ENV);
 app.use(cors())
 app.use(express.json());
 // TODO: Use multer correctly.
-const upload = multer({ dest: 'uploads/' });
-app.use(upload.fields([]));
 
 setupGatewayAuthenticationMiddlewares(app, AuthServiceAlpha.getInstance());
 
