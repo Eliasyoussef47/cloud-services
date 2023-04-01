@@ -5,7 +5,9 @@ export default class TargetHandler {
 	public static index: RequestHandler = async (req, res) => {
 		const responseBody = {
 			status: "success",
-			data: null
+			data: {
+				message: "index"
+			}
 		} satisfies ResponseBody;
 
 		res.json(responseBody);
@@ -14,7 +16,9 @@ export default class TargetHandler {
 	public static store: RequestHandler = async (req, res) => {
 		const responseBody = {
 			status: "success",
-			data: null
+			data: {
+				message: "store"
+			}
 		} satisfies ResponseBody;
 
 		res.json(responseBody);
@@ -23,7 +27,9 @@ export default class TargetHandler {
 	public static show: RequestHandler = async (req, res) => {
 		const responseBody = {
 			status: "success",
-			data: null
+			data: {
+				message: "show"
+			}
 		} satisfies ResponseBody;
 
 		res.json(responseBody);
@@ -32,7 +38,9 @@ export default class TargetHandler {
 	public static update: RequestHandler = async (req, res) => {
 		const responseBody = {
 			status: "success",
-			data: null
+			data: {
+				message: "update"
+			}
 		} satisfies ResponseBody;
 
 		res.json(responseBody);
@@ -41,7 +49,9 @@ export default class TargetHandler {
 	public static destroy: RequestHandler = async (req, res) => {
 		const responseBody = {
 			status: "success",
-			data: null
+			data: {
+				message: "destroy"
+			}
 		} satisfies ResponseBody;
 
 		res.json(responseBody);
