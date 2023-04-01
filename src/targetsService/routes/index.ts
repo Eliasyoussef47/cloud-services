@@ -6,9 +6,7 @@ import mime from "mime-types";
 export const targetsRouter = express.Router();
 
 const storage = multer.diskStorage({
-	destination: function (req, file, cb) {
-		cb(null, "uploads/targetsService/");
-	},
+	destination: "uploads/targetsService/",
 	filename: function (req, file, cb) {
 		const fileExtension = mime.extension(file.mimetype);
 		cb(null, `${Date.now()}.${fileExtension}`);
