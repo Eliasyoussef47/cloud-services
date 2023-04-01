@@ -11,7 +11,10 @@
 		"submissions:nodemon": "nodemon dist/submissionsService.js --watch dist/submissionsService.js -L",
 		"targets:nodemon": "nodemon dist/targetsService.js --watch dist/targetsService.js -L",
 		"start": "concurrently \"npm:apiGateway:nodemon\" \"npm:imageRecognition:nodemon\" \"npm:submissions:nodemon\" \"npm:targets:nodemon\"",
-		"dev": "concurrently \"npm:watch\" \"npm:apiGateway:nodemon\" \"npm:imageRecognition:nodemon\" \"npm:submissions:nodemon\" \"npm:targets:nodemon\""
+		"dev": "concurrently \"npm:watch\" \"npm:apiGateway:nodemon\" \"npm:imageRecognition:nodemon\" \"npm:submissions:nodemon\" \"npm:targets:nodemon\"",
+		"test": "jest",
+		"test:coverage": "jest --json --coverage --testLocationInResults",
+		"test:coverage:ci": "jest --ci --coverage --testLocationInResults"
 	},
 	"dependencies": {
 		"amqplib": "^0.10.3",
@@ -50,6 +53,8 @@
 		"rollup-plugin-auto-external": "^2.0.0",
 		"tozod": "^3.0.0",
 		"ts-jest": "^29.0.5",
+		"ts-node": "^10.9.1",
+		"tsconfig": "^7.0.0",
 		"tslib": "^2.5.0",
 		"typescript": "^4.9.5"
 	},
