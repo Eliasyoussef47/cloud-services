@@ -25,14 +25,7 @@ app.use("/uploads/targets", express.static("uploads/targetsService"));
 
 setupGatewayAuthenticationMiddlewares(app, AuthServiceAlpha.getInstance());
 
-// TODO: Add routes.
 app.use(authenticatedRouter);
-
-// authenticatedRouter.stack.forEach(function(r){
-// 	if (r.route && r.route.path){
-// 		console.log(r.route.path)
-// 	}
-// })
 
 attachErrorHandlers(app);
 

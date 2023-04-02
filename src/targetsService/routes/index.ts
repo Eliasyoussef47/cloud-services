@@ -13,12 +13,12 @@ const storage = multer.diskStorage({
 	}
 });
 
-const upload = multer({ storage: storage });
-targetsRouter.route("/targets")
+const upload = multer({storage});
+targetsRouter.route("/")
 	.get(TargetHandler.index)
 	.post(upload.single("photo"), TargetHandler.store);
 
-targetsRouter.route("/targets/:id")
+targetsRouter.route("/:id")
 	.get(TargetHandler.show)
 	.patch(TargetHandler.update)
 	.delete(TargetHandler.destroy);

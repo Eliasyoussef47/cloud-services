@@ -10,6 +10,8 @@ import { getAuthenticatedRouter, nonAuthenticatedRouter } from "@/apiGateway/rou
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
 import { setupDependencies } from "@/apiGateway/setup.js";
 
+// TODO: Database health check.
+// TODO: Message broker health check.
 dotenv.config();
 Environment.setup();
 await setupDependencies();

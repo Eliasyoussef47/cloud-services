@@ -17,7 +17,8 @@ export interface Env {
 	AUTH_DATABASE_PATH: string;
 }
 
-export const stringWithValueSchema = z.string().min(1, "Property doesn't have a value.");
+export const stringWithValueSchema = z.string().min(1, "Environment variable must have a value.");
+export const urlSchema = stringWithValueSchema.url("Environment variable must be a valid URL.");
 
 export const envFileSchema: toZod<Env> = z.object({
 	JWT_USERS_SECRET: stringWithValueSchema,
@@ -25,11 +26,11 @@ export const envFileSchema: toZod<Env> = z.object({
 	SERVICES_API_KEY: stringWithValueSchema,
 	IMAGGA_API_KEY: stringWithValueSchema,
 	IMAGGA_API_SECRET: stringWithValueSchema,
-	MESSAGE_BROKER_URL: stringWithValueSchema.url(),
-	API_GATEWAY_URL: stringWithValueSchema.url(),
-	TARGETS_SERVICE_URL: stringWithValueSchema.url(),
-	SUBMISSIONS_SERVICE_URL: stringWithValueSchema.url(),
-	IMAGE_RECOGNITION_SERVICE_URL: stringWithValueSchema.url(),
+	MESSAGE_BROKER_URL: urlSchema,
+	API_GATEWAY_URL: urlSchema,
+	TARGETS_SERVICE_URL: urlSchema,
+	SUBMISSIONS_SERVICE_URL: urlSchema,
+	IMAGE_RECOGNITION_SERVICE_URL: urlSchema,
 	JWT_EXPIRES_IN: z.coerce.number(),
 	AUTH_DATABASE_PATH: stringWithValueSchema
 });
