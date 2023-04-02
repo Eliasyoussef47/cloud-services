@@ -1,5 +1,7 @@
 import { AsyncRequestHandler } from "@/types/express/index.js";
 import { CircuitBreakerRequestHandler } from "@/shared/types/CircuitBreaker.js";
+import CircuitBreaker from "opossum";
+import createHttpError from "http-errors";
 
 // TODO: Probably no longer needed.
 export const makeCircuitBreakerRequestHandler = (circuitBreaker: CircuitBreakerRequestHandler): AsyncRequestHandler => {
@@ -15,4 +17,25 @@ export const makeCircuitBreakerRequestHandler = (circuitBreaker: CircuitBreakerR
 				next(e);
 			});
 	};
+};
+
+export const attachStandardCircuitBreakerCallbacks = (circuitBreaker: CircuitBreaker, circuitBreakerName: string = "Circuit breaker") => {
+	circuitBreaker.fallback((e) => {
+		if (e instanceof Error) {
+			throw e;
+		} else {
+			throw createHttpError(503, "ServiceUnavailable");
+		}
+	});
+	// TODO: Disable unneeded callbacks.
+	circuitBreaker.on("fallback", (result) => {
+		console.log(`${circuitBreakerName}: fallback: `, result);
+	});
+	circuitBreaker.on("success", () => console.log(`${circuitBreakerName}: success`));
+	circuitBreaker.on("failure", () => console.log(`${circuitBreakerName}: failed`));
+	circuitBreaker.on("timeout", () => console.log(`${circuitBreakerName}: timed out`));
+	circuitBreaker.on("reject", () => console.log(`${circuitBreakerName}: rejected`));
+	circuitBreaker.on("open", () => console.log(`${circuitBreakerName}: opened`));
+	circuitBreaker.on("halfOpen", () => console.log(`${circuitBreakerName}: halfOpened`));
+	circuitBreaker.on("close", () => console.log(`${circuitBreakerName}: closed`));
 };

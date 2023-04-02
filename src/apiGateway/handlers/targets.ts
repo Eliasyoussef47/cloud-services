@@ -4,7 +4,7 @@ import { RequestHandler } from "express-serve-static-core";
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
 import CircuitBreaker, { Options as CircuitBreakerOptions } from "opossum";
 import Targets from "@/apiGateway/businessLogic/targets.js";
-import { Error } from "mongoose";
+import { attachStandardCircuitBreakerCallbacks } from "@/shared/utils/CircuitBreaker.js";
 
 const circuitBreakerOptions: CircuitBreakerOptions = {
 	timeout: 3000, // If our function takes longer than 3 seconds, trigger a failure
@@ -13,25 +13,7 @@ const circuitBreakerOptions: CircuitBreakerOptions = {
 };
 
 const indexCircuitBreaker = new CircuitBreaker(Targets.index, circuitBreakerOptions);
-indexCircuitBreaker.fallback((e) => {
-	if (e instanceof Error) {
-		throw e;
-	} else {
-		throw createHttpError(503, "ServiceUnavailable");
-	}
-});
-
-indexCircuitBreaker.on("fallback", (result) => {
-	console.log("indexCircuitBreaker: fallback: ", result);
-});
-indexCircuitBreaker.on("success", () => console.log("indexCircuitBreaker: success"));
-indexCircuitBreaker.on("failure", () => console.log("indexCircuitBreaker: failed"));
-indexCircuitBreaker.on("timeout", () => console.log("indexCircuitBreaker: timed out"));
-indexCircuitBreaker.on("reject", () => console.log("indexCircuitBreaker: rejected"));
-indexCircuitBreaker.on("open", () => console.log("indexCircuitBreaker: opened"));
-indexCircuitBreaker.on("halfOpen", () => console.log("indexCircuitBreaker: halfOpened"));
-indexCircuitBreaker.on("close", () => console.log("indexCircuitBreaker: closed"));
-
+attachStandardCircuitBreakerCallbacks(indexCircuitBreaker);
 
 export default class TargetHandler {
 	public static index: RequestHandler = async (req, res, next) => {
@@ -39,7 +21,6 @@ export default class TargetHandler {
 		let fireResult: Response;
 		try {
 			fireResult = await indexCircuitBreaker.fire();
-			console.log("Service breaker resolved:", fireResult);
 
 			const responseJson = await fireResult.json();
 
