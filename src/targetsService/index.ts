@@ -23,7 +23,7 @@ app.use(express.json());
 
 app.use("/uploads/targets", express.static("uploads/targetsService"));
 
-setupGatewayAuthenticationMiddlewares(app, AuthServiceAlpha.getInstance());
+// setupGatewayAuthenticationMiddlewares(app, AuthServiceAlpha.getInstance());
 
 app.use(authenticatedRouter);
 

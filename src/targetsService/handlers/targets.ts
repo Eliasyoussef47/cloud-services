@@ -14,11 +14,13 @@ export default class TargetHandler {
 	};
 
 	public static store: RequestHandler = async (req, res) => {
-		console.log("targets.store");
+		console.log("targets.store.locationName", req.body["locationName"]);
+		console.log("targets.store.file", req.file);
 		const responseBody = {
 			status: "success",
 			data: {
-				message: "store"
+				message: "store",
+				locationName: req.body["locationName"]
 			}
 		} satisfies ResponseBody;
 

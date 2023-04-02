@@ -15,8 +15,8 @@ export interface IndexArgs {
 }
 
 export interface StoreArgs {
-	// locationName: string;
-	// photo: Blob;
+	locationName: string;
+	photo: Blob;
 }
 
 export default class Targets {
@@ -49,8 +49,7 @@ export default class Targets {
 		const fetchInit: RequestInit = {
 			method: "post",
 			headers: myHeaders,
-			body: JSON.stringify({})
-			// body: formDataAlpha as FormData
+			body: formDataAlpha as FormData
 		};
 
 		const url = new URL(Environment.getInstance().targetServiceUrl);
