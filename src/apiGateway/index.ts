@@ -6,7 +6,7 @@ import { AuthServiceAlpha } from "@/auth/AuthServiceAlpha.js";
 import { Environment } from "@/shared/operation/Environment.js";
 import { attachErrorHandlers } from "@/shared/operation/errorHandling.js";
 import { setupUserAuthenticationMiddlewares } from "@/auth/middlewares/authentication.js";
-import { authenticatedRouter, nonAuthenticatedRouter } from "@/apiGateway/routes/router.js";
+import { getAuthenticatedRouter, nonAuthenticatedRouter } from "@/apiGateway/routes/router.js";
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
 import { setupDependencies } from "@/apiGateway/setup.js";
 
@@ -24,9 +24,6 @@ app.set("env", process.env.NODE_ENV);
 
 app.use(cors());
 app.use(express.json());
-// TODO: Use multer correctly.
-// const upload = multer({ dest: 'uploads/' });
-// app.use(upload.fields([]));
 
 app.use(nonAuthenticatedRouter);
 
@@ -34,7 +31,7 @@ setupUserAuthenticationMiddlewares(app, AuthServiceBeta.getInstance());
 // TODO: Roles and such.
 // app.use(roles.middleware());
 
-app.use(authenticatedRouter);
+app.use(getAuthenticatedRouter());
 
 attachErrorHandlers(app);
 
