@@ -44,7 +44,7 @@ export default class TargetHandler {
 	public static store: RequestHandler = async (req, res, next) => {
 		console.log("gateway.targets.store.locationName", req.body["locationName"]);
 		console.log("gateway.targets.store.file", req.file);
-		// TODO: req.body is undefined.
+		// TODO: File is being renamed.
 		const args: StoreArgs = {
 			locationName: req.body["locationName"] as string,
 			photo: new Blob([req.file!.buffer])
