@@ -14,6 +14,7 @@ export default class TargetHandler {
 	};
 
 	public static store: RequestHandler = async (req, res) => {
+		console.log("targets.store");
 		const responseBody = {
 			status: "success",
 			data: {

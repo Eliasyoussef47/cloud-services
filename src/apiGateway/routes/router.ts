@@ -8,7 +8,6 @@ nonAuthenticatedRouter.use(authenticationRouter);
 
 const getAuthenticatedRouter = () => {
 	const authenticatedRouter = express.Router();
-	// TODO: Circuit breaker.
 	authenticatedRouter.use(getTargetRouter());
 
 	return authenticatedRouter;

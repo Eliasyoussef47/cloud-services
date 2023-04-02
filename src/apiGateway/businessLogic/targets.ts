@@ -1,6 +1,7 @@
 import { Environment } from "@/shared/operation/Environment.js";
 import createHttpError from "http-errors";
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
+import { makeTypedFormData } from "@/types/Http.js";
 
 export type ServiceCallArgsAlpha<TQueryParams extends Record<string, unknown> = Record<string, unknown>> = {
 	queryParams: TQueryParams;
@@ -13,6 +14,11 @@ export interface IndexArgs {
 	locationName?: string;
 }
 
+export interface StoreArgs {
+	// locationName: string;
+	// photo: Blob;
+}
+
 export default class Targets {
 	/**
 	 *
@@ -20,12 +26,9 @@ export default class Targets {
 	 * @throws {Error} When the fetch function fails or if the server responds with >= 500 status code.
 	 */
 	public static async index(args?: IndexArgs): Promise<Response> {
-		const myHeaders = new Headers();
-		myHeaders.append("Authorization", `Bearer ${AuthServiceBeta.getInstance().gatewayJwt}`);
-
-		const fetchInit = {
+		const fetchInit: RequestInit = {
 			method: "get",
-			headers: myHeaders
+			headers: Targets.getDefaultHeaders()
 		};
 
 		const url = new URL(Environment.getInstance().targetServiceUrl);
@@ -34,6 +37,35 @@ export default class Targets {
 			url.searchParams.set("locationName", args.locationName);
 		}
 
+		return await this.defaultServiceCall(url, fetchInit);
+	}
+
+	public static async store(args: StoreArgs) {
+		const myHeaders = Targets.getDefaultHeaders();
+		// myHeaders.set("Content-Type", "multipart/form-data");
+
+		const formDataAlpha = makeTypedFormData<StoreArgs>(args);
+
+		const fetchInit: RequestInit = {
+			method: "post",
+			headers: myHeaders,
+			body: JSON.stringify({})
+			// body: formDataAlpha as FormData
+		};
+
+		const url = new URL(Environment.getInstance().targetServiceUrl);
+
+		return await Targets.defaultServiceCall(url, fetchInit);
+	}
+
+	private static getDefaultHeaders() {
+		const myHeaders = new Headers();
+		myHeaders.append("Authorization", `Bearer ${AuthServiceBeta.getInstance().gatewayJwt}`);
+
+		return myHeaders
+	}
+
+	private static async defaultServiceCall(url: URL, fetchInit: RequestInit) {
 		let fetchResult;
 
 		try {
@@ -48,7 +80,10 @@ export default class Targets {
 		}
 
 		if (fetchResult.status >= 500) {
-			throw createHttpError<503>(503, "ServiceUnavailable");
+			// TODO: Remove logging.
+			const errorBody = await fetchResult.json();
+			console.log(errorBody);
+			throw createHttpError(fetchResult.status, "ServiceUnavailable");
 		}
 
 		return fetchResult;
