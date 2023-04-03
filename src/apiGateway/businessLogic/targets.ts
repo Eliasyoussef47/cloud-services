@@ -79,10 +79,10 @@ export default class Targets {
 		}
 
 		if (fetchResult.status >= 500) {
-			// TODO: Remove logging.
+			console.log("Error (json) from service:");
 			const errorBody = await fetchResult.json();
 			console.log(errorBody);
-			throw createHttpError(fetchResult.status, "ServiceUnavailable");
+			throw createHttpError<503>(503, "ServiceUnavailable");
 		}
 
 		return fetchResult;

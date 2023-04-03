@@ -24,8 +24,7 @@ export const attachStandardCircuitBreakerCallbacks = (circuitBreaker: CircuitBre
 		if (e instanceof Error) {
 			throw e;
 		} else {
-			// TODO: Remove logging.
-			console.log("fallback e is not an instance of Error.");
+			console.log("fallback e is not an instance of Error:");
 			console.log(e);
 			throw createHttpError(503, "ServiceUnavailable");
 		}
