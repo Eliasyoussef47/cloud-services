@@ -1,6 +1,8 @@
 import { RequestHandler } from "express-serve-static-core";
 import { ResponseBody } from "@/shared/types/Response.js";
+import { storeBodySchema, storeFilesSchema } from "@/shared/validation/targets.js";
 
+// TODO: Validation.
 export default class TargetHandler {
 	public static index: RequestHandler = async (req, res) => {
 		const responseBody = {
@@ -14,11 +16,17 @@ export default class TargetHandler {
 	};
 
 	public static store: RequestHandler = async (req, res) => {
+		// TODO: Better validation is possible.
+		const reqBody = storeBodySchema.parse(req.body);
+		const uploadedFiles = storeFilesSchema.parse(req.files);
+		const uploadedFile = uploadedFiles.photo[0];
+		const photoBlob = new Blob([uploadedFile.buffer], { type: uploadedFile.mimetype });
+
 		const responseBody = {
 			status: "success",
 			data: {
 				message: "store",
-				locationName: req.body["locationName"]
+				locationName: reqBody.locationName
 			}
 		} satisfies ResponseBody;
 

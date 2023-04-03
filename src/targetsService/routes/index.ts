@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
 const upload = multer({storage});
 targetsRouter.route("/")
 	.get(TargetHandler.index)
-	.post(upload.single("photo"), TargetHandler.store);
+	.post(upload.fields([{name: "photo"}]), TargetHandler.store);
 
 targetsRouter.route("/:id")
 	.get(TargetHandler.show)

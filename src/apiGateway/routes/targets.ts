@@ -10,7 +10,7 @@ const getRouter = () => {
 
 	targetsRouter.route(route)
 		.get(TargetHandler.index)
-		.post(upload.single("photo"), TargetHandler.store);
+		.post(upload.fields([{name: "photo"}]), TargetHandler.store);
 
 	return targetsRouter;
 

@@ -1,6 +1,11 @@
-type TypedFormDataValue = FormDataEntryValue | Blob
-type FormDataTemplateAlpha<T> = Record<keyof T, TypedFormDataValue>;
+type TypedFormDataValue = FormDataEntryValue | Blob;
+type FormDataTemplateAlpha<T> = {
+	[key in keyof T]?: TypedFormDataValue;
+};
 type FormDataTemplateBeta<T> = Record<string, TypedFormDataValue>;
+type SearchParamsTemplate<T> = {
+	[key in keyof T]?: string;
+};
 
 /**
  * Polyfill for FormData Generic
@@ -152,3 +157,46 @@ class TypedFormData<T extends FormDataTemplateAlpha<T>> extends FormData impleme
 	}
 
 }
+
+export interface ITypedURLSearchParams<T extends SearchParamsTemplate<T>> {
+	/** Appends a specified key/value pair as a new search parameter. */
+	append<K extends keyof T>(name: K, value: string): void;
+
+	/** Deletes the given search parameter, and its associated value, from the list of all search parameters. */
+	delete<K extends keyof T>(name: K): void;
+
+	/** Returns the first value associated to the given search parameter. */
+	get<K extends keyof T>(name: K): string | null;
+
+	/** Returns all the values association with a given search parameter. */
+	getAll<K extends keyof T>(name: K): string[];
+
+	/** Returns a Boolean indicating if such a search parameter exists. */
+	has<K extends keyof T>(name: K): boolean;
+
+	/** Sets the value associated to a given search parameter to the given value. If there were several values, delete the others. */
+	set<K extends keyof T>(name: K, value: T[K]): void;
+
+	sort(): void;
+
+	/** Returns a string containing a query string suitable for use in a URL. Does not include the question mark. */
+	toString(): string;
+
+	forEach<K extends keyof T>(
+		callbackfn: (value: T[K], key: K, parent: ITypedURLSearchParams<T>) => void,
+		thisArg?: any
+	): void;
+}
+
+export const makeTypedSearchParams = <T extends SearchParamsTemplate<T>>(searchParams: URLSearchParams, values: T): ITypedURLSearchParams<T> => {
+	const result = searchParams as unknown as ITypedURLSearchParams<T>;
+	for (const key in values) {
+		const unwrappedValue = values[key];
+		if (!unwrappedValue) {
+			continue;
+		}
+		result.append(key, unwrappedValue);
+	}
+
+	return result;
+};

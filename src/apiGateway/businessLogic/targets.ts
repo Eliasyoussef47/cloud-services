@@ -1,7 +1,7 @@
 import { Environment } from "@/shared/operation/Environment.js";
 import createHttpError from "http-errors";
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
-import { makeTypedFormData } from "@/types/Http.js";
+import { makeTypedFormData, makeTypedSearchParams } from "@/types/Http.js";
 
 export type ServiceCallArgsAlpha<TQueryParams extends Record<string, unknown> = Record<string, unknown>> = {
 	queryParams: TQueryParams;
@@ -34,7 +34,8 @@ export default class Targets {
 		const url = new URL(Environment.getInstance().targetServiceUrl);
 
 		if (args && args.locationName) {
-			url.searchParams.set("locationName", args.locationName);
+			const searchParams = url.searchParams;
+			makeTypedSearchParams<IndexArgs>(searchParams, args);
 		}
 
 		return await Targets.defaultServiceCall(url, fetchInit);

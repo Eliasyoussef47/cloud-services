@@ -1,7 +1,10 @@
 import { RequestHandler } from "express-serve-static-core";
 import CircuitBreaker, { Options as CircuitBreakerOptions } from "opossum";
-import Targets, { StoreArgs } from "@/apiGateway/businessLogic/targets.js";
+import Targets, { IndexArgs, StoreArgs } from "@/apiGateway/businessLogic/targets.js";
 import { attachStandardCircuitBreakerCallbacks } from "@/shared/utils/CircuitBreaker.js";
+import { toZod } from "tozod";
+import { z } from "zod";
+import { storeBodySchema, storeFilesSchema } from "@/shared/validation/targets.js";
 
 const circuitBreakerOptions: CircuitBreakerOptions = {
 	timeout: 3000, // If our function takes longer than 3 seconds, trigger a failure
@@ -15,14 +18,19 @@ attachStandardCircuitBreakerCallbacks(indexCircuitBreaker);
 const storeCircuitBreaker = new CircuitBreaker(Targets.store, circuitBreakerOptions);
 attachStandardCircuitBreakerCallbacks(storeCircuitBreaker);
 
+const indexParamsSchema: toZod<IndexArgs> = z.object({
+	locationName: z.string().optional()
+});
+
 // TODO: Validation.
 export default class TargetHandler {
 	// TODO: Validation.
-	public static index: RequestHandler = async (req, res, next) => {
-		// TODO: Get location name.
+	public static index: RequestHandler<IndexArgs> = async (req, res, next) => {
+		const parsedParams = indexParamsSchema.parse(req.params);
+
 		let fireResult: Response;
 		try {
-			fireResult = await indexCircuitBreaker.fire();
+			fireResult = await indexCircuitBreaker.fire(parsedParams);
 		} catch (e) {
 			console.log("Service breaker rejected: ", e);
 			next(e);
@@ -40,13 +48,15 @@ export default class TargetHandler {
 		}
 	};
 
-	// TODO: Validation.
 	public static store: RequestHandler = async (req, res, next) => {
-		const uploadedFile = req.file;
-		const photoBlob = new Blob([uploadedFile!.buffer], {type: uploadedFile?.mimetype});
+		// TODO: Better validation is possible.
+		const reqBody = storeBodySchema.parse(req.body);
+		const uploadedFiles = storeFilesSchema.parse(req.files);
+		const uploadedFile = uploadedFiles.photo[0];
+		const photoBlob = new Blob([uploadedFile.buffer], { type: uploadedFile.mimetype });
 
 		const args: StoreArgs = {
-			locationName: req.body["locationName"] as string,
+			locationName: reqBody.locationName,
 			photo: photoBlob
 		};
 
