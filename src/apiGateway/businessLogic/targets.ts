@@ -37,7 +37,7 @@ export default class Targets {
 			url.searchParams.set("locationName", args.locationName);
 		}
 
-		return await this.defaultServiceCall(url, fetchInit);
+		return await Targets.defaultServiceCall(url, fetchInit);
 	}
 
 	public static async store(args: StoreArgs) {
