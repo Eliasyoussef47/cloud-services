@@ -9,6 +9,7 @@ export type CreateParams = Pick<User, "customId" | "opaqueId" | "username" | "pa
 
 export default interface IUserRepository {
 	get(customId: string): Promise<UserPersistent | null>;
+
 	getByOpaqueId(opaqueId: string): Promise<UserPersistent | null>;
 
 	getByUsername(username: string): Promise<UserPersistent | null>;

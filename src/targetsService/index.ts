@@ -8,9 +8,11 @@ import { setupGatewayAuthenticationMiddlewares } from "@/auth/middlewares/authen
 import { attachErrorHandlers } from "@/shared/operation/errorHandling.js";
 import { authenticatedRouter } from "@/targetsService/routes/router.js";
 import { uploadedTargetsPath } from "@/shared/constants.js";
+import { setupDependencies } from "@/targetsService/setup.js";
 
 dotenv.config();
 Environment.setup();
+await setupDependencies();
 AuthServiceAlpha.setup();
 
 const port = Number(Environment.getInstance().targetServiceUrl.port) || 3001;

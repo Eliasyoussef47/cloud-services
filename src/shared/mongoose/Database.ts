@@ -1,5 +1,5 @@
-import mongoose, { Connection } from "mongoose";
 import { Environment } from "@/shared/operation/Environment.js";
+import mongoose, { Connection } from "mongoose";
 
 export default class Database {
 	static #instance: Database;
@@ -21,8 +21,8 @@ export default class Database {
 		this.#instance = value;
 	}
 
-	public static async setup() {
-		const connection = await mongoose.createConnection(Environment.getInstance().envFile.AUTH_DATABASE_PATH).asPromise();
+	public static async setup(databaseUrl: string) {
+		const connection = await mongoose.createConnection(databaseUrl).asPromise();
 
 		this.setInstance(new Database(connection));
 	}
