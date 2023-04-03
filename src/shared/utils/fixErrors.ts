@@ -1,4 +1,6 @@
-if (!('toJSON' in Error.prototype))
+import { isProd } from "@/shared/ErrorHandlers.js";
+
+if (!('toJSON' in Error.prototype) && isProd()) {
 	Object.defineProperty(Error.prototype, 'toJSON', {
 		value: function () {
 			const alt = {};
@@ -13,3 +15,4 @@ if (!('toJSON' in Error.prototype))
 		configurable: true,
 		writable: true
 	});
+}

@@ -20,8 +20,12 @@ export const zodErrorSchema = z.object({
 	name: z.literal("ZodError")
 }).passthrough();
 
-export function isProd(req: Request) {
-	return req.app.get("env") === "production";
+export function isProd(req?: Request) {
+	if (req) {
+		return req.app.get("env") === "production";
+	}
+
+	return process.env.NODE_ENV === "production";
 }
 
 export const notFoundHandler: RequestHandler = () => {
