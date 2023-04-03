@@ -45,7 +45,7 @@ export class AuthServiceBeta extends AuthServiceBase {
 					return done(null, value);
 				})
 				.catch((e) => {
-					done(createHttpError(401, e), false);
+					done(createHttpError(407, e), false);
 				});
 		});
 
