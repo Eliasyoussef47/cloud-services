@@ -27,4 +27,17 @@ jobs:
       - name: Build
         run: npx rollup --config ./rollup.config.ts --configPlugin typescript
       - name: Run Image Targets Service
+        env:
+          JWT_USERS_SECRET: 1234
+          JWT_GATEWAY_SECRET: 1234
+          SERVICES_API_KEY: 1234
+          JWT_EXPIRES_IN: 12312
+          IMAGGA_API_KEY: "mock_var_value1"
+          IMAGGA_API_SECRET: "mock_var_value2"
+          MESSAGE_BROKER_URL: "amqp://127.0.0.1:5672"
+          API_GATEWAY_URL: "http://127.0.0.1:3000"
+          TARGETS_SERVICE_URL: "http://127.0.0.1:3001"
+          SUBMISSIONS_SERVICE_URL: "http://127.0.0.1:3002"
+          IMAGE_RECOGNITION_SERVICE_URL: "http://127.0.0.1:3003"
+          AUTH_DATABASE_PATH: "mongodb://127.0.0.1:27017/auth_service"
         run: npm run targets
