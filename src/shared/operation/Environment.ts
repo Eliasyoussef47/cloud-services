@@ -1,6 +1,7 @@
 import * as process from "process";
 import { toZod } from "tozod";
 import z from "zod";
+import { uploadedTargetsPath } from "@/shared/constants.js";
 
 export interface Env {
 	JWT_USERS_SECRET: string;
@@ -49,6 +50,10 @@ export class Environment {
 
 	public get targetServiceUrl(): URL {
 		return new URL(this.#envFile.TARGETS_SERVICE_URL);
+	}
+
+	public get targetUploadsUrl(): URL {
+		return new URL(uploadedTargetsPath, this.targetServiceUrl);
 	}
 
 	public get envFile(): Env {

@@ -7,6 +7,7 @@ import cors from "cors";
 import { setupGatewayAuthenticationMiddlewares } from "@/auth/middlewares/authentication.js";
 import { attachErrorHandlers } from "@/shared/operation/errorHandling.js";
 import { authenticatedRouter } from "@/targetsService/routes/router.js";
+import { uploadedTargetsPath } from "@/shared/constants.js";
 
 dotenv.config();
 Environment.setup();
@@ -21,9 +22,10 @@ app.set("env", process.env.NODE_ENV);
 app.use(cors())
 app.use(express.json());
 
-app.use("/uploads/targets", express.static("uploads/targetsService"));
+// TODO: User based authorization.
+app.use(uploadedTargetsPath, express.static("uploads/targetsService"));
 
-// setupGatewayAuthenticationMiddlewares(app, AuthServiceAlpha.getInstance());
+setupGatewayAuthenticationMiddlewares(app, AuthServiceAlpha.getInstance());
 
 app.use(authenticatedRouter);
 

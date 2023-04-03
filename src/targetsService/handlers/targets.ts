@@ -1,6 +1,7 @@
 import { RequestHandler } from "express-serve-static-core";
 import { ResponseBody } from "@/shared/types/Response.js";
 import { storeBodySchema, storeFilesSchema } from "@/shared/validation/targets.js";
+import { Environment } from "@/shared/operation/Environment.js";
 
 // TODO: Validation.
 export default class TargetHandler {
@@ -20,13 +21,15 @@ export default class TargetHandler {
 		const reqBody = storeBodySchema.parse(req.body);
 		const uploadedFiles = storeFilesSchema.parse(req.files);
 		const uploadedFile = uploadedFiles.photo[0];
-		const photoBlob = new Blob([uploadedFile.buffer], { type: uploadedFile.mimetype });
+
+		const fileUrl = new URL(uploadedFile.filename, Environment.getInstance().targetUploadsUrl);
 
 		const responseBody = {
 			status: "success",
 			data: {
 				message: "store",
-				locationName: reqBody.locationName
+				locationName: reqBody.locationName,
+				photo: fileUrl.toString()
 			}
 		} satisfies ResponseBody;
 
