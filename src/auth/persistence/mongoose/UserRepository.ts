@@ -26,7 +26,7 @@ export default class UserRepository implements IUserRepository {
 	public async create(createParams: CreateParams): Promise<UserPersistent> {
 		const newUser = new this._model(<User>{
 			customId: createParams.customId,
-			userId: createParams.userId,
+			opaqueId: createParams.opaqueId,
 			username: createParams.username,
 			password: createParams.password
 		});
@@ -38,8 +38,8 @@ export default class UserRepository implements IUserRepository {
 		return await this._model.findOne(<Pick<User, "customId">>{ customId: customId }).exec() as MyHydratedDocument<User>;
 	}
 
-	public async getByUserId(userId: string): Promise<UserPersistent | null> {
-		return await this._model.findOne(<Pick<User, "userId">>{ userId: userId }).exec() as MyHydratedDocument<User>;
+	public async getByOpaqueId(opaqueId: string): Promise<UserPersistent | null> {
+		return await this._model.findOne(<Pick<User, "opaqueId">>{ opaqueId: opaqueId }).exec() as MyHydratedDocument<User>;
 	}
 
 	public async getByUsername(username: string): Promise<UserPersistent | null> {

@@ -8,7 +8,7 @@ export type UserModelType = Model<MongooseUser>;
 export const userSchema = new Schema<MongooseUser, UserModelType, User, UserModelType, User, UserModelType, DefaultSchemaOptions, User, User>({
 	// TODO: Set index on customId.
 	customId: { type: SchemaTypes.String, required: true },
-	userId: { type: SchemaTypes.String, required: true },
+	opaqueId: { type: SchemaTypes.String, required: true },
 	username: { type: SchemaTypes.String, required: true, unique: true },
 	password: { type: SchemaTypes.String, required: true },
 });

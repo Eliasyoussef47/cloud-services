@@ -5,11 +5,11 @@ export interface UserPersistent extends User, IPersistent<User> {
 
 }
 
-export type CreateParams = Pick<User, "customId" | "userId" | "username" | "password">;
+export type CreateParams = Pick<User, "customId" | "opaqueId" | "username" | "password">;
 
 export default interface IUserRepository {
 	get(customId: string): Promise<UserPersistent | null>;
-	getByUserId(userId: string): Promise<UserPersistent | null>;
+	getByOpaqueId(opaqueId: string): Promise<UserPersistent | null>;
 
 	getByUsername(username: string): Promise<UserPersistent | null>;
 

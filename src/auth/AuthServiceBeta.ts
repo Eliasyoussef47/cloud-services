@@ -105,7 +105,7 @@ export class AuthServiceBeta extends AuthServiceBase {
 	 * @throws {CustomError}
 	 */
 	public async getMatchingUser(payload: UserJwtPayload): Promise<User> {
-		const foundUser = await ServicesRegistry.getInstance().userRepository.getByUserId(payload.sub);
+		const foundUser = await ServicesRegistry.getInstance().userRepository.getByOpaqueId(payload.sub);
 
 		if (!foundUser) {
 			throw new CustomError("Invalid user");
@@ -116,11 +116,11 @@ export class AuthServiceBeta extends AuthServiceBase {
 
 	public async register(loginForm: LoginForm) {
 		const customId = crypto.randomUUID();
-		const tempId = crypto.randomUUID();
+		const opaqueId = crypto.randomUUID();
 		const password = AuthServiceBeta.createPassword(loginForm.password);
 
 		// TODO: username must be unique.
-		return await ServicesRegistry.getInstance().userRepository.create({customId, tempId, username: loginForm.username, password});
+		return await ServicesRegistry.getInstance().userRepository.create({customId, opaqueId, username: loginForm.username, password});
 	}
 
 	public async login(loginForm: LoginForm): Promise<string | undefined> {
@@ -134,13 +134,13 @@ export class AuthServiceBeta extends AuthServiceBase {
 			return undefined;
 		}
 
-		foundUser.userId = crypto.randomUUID();
+		foundUser.opaqueId = crypto.randomUUID();
 		await foundUser.save();
 
 		return jwt.sign({}, <string> this.userJwtOptions.secretOrKey,
 			{
 				expiresIn: this.jwtExpiresIn,
-				subject: foundUser.userId
+				subject: foundUser.opaqueId
 			});
 	}
 }

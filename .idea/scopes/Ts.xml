@@ -1,3 +1,3 @@
 <component name="DependencyValidationManager">
-  <scope name="Ts" pattern="!file[eindopdracht]:dist//*" />
+  <scope name="Ts" pattern="!file[eindopdracht]:dist//*&amp;&amp;!file[eindopdracht]:node_modules//*" />
 </component>

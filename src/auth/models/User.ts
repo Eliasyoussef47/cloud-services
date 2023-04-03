@@ -11,12 +11,12 @@ export interface User {
 	/**
 	 * Fake and temporary ID issued to the user's JWT to obscure the real ID in the database.
 	 */
-	userId: string;
+	opaqueId: string;
 	username: string;
 	password: string;
 }
 
-export const userResourceSchema: toZod<Pick<User, "userId" | "username">> = z.object({
-	userId: z.string(),
+export const userResourceSchema: toZod<Pick<User, "opaqueId" | "username">> = z.object({
+	opaqueId: z.string(),
 	username: z.string()
 });
