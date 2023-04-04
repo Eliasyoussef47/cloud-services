@@ -1,17 +1,17 @@
 import { Channel } from "amqplib";
 
-export const exchangeAlphaName = "alpha";
-export const exchangeBravoName = "bravo";
-export const exchangeCharlieName = "charlie";
-export const exchangeDeltaName = "delta";
+export const exchangeAlphaName = "webs.alpha";
+export const exchangeBravoName = "webs.bravo";
+export const exchangeCharlieName = "webs.charlie";
+export const exchangeDeltaName = "webs.delta";
 
 export type ExchangeName = typeof exchangeAlphaName | typeof exchangeBravoName | typeof exchangeCharlieName | typeof exchangeDeltaName;
 
 export type AssertExchangeParams = Parameters<Channel["assertExchange"]>
 
 export const exchangeAlphaParams: AssertExchangeParams = [exchangeAlphaName, "topic", { durable: true }];
-export const exchangeBravoParams: AssertExchangeParams = [exchangeBravoName, "fanout", { durable: true }];
-export const exchangeCharlieParams: AssertExchangeParams = [exchangeCharlieName, "fanout", { durable: true }];
+export const exchangeBravoParams: AssertExchangeParams = [exchangeBravoName, "topic", { durable: true }];
+export const exchangeCharlieParams: AssertExchangeParams = [exchangeCharlieName, "topic", { durable: true }];
 export const exchangeDeltaParams: AssertExchangeParams = [exchangeDeltaName, "fanout", { durable: true }];
 
 export const targetsServicesUsersCreatedQueueName = "targetsService.users.created";

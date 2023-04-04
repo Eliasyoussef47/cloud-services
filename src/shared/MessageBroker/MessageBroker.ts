@@ -18,7 +18,7 @@ export interface IAssertsExchanges extends IMessageBrokerUser {
 }
 
 export interface IAssertsQueues extends IMessageBrokerUser {
-	assertQueues(): Promise<boolean>;
+	setupQueues(): Promise<boolean>;
 }
 
 export interface IHasExchangeAlpha extends IMessageBrokerUser, IAssertsExchanges {

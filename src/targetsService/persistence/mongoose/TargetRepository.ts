@@ -23,7 +23,6 @@ export default class TargetRepository implements ITargetRepository {
 	}
 
 	public async create(createArgs: CreateArgs): Promise<TargetPersistent> {
-		// TODO: Implement.
 		const data: CreateArgs = {
 			customId: createArgs.customId,
 			userId: createArgs.userId,

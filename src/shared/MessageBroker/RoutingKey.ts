@@ -3,25 +3,22 @@ import { ConsumeMessage } from "amqplib";
 // TODO: Update routing keys.
 export type anyWord = "*";
 export type restOfTopic = "#";
-export type title = "blogPost" | "comment" | anyWord;
-export type method = "create" | "get" | "delete" | anyWord;
-export type identifier = "request" | "response" | "event" | string | anyWord;
+export type resource = "targets" | "submissions" | "users" | anyWord;
+export type part = "image" | anyWord;
+export type event = "created" | "processed" | string | anyWord;
 
 export type RoutingKeyPart = anyWord
 	| restOfTopic
-	| title
-	| method
-	| identifier;
+	| resource
+	| part
+	| event;
 
 export type opt<T extends RoutingKeyPart> = `.${T}` | "";
 
-export type RoutingKey = `${title}${opt<method>}${opt<identifier>}`
+export type RoutingKey =
+	| `${resource}${opt<part>}${opt<event>}`
 	| `${restOfTopic}`
-	| `${title}.${restOfTopic}`
-	| `${title}.${method}.${restOfTopic}`;
+	| `${resource}.${restOfTopic}`
+	| `${resource}.${part}.${restOfTopic}`;
 
 export type ConsumeListener = (msg: ConsumeMessage | null) => void;
-
-export const blogPostsQueueName = "blogPosts";
-export const commentsRequestsQueueName = "commentsRequests";
-export const commentsResponsesQueueName = "commentsResponses";

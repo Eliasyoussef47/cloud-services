@@ -2,7 +2,7 @@ import { IMessageBrokerTargetProcessed, IMessageBrokerUser, IMessageBrokerUserCr
 import { Channel, Connection, Replies } from "amqplib";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
 import { MessageBrokerUserCreatedPublisher } from "@/shared/MessageBroker/helperClasses.js";
-import { exchangeAlphaParams, exchangeCharlieParams, exchangeDeltaParams, targetsServicesTargetsProcessedQueueParams, targetsServicesUsersCreatedQueueParams } from "@/shared/MessageBroker/constants.js";
+import { exchangeAlphaParams, exchangeCharlieParams, exchangeDeltaParams, targetsServicesTargetsProcessedQueueName, targetsServicesTargetsProcessedQueueParams, targetsServicesUsersCreatedQueueParams } from "@/shared/MessageBroker/constants.js";
 
 export class AuthServiceMessageBroker implements IMessageBrokerUserCreatedPublisher {
 	public exchangeAlpha: Replies.AssertExchange | undefined;
@@ -129,10 +129,47 @@ export class TargetsServiceMessageBroker implements IMessageBrokerUserCreatedCon
 		return true;
 	}
 
-	public async assertQueues(): Promise<boolean> {
-		this.usersQueue = await this.channel?.assertQueue(...targetsServicesUsersCreatedQueueParams);
-		this.targetsProcessedQueue = await this.channel?.assertQueue(...targetsServicesTargetsProcessedQueueParams);
+	public async setupQueues(): Promise<boolean> {
+		const setupTargetsServicesUsersCreatedQueue = async () => {
+			try {
+				if (!this.channel) {
+					return;
+				}
 
+				this.usersQueue = await this.channel?.assertQueue(...targetsServicesUsersCreatedQueueParams);
+
+				if (!this.exchangeDelta || !this.usersQueue) {
+					return;
+				}
+
+				await this.channel.bindQueue(this.usersQueue.queue, this.exchangeDelta.exchange, <RoutingKey> "#");
+			} catch (e) {
+				this.usersQueue = undefined;
+			}
+		}
+
+		const setupTargetsServicesTargetsProcessedQueue = async () => {
+			try {
+				if (!this.channel) {
+					return;
+				}
+
+				this.targetsProcessedQueue = await this.channel?.assertQueue(...targetsServicesTargetsProcessedQueueParams);
+
+				if (!this.exchangeCharlie || !this.targetsProcessedQueue) {
+					return;
+				}
+
+				await this.channel.bindQueue(this.targetsProcessedQueue.queue, this.exchangeCharlie.exchange, <RoutingKey> "submissions.image.processed");
+			} catch (e) {
+				this.usersQueue = undefined;
+			}
+		}
+
+		await setupTargetsServicesUsersCreatedQueue.call(this);
+		await setupTargetsServicesTargetsProcessedQueue.call(this);
+
+		// TODO: Return real value.
 		return true;
 	}
 

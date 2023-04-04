@@ -34,9 +34,10 @@ export class MessageBrokerUser implements IMessageBrokerUser {
 				// throw new CustomError("Channel not constructed.");
 			}
 
-			return channel.publish(exchange, routingKey, Buffer.from(msg));
+			// Messages are persistent so they are written to disk. This ensures that messages are not lost after system restart.
+			return channel.publish(exchange, routingKey, Buffer.from(msg), { persistent: true });
 		} catch (error) {
-			console.log("Error in publisher : " + error);
+			console.log("Error while publishing : " + error);
 			return false;
 		}
 	}
