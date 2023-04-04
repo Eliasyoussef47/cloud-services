@@ -24,12 +24,14 @@ jobs:
           node-version: 16
       - name: Install dependencies
         run: npm ci
-      - name: Install mongodb-memory-server
-        run: npm install mongodb-memory-server
       - name: Build
         run: npx rollup --config ./rollup.config.ts --configPlugin typescript
       - name: Connect to MongoDB
-        run: node connectToMongo.js
+        run: |
+          curl -O https://fastdl.mongodb.org/tools/db/mongodb-database-tools-100.5.0-ubuntu2004-x86_64.deb
+          sudo dpkg -i mongodb-database-tools-100.5.0-ubuntu2004-x86_64.deb
+          export MONGODB_URI=mongodb://localhost:27017/mydatabase
+          mongo --eval 'db.runCommand({ connectionStatus: 1 })'
       - name: Run API Gateway
         env:
           JWT_USERS_SECRET: 1234
@@ -45,5 +47,5 @@ jobs:
           IMAGE_RECOGNITION_SERVICE_URL: "http://127.0.0.1:3003"
           AUTH_DATABASE_PATH: "mongodb://127.0.0.1:27017/auth_service"
           TARGETS_DATABASE_PATH: "mongodb://127.0.0.1:27017/targets_service"
-          
+
         run: npm run apiGateway
