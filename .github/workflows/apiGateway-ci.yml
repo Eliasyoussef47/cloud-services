@@ -40,4 +40,5 @@ jobs:
           SUBMISSIONS_SERVICE_URL: "http://127.0.0.1:3002"
           IMAGE_RECOGNITION_SERVICE_URL: "http://127.0.0.1:3003"
           AUTH_DATABASE_PATH: "mongodb://127.0.0.1:27017/auth_service"
+          TARGETS_DATABASE_PATH: "mongodb://127.0.0.1:27017/targets_service"
         run: npm run apiGateway
