@@ -23,7 +23,7 @@ export default class ServicesRegistry implements Services {
 		this._targetRepository = services.targetRepository;
 		this._userRepository = services.userRepository;
 		this.messageBrokerUser = services.messageBrokerUser;
-		this.targetsServiceMessageBroker = services.authServiceMessageBroker;
+		this.targetsServiceMessageBroker = services.targetsServiceMessageBroker;
 	}
 
 	public static getInstance(): ServicesRegistry {
