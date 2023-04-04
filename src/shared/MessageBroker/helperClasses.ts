@@ -2,8 +2,7 @@ import { IMessageBrokerUser, IMessageBrokerUserCreatedPublisher } from "@/shared
 import amqp, { Channel, Connection, Replies } from "amqplib";
 import { CustomError } from "@/shared/types/errors/CustomError.js";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
-import NotImplementedError from "@/shared/types/errors/NotImplementedError.js";
-import { exchangeAlphaParams } from "@/shared/MessageBroker/constants.js";
+import { exchangeAlphaName, exchangeAlphaParams, ExchangeName } from "@/shared/MessageBroker/constants.js";
 
 export class MessageBrokerUser implements IMessageBrokerUser {
 	public connection: Connection | undefined;
@@ -27,16 +26,28 @@ export class MessageBrokerUser implements IMessageBrokerUser {
 		return this.channel;
 	}
 
-	public publish(routingKey: RoutingKey, msg: string): boolean {
-		throw new NotImplementedError();
+	public publish(routingKey: RoutingKey, msg: string, exchange: ExchangeName = exchangeAlphaName): boolean {
+		try {
+			const channel = this.channel;
+			if (!channel) {
+				return false;
+				// throw new CustomError("Channel not constructed.");
+			}
+
+			return channel.publish(exchange, routingKey, Buffer.from(msg));
+		} catch (error) {
+			console.log("Error in publisher : " + error);
+			return false;
+		}
 	}
 }
 
 export class MessageBrokerUserCreatedPublisher implements IMessageBrokerUserCreatedPublisher {
+	public exchangeAlpha: Replies.AssertExchange | undefined;
 	private _messageBrokerUser: IMessageBrokerUser;
 
-	constructor() {
-		this._messageBrokerUser = new MessageBrokerUser();
+	constructor(messageBrokerUser: IMessageBrokerUser) {
+		this._messageBrokerUser = messageBrokerUser;
 	}
 
 	public get connection(): Connection | undefined {
@@ -55,8 +66,6 @@ export class MessageBrokerUserCreatedPublisher implements IMessageBrokerUserCrea
 		this._messageBrokerUser.channel = value;
 	}
 
-	public exchangeAlpha: Replies.AssertExchange | undefined;
-
 	public async assertExchanges(): Promise<boolean> {
 		this.exchangeAlpha = await this.channel?.assertExchange(...exchangeAlphaParams);
 
@@ -72,8 +81,7 @@ export class MessageBrokerUserCreatedPublisher implements IMessageBrokerUserCrea
 		return this._messageBrokerUser.createChannel();
 	}
 
-	public publish(routingKey: RoutingKey, msg: string): boolean {
+	public publish(routingKey: RoutingKey, msg: string, exchange: string = "alpha"): boolean {
 		return this._messageBrokerUser.publish(routingKey, msg);
 	}
 }
-
