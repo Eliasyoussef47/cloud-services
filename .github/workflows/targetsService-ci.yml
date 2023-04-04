@@ -28,8 +28,8 @@ jobs:
         run: npm install mongodb-memory-server
       - name: Build
         run: npx rollup --config ./rollup.config.ts --configPlugin typescript
-      - name: Mock MongoDB Connection
-        run: npx ts-node ./scripts/mockMongo.ts
+      - name: Connect to MongoDB
+        run: node connectToMongo.js
       - name: Run Image Targets Service
         env:
           JWT_USERS_SECRET: 1234

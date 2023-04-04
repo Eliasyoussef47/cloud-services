@@ -15,13 +15,6 @@ on:
 jobs:
   build-run:
     runs-on: ubuntu-latest
-    services:
-      mongo:
-        image: mongo:5.0.15
-        ports:
-          - "27017"
-        volumes:
-          - ./data/db:/data/db
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -35,8 +28,8 @@ jobs:
         run: npm install mongodb-memory-server
       - name: Build
         run: npx rollup --config ./rollup.config.ts --configPlugin typescript
-      - name: Mock MongoDB Connection
-        run: npx ts-node ./scripts/mockMongo.ts
+      - name: Connect to MongoDB
+        run: node connectToMongo.js
       - name: Run API Gateway
         env:
           JWT_USERS_SECRET: 1234
