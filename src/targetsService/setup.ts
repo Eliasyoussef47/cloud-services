@@ -4,7 +4,7 @@ import ServicesRegistry, { Services } from "@/targetsService/ServiceRegistry.js"
 import TargetRepository from "@/targetsService/persistence/mongoose/TargetRepository.js";
 import UserRepository from "@/targetsService/persistence/mongoose/UserRepository.js";
 import { MessageBrokerUser } from "@/shared/MessageBroker/helperClasses.js";
-import { TargetsServiceMessageBroker } from "@/shared/MessageBroker/implementations.js";
+import { TargetsServiceMessageBroker } from "@/targetsService/MessageBroker/MessageBroker.js";
 
 async function setupMessageBroker() {
 	const messageBrokerUser = new MessageBrokerUser();

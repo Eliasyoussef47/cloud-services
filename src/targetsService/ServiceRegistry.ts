@@ -1,7 +1,7 @@
 import IUserRepository from "@/targetsService/persistence/IUserRepository.js";
 import ITargetRepository from "@/targetsService/persistence/ITargetRepository.js";
 import { IMessageBrokerUser } from "@/shared/MessageBroker/MessageBroker.js";
-import { TargetsServiceMessageBroker } from "@/shared/MessageBroker/implementations.js";
+import { TargetsServiceMessageBroker } from "@/targetsService/MessageBroker/MessageBroker.js";
 
 export interface Services {
 	targetRepository: ITargetRepository;

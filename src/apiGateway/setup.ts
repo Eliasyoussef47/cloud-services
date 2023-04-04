@@ -2,8 +2,9 @@ import ServicesRegistry, { Services } from "@/auth/ServicesRegistry.js";
 import UserRepository from "@/auth/persistence/mongoose/UserRepository.js";
 import Database from "@/shared/mongoose/Database.js";
 import { Environment } from "@/shared/operation/Environment.js";
-import { AuthServiceMessageBroker, TargetsServiceMessageBroker } from "@/shared/MessageBroker/implementations.js";
+import { AuthServiceMessageBroker } from "@/shared/MessageBroker/implementations.js";
 import { MessageBrokerUser } from "@/shared/MessageBroker/helperClasses.js";
+import { TargetsServiceMessageBroker } from "@/targetsService/MessageBroker/MessageBroker.js";
 
 async function setupMessageBroker() {
 	const messageBrokerUser = new MessageBrokerUser();
