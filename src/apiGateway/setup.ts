@@ -11,19 +11,19 @@ async function setupMessageBroker() {
 	await messageBrokerUser.connect(Environment.getInstance().envFile.MESSAGE_BROKER_URL);
 	await messageBrokerUser.createChannel();
 
-	const targetsServiceMessageBroker = new AuthServiceMessageBroker(messageBrokerUser);
-	await targetsServiceMessageBroker.assertExchanges();
-	return { messageBrokerUser, targetsServiceMessageBroker };
+	const authServiceMessageBroker = new AuthServiceMessageBroker(messageBrokerUser);
+	await authServiceMessageBroker.assertExchanges();
+	return { messageBrokerUser, authServiceMessageBroker };
 }
 
 export async function setupDependencies() {
 	await Database.setup(Environment.getInstance().envFile.AUTH_DATABASE_PATH);
-	const { messageBrokerUser, targetsServiceMessageBroker } = await setupMessageBroker();
+	const { messageBrokerUser, authServiceMessageBroker } = await setupMessageBroker();
 
 	const services: Services = {
 		userRepository: new UserRepository(Database.getInstance().connection),
 		messageBrokerUser: messageBrokerUser,
-		authServiceMessageBroker: targetsServiceMessageBroker
+		authServiceMessageBroker: authServiceMessageBroker
 	}
 	ServicesRegistry.setupInitial(services);
 }
