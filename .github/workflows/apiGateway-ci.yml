@@ -27,7 +27,8 @@ jobs:
       - name: Build
         run: npx rollup --config ./rollup.config.ts --configPlugin typescript
       - name: Mock MongoDB Connection
-        run: npm run mock-db-connection
+        run: |
+          node node_modules/.bin/mockgoose --mongo-version 4.4.9 --port 27017
       - name: Run API Gateway
         env:
           JWT_USERS_SECRET: 1234
