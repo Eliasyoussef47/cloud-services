@@ -28,7 +28,7 @@ jobs:
         run: npx rollup --config ./rollup.config.ts --configPlugin typescript
       - name: Mock MongoDB Connection
         run: |
-          node node_modules/.bin/mockgoose --mongo-version 4.4.9 --port 27017
+          node node_modules/mockgoose --mongo-version 4.4.9 --port 27017
       - name: Run Image Targets Service
         env:
           JWT_USERS_SECRET: 1234
