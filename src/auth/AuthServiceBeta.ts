@@ -111,7 +111,7 @@ export class AuthServiceBeta extends AuthServiceBase {
 			throw new CustomError("Invalid user");
 		}
 
-		return foundUser;
+		return foundUser.toObject();
 	}
 
 	public async register(loginForm: LoginForm) {

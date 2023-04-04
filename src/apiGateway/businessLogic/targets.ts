@@ -2,6 +2,7 @@ import { Environment } from "@/shared/operation/Environment.js";
 import createHttpError from "http-errors";
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
 import { makeTypedFormData, makeTypedSearchParams } from "@/types/Http.js";
+import { StoreBody } from "@/shared/types/targetsService/index.js";
 
 export type ServiceCallArgsAlpha<TQueryParams extends Record<string, unknown> = Record<string, unknown>> = {
 	queryParams: TQueryParams;
@@ -14,8 +15,7 @@ export interface IndexArgs {
 	locationName?: string;
 }
 
-export interface StoreArgs {
-	locationName: string;
+export type StoreArgs = StoreBody & {
 	photo: Blob;
 }
 

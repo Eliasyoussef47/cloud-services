@@ -5,6 +5,7 @@ import { attachStandardCircuitBreakerCallbacks } from "@/shared/utils/CircuitBre
 import { toZod } from "tozod";
 import { z } from "zod";
 import { storeBodySchema, storeFilesSchema } from "@/shared/validation/targets.js";
+import { User } from "@/auth/models/User.js";
 
 const circuitBreakerOptions: CircuitBreakerOptions = {
 	timeout: 3000, // If our function takes longer than 3 seconds, trigger a failure
@@ -54,8 +55,10 @@ export default class TargetHandler {
 		const uploadedFiles = storeFilesSchema.parse(req.files);
 		const uploadedFile = uploadedFiles.photo[0];
 		const photoBlob = new Blob([uploadedFile.buffer], { type: uploadedFile.mimetype });
+		const user = req.user as User;
 
 		const args: StoreArgs = {
+			userId: user.customId,
 			locationName: reqBody.locationName,
 			photo: photoBlob
 		};

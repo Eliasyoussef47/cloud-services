@@ -1,12 +1,12 @@
-import { MongooseBase } from "@/shared/types/database/mongoose/mongoose.js";
+import { MongooseBase, MongooseWithTimestamps } from "@/shared/types/database/mongoose/mongoose.js";
 import { Target } from "@/targetsService/models/Target.js";
 import { DefaultSchemaOptions, type Model, Schema, SchemaTypes } from "mongoose";
 import UserRepository from "@/targetsService/persistence/mongoose/UserRepository.js";
 
-type MongooseTarget = MongooseBase & Target;
+type MongooseTarget = MongooseBase & MongooseWithTimestamps & Target;
 export type TargetModelType = Model<MongooseTarget>;
 
-export const targetSchema = new Schema<MongooseTarget, TargetModelType, Target, TargetModelType, Target, TargetModelType, DefaultSchemaOptions, Target, Target>({
+export const targetSchema = new Schema<MongooseTarget, TargetModelType, Target, TargetModelType, Target, TargetModelType, DefaultSchemaOptions, MongooseTarget, Target>({
 	// TODO: Set index on customId.
 	customId: { type: SchemaTypes.String, required: true },
 	userId: { type: SchemaTypes.String, required: true, ref: UserRepository.modelName },

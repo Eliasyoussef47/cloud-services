@@ -5,7 +5,12 @@ export interface TargetPersistent extends Target, IPersistent<Target> {
 
 }
 
-export type CreateArgs = Pick<Target, "customId" | "userId" | "source" | "base64Encoded" | "locationName">;
+export type CreateArgs = Pick<Target,
+	| "customId"
+	| "userId"
+	| "source"
+	| "base64Encoded"
+	| "locationName">;
 
 export default interface ITargetRepository {
 	get(customId: string): Promise<TargetPersistent | null>;

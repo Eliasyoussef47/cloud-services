@@ -12,6 +12,11 @@ export type MongooseBase<T = Types.ObjectId> = {
 	__v?: any;
 }
 
+export type MongooseWithTimestamps = {
+	createdAt: Date;
+	updatedAt: Date;
+}
+
 export type MyHydratedDocument<DocType,
 	TOverrides = {},
 	TQueryHelpers = {}>
