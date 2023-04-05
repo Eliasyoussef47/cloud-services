@@ -30,6 +30,8 @@ export default class AuthenticationHandler {
 		} satisfies ResponseBody;
 
 		res.json(responseBody);
+
+		ServicesRegistry.getInstance().authServiceMessageBroker.publishUserCreated({customId: newUser.customId});
 	};
 
 	public static loginPost: RequestHandler = async (req, res) => {

@@ -7,9 +7,9 @@ export type ServiceError = typeof serviceError[number];
 export const serviceStatus = [...serviceSucces, ...serviceError];
 export type ServiceStatus = typeof serviceStatus[number];
 
-export interface ResponseBody<DataT = object> {
-	status: ServiceStatus;
-	data: DataT | null
+export interface ResponseBody<DataT extends object | null = object, TStatus extends ServiceStatus = ServiceStatus> {
+	status: TStatus;
+	data: DataT
 }
 
 export const statusCodeStatusMessage: Map<number, ServiceStatus> = new Map([

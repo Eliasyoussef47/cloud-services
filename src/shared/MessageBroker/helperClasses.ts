@@ -1,4 +1,4 @@
-import { IMessageBrokerUser, IMessageBrokerUserCreatedPublisher } from "@/shared/MessageBroker/MessageBroker.js";
+import { IAssertsExchanges, IMessageBrokerUser, IMessageBrokerUserCreatedPublisher } from "@/shared/MessageBroker/MessageBroker.js";
 import amqp, { Channel, Connection, Replies } from "amqplib";
 import { CustomError } from "@/shared/types/errors/CustomError.js";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
@@ -84,5 +84,57 @@ export class MessageBrokerUserCreatedPublisher implements IMessageBrokerUserCrea
 
 	public publish(routingKey: RoutingKey, msg: string, exchange: string = "alpha"): boolean {
 		return this._messageBrokerUser.publish(routingKey, msg);
+	}
+}
+
+export class BindExchange_A_D implements IAssertsExchanges {
+	private readonly _channel: Channel | undefined;
+	private readonly _exchangeAlpha: Replies.AssertExchange | undefined;
+	private readonly _exchangeDelta: Replies.AssertExchange | undefined;
+
+	constructor(channel: Channel, exchangeAlpha: Replies.AssertExchange, exchangeDelta: Replies.AssertExchange) {
+		this._channel = channel;
+		this._exchangeAlpha = exchangeAlpha;
+		this._exchangeDelta = exchangeDelta;
+	}
+
+	public async assertExchanges(): Promise<boolean> {
+		try {
+			if (!this._channel || !this._exchangeAlpha || !this._exchangeDelta) {
+				return false;
+			}
+
+			await this._channel?.bindExchange(this._exchangeDelta.exchange, this._exchangeAlpha.exchange, <RoutingKey> "users.*.created");
+
+			return true;
+		} catch (e) {
+			return false;
+		}
+	}
+}
+
+export class BindExchange_A_C implements IAssertsExchanges {
+	private readonly _channel: Channel | undefined;
+	private readonly _exchangeAlpha: Replies.AssertExchange | undefined;
+	private readonly _exchangeCharlie: Replies.AssertExchange | undefined;
+
+	constructor(channel: Channel, exchangeAlpha: Replies.AssertExchange, exchangeCharlie: Replies.AssertExchange) {
+		this._channel = channel;
+		this._exchangeAlpha = exchangeAlpha;
+		this._exchangeCharlie = exchangeCharlie;
+	}
+
+	public async assertExchanges(): Promise<boolean> {
+		try {
+			if (!this._channel || !this._exchangeAlpha || !this._exchangeCharlie) {
+				return false;
+			}
+
+			await this._channel?.bindExchange(this._exchangeCharlie.exchange, this._exchangeAlpha.exchange, <RoutingKey> "*.image.processed");
+
+			return true;
+		} catch (e) {
+			return false;
+		}
 	}
 }

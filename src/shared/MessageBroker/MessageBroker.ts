@@ -13,7 +13,7 @@ export interface IMessageBrokerUser {
 	publish(routingKey: RoutingKey, msg: string, exchange?: ExchangeName): boolean;
 }
 
-export interface IAssertsExchanges extends IMessageBrokerUser {
+export interface IAssertsExchanges {
 	assertExchanges(): Promise<boolean>;
 }
 

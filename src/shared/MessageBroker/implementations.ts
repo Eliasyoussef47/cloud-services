@@ -2,6 +2,7 @@ import { IMessageBrokerUser, IMessageBrokerUserCreatedPublisher } from "@/shared
 import { Channel, Connection, Replies } from "amqplib";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
 import { MessageBrokerUserCreatedPublisher } from "@/shared/MessageBroker/helperClasses.js";
+import { UserCreatedBody, UserCreatedMessage } from "@/shared/MessageBroker/messages.js";
 
 export class AuthServiceMessageBroker implements IMessageBrokerUserCreatedPublisher {
 	public exchangeAlpha: Replies.AssertExchange | undefined;
@@ -42,5 +43,18 @@ export class AuthServiceMessageBroker implements IMessageBrokerUserCreatedPublis
 	public publish(routingKey: RoutingKey, msg: string, exchange: string = "alpha"): boolean {
 		return this._messageBrokerUserCreatedPublisher.publish(routingKey, msg);
 	}
-}
 
+	public publishUserCreated(message: UserCreatedBody): boolean {
+		const completeMessage: UserCreatedMessage = {
+			type: "User",
+			status: "created",
+			data: message
+		};
+		return this.publishUserCreatedBase(completeMessage);
+	}
+
+	private publishUserCreatedBase(message: UserCreatedMessage): boolean {
+
+		return this.publish("users.*.created", JSON.stringify(message));
+	}
+}

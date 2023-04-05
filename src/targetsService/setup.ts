@@ -15,6 +15,7 @@ async function setupMessageBroker() {
 	const targetsServiceMessageBroker = new TargetsServiceMessageBroker(messageBrokerUser);
 	await targetsServiceMessageBroker.assertExchanges();
 	await targetsServiceMessageBroker.setupQueues();
+	void targetsServiceMessageBroker.consume();
 	return { messageBrokerUser, targetsServiceMessageBroker };
 }
 

@@ -14,8 +14,8 @@ export const exchangeBravoParams: AssertExchangeParams = [exchangeBravoName, "to
 export const exchangeCharlieParams: AssertExchangeParams = [exchangeCharlieName, "topic", { durable: true }];
 export const exchangeDeltaParams: AssertExchangeParams = [exchangeDeltaName, "fanout", { durable: true }];
 
-export const targetsServicesUsersCreatedQueueName = "targetsService.users.created";
-export const targetsServicesTargetsProcessedQueueName = "targetsService.targets.processed";
+export const targetsServicesUsersCreatedQueueName = "users.created.targetsService";
+export const targetsServicesTargetsProcessedQueueName = "targets.processed.targetsService";
 
 export type AssertQueueParams = Parameters<Channel["assertQueue"]>
 

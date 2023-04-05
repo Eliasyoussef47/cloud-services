@@ -1,7 +1,10 @@
 import { IMessageBrokerTargetProcessed, IMessageBrokerUser, IMessageBrokerUserCreatedConsumer } from "@/shared/MessageBroker/MessageBroker.js";
-import { Channel, Connection, Replies } from "amqplib";
+import { Channel, Connection, ConsumeMessage, Replies } from "amqplib";
 import { exchangeAlphaParams, exchangeCharlieParams, exchangeDeltaParams, targetsServicesTargetsProcessedQueueParams, targetsServicesUsersCreatedQueueParams } from "@/shared/MessageBroker/constants.js";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
+import { UserCreatedMessage, userCreatedMessageSchema } from "@/shared/MessageBroker/messages.js";
+import ServicesRegistry from "@/targetsService/ServiceRegistry.js";
+import { BindExchange_A_C, BindExchange_A_D } from "@/shared/MessageBroker/helperClasses.js";
 
 export class TargetsServiceMessageBroker implements IMessageBrokerUserCreatedConsumer, IMessageBrokerTargetProcessed {
 	private _messageBrokerUser: IMessageBrokerUser;
@@ -10,6 +13,8 @@ export class TargetsServiceMessageBroker implements IMessageBrokerUserCreatedCon
 	private _exchangeDelta: Replies.AssertExchange | undefined;
 	private _targetsProcessedQueue: Replies.AssertQueue | undefined;
 	private _usersQueue: Replies.AssertQueue | undefined;
+	private _bindExchange_A_D: BindExchange_A_D | undefined;
+	private _bindExchange_A_C: BindExchange_A_C | undefined;
 
 	constructor(messageBrokerUser: IMessageBrokerUser) {
 		this._messageBrokerUser = messageBrokerUser;
@@ -80,9 +85,22 @@ export class TargetsServiceMessageBroker implements IMessageBrokerUserCreatedCon
 	}
 
 	public async assertExchanges(): Promise<boolean> {
+		if (!this.channel) {
+			return false;
+		}
+
 		this.exchangeAlpha = await this.channel?.assertExchange(...exchangeAlphaParams);
 		this.exchangeCharlie = await this.channel?.assertExchange(...exchangeCharlieParams);
 		this.exchangeDelta = await this.channel?.assertExchange(...exchangeDeltaParams);
+		if (!this.exchangeAlpha || !this.exchangeCharlie || !this.exchangeDelta) {
+			return false;
+		}
+
+		this._bindExchange_A_D = new BindExchange_A_D(this.channel, this.exchangeAlpha, this.exchangeDelta);
+		await this._bindExchange_A_D.assertExchanges();
+
+		this._bindExchange_A_C = new BindExchange_A_C(this.channel, this.exchangeAlpha, this.exchangeCharlie);
+		await this._bindExchange_A_C.assertExchanges();
 
 		return true;
 	}
@@ -100,7 +118,7 @@ export class TargetsServiceMessageBroker implements IMessageBrokerUserCreatedCon
 					return;
 				}
 
-				await this.channel.bindQueue(this.usersQueue.queue, this.exchangeDelta.exchange, <RoutingKey> "#");
+				await this.channel.bindQueue(this.usersQueue.queue, this.exchangeDelta.exchange, <RoutingKey> "");
 			} catch (e) {
 				this.usersQueue = undefined;
 			}
@@ -118,7 +136,7 @@ export class TargetsServiceMessageBroker implements IMessageBrokerUserCreatedCon
 					return;
 				}
 
-				await this.channel.bindQueue(this.targetsProcessedQueue.queue, this.exchangeCharlie.exchange, <RoutingKey> "submissions.image.processed");
+				await this.channel.bindQueue(this.targetsProcessedQueue.queue, this.exchangeCharlie.exchange, <RoutingKey> "targets.image.processed");
 			} catch (e) {
 				this.usersQueue = undefined;
 			}
@@ -133,5 +151,49 @@ export class TargetsServiceMessageBroker implements IMessageBrokerUserCreatedCon
 
 	public publish(routingKey: RoutingKey, msg: string, exchange: string = "alpha"): boolean {
 		return this._messageBrokerUser.publish(routingKey, msg);
+	}
+
+	private async consumeUserCreated(message: UserCreatedMessage) {
+		await ServicesRegistry.getInstance().userRepository.create({ customId: message.data.customId });
+	}
+
+	public async userCreatedListener(msg: ConsumeMessage | null) {
+		if (!msg) {
+			return;
+		}
+
+		const channel = this.channel;
+		if (!channel) {
+			return;
+		}
+
+		const messageObject = JSON.parse(msg.content.toString());
+		const parsedMessage = userCreatedMessageSchema.safeParse(messageObject);
+
+		if (!parsedMessage.success) {
+			return;
+		}
+
+		channel.ack(msg);
+		await this.consumeUserCreated(parsedMessage.data);
+	}
+
+	public async consume(): Promise<void> {
+		try {
+			const channel = this.channel;
+			if (!channel) {
+				return;
+			}
+
+			const usersQueue = this.usersQueue;
+			if (!usersQueue) {
+				return;
+			}
+
+			channel.consume(usersQueue.queue, (msg) => this.userCreatedListener(msg)).then();
+
+		} catch (error) {
+			console.log (`Error in consume: ${error}`);
+		}
 	}
 }
