@@ -13,7 +13,7 @@ export const targetSchema = new Schema<MongooseTarget, TargetModelType, Target, 
 	source: { type: SchemaTypes.String, required: true },
 	base64Encoded: { type: SchemaTypes.String, required: true },
 	locationName: { type: SchemaTypes.String, required: true },
-	externalUploadId: { type: SchemaTypes.String, required: false },
+	externalUploadId: { type: SchemaTypes.String, default: null },
 
 }, { timestamps: true });
 targetSchema.set("toObject", { versionKey: false, useProjection: true });
