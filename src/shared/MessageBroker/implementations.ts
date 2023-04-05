@@ -1,47 +1,24 @@
-import { IMessageBrokerUser, IMessageBrokerUserCreatedPublisher } from "@/shared/MessageBroker/MessageBroker.js";
-import { Channel, Connection, Replies } from "amqplib";
+import { IMessagePublisher } from "@/shared/MessageBroker/MessageBroker.js";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
-import { MessageBrokerUserCreatedPublisher } from "@/shared/MessageBroker/helperClasses.js";
+import { MessageBroker } from "@/shared/MessageBroker/helperClasses.js";
 import { UserCreatedBody, UserCreatedMessage } from "@/shared/MessageBroker/messages.js";
+import { exchangeAlphaName, ExchangeName } from "@/shared/MessageBroker/constants.js";
 
-export class AuthServiceMessageBroker implements IMessageBrokerUserCreatedPublisher {
-	public exchangeAlpha: Replies.AssertExchange | undefined;
-	private _messageBrokerUserCreatedPublisher: IMessageBrokerUserCreatedPublisher;
+export class AuthServiceMessageBroker implements IMessagePublisher {
+	private _messageBroker: MessageBroker;
 
-	constructor(messageBrokerUser: IMessageBrokerUser) {
-		this._messageBrokerUserCreatedPublisher = new MessageBrokerUserCreatedPublisher(messageBrokerUser);
-	}
-
-	public get connection(): Connection | undefined {
-		return this._messageBrokerUserCreatedPublisher.connection;
-	}
-
-	public set connection(value: Connection | undefined) {
-		this._messageBrokerUserCreatedPublisher.connection = value;
-	}
-
-	public get channel(): Channel | undefined {
-		return this._messageBrokerUserCreatedPublisher.channel;
-	}
-
-	public set channel(value: Channel | undefined) {
-		this._messageBrokerUserCreatedPublisher.channel = value;
+	constructor(messageBroker: MessageBroker) {
+		this._messageBroker = messageBroker;
 	}
 
 	public async assertExchanges(): Promise<boolean> {
-		return this._messageBrokerUserCreatedPublisher.assertExchanges();
+		await this._messageBroker.assertExchangeAlpha();
+
+		return true;
 	}
 
-	public connect(url: string): Promise<Connection | undefined> {
-		return this._messageBrokerUserCreatedPublisher.connect(url);
-	}
-
-	public createChannel(): Promise<Channel | undefined> {
-		return this._messageBrokerUserCreatedPublisher.createChannel();
-	}
-
-	public publish(routingKey: RoutingKey, msg: string, exchange: string = "alpha"): boolean {
-		return this._messageBrokerUserCreatedPublisher.publish(routingKey, msg);
+	public publish(routingKey: RoutingKey, msg: string, exchange: ExchangeName = exchangeAlphaName): boolean {
+		return this._messageBroker.publish(routingKey, msg);
 	}
 
 	public publishUserCreated(message: UserCreatedBody): boolean {
@@ -54,7 +31,6 @@ export class AuthServiceMessageBroker implements IMessageBrokerUserCreatedPublis
 	}
 
 	private publishUserCreatedBase(message: UserCreatedMessage): boolean {
-
 		return this.publish("users.*.created", JSON.stringify(message));
 	}
 }

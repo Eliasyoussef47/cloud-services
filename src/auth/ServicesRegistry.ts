@@ -1,22 +1,22 @@
 import IUserRepository from "@/auth/persistence/IUserRepository.js";
 import { AuthServiceMessageBroker } from "@/shared/MessageBroker/implementations.js";
-import { IMessageBrokerUser } from "@/shared/MessageBroker/MessageBroker.js";
+import { MessageBroker } from "@/shared/MessageBroker/helperClasses.js";
 
 export interface Services {
 	userRepository: IUserRepository;
-	messageBrokerUser: IMessageBrokerUser;
+	messageBroker: MessageBroker;
 	authServiceMessageBroker: AuthServiceMessageBroker;
 }
 
 export default class ServicesRegistry implements Services {
 	static #instance: ServicesRegistry;
-	public messageBrokerUser: IMessageBrokerUser;
+	public messageBroker: MessageBroker;
 	private readonly _userRepository: IUserRepository;
 	private readonly _authServiceMessageBroker: AuthServiceMessageBroker;
 
 	constructor(services: Services) {
 		this._userRepository = services.userRepository;
-		this.messageBrokerUser = services.messageBrokerUser;
+		this.messageBroker = services.messageBroker;
 		this._authServiceMessageBroker = services.authServiceMessageBroker;
 	}
 

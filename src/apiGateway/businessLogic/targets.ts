@@ -65,6 +65,12 @@ export default class Targets {
 		return myHeaders
 	}
 
+	/**
+	 * Used as to perform the HTTP requests.
+	 * @param url
+	 * @param fetchInit
+	 * @private
+	 */
 	private static async defaultServiceCall(url: URL, fetchInit: RequestInit) {
 		let fetchResult;
 

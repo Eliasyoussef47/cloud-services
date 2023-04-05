@@ -1,29 +1,35 @@
 import IUserRepository from "@/targetsService/persistence/IUserRepository.js";
 import ITargetRepository from "@/targetsService/persistence/ITargetRepository.js";
-import { IMessageBrokerUser } from "@/shared/MessageBroker/MessageBroker.js";
 import { TargetsServiceMessageBroker } from "@/targetsService/MessageBroker/MessageBroker.js";
+import { MessageBroker } from "@/shared/MessageBroker/helperClasses.js";
 
 export interface Services {
 	targetRepository: ITargetRepository;
 	userRepository: IUserRepository;
-	messageBrokerUser: IMessageBrokerUser;
+	messageBroker: MessageBroker;
 	targetsServiceMessageBroker: TargetsServiceMessageBroker;
 }
 
 export default class ServicesRegistry implements Services {
 	static #instance: ServicesRegistry;
-
+	public messageBroker: MessageBroker;
+	public targetsServiceMessageBroker: TargetsServiceMessageBroker;
 	private readonly _targetRepository: ITargetRepository;
 	private readonly _userRepository: IUserRepository;
-
-	public messageBrokerUser: IMessageBrokerUser;
-	public targetsServiceMessageBroker: TargetsServiceMessageBroker;
 
 	constructor(services: Services) {
 		this._targetRepository = services.targetRepository;
 		this._userRepository = services.userRepository;
-		this.messageBrokerUser = services.messageBrokerUser;
+		this.messageBroker = services.messageBroker;
 		this.targetsServiceMessageBroker = services.targetsServiceMessageBroker;
+	}
+
+	public get targetRepository(): ITargetRepository {
+		return this._targetRepository;
+	}
+
+	public get userRepository(): IUserRepository {
+		return this._userRepository;
 	}
 
 	public static getInstance(): ServicesRegistry {
@@ -36,14 +42,6 @@ export default class ServicesRegistry implements Services {
 
 	public static setupInitial(services: Services) {
 		ServicesRegistry.setInstance(new ServicesRegistry(services));
-	}
-
-	public get targetRepository(): ITargetRepository {
-		return this._targetRepository;
-	}
-
-	public get userRepository(): IUserRepository {
-		return this._userRepository;
 	}
 
 }
