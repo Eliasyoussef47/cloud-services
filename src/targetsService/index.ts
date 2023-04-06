@@ -1,4 +1,5 @@
 import "@/shared/utils/fixErrors.js";
+import "@/shared/utils/mongooseToJson.js";
 import * as dotenv from "dotenv";
 import { Environment } from "@/shared/operation/Environment.js";
 import { AuthServiceAlpha } from "@/auth/AuthServiceAlpha.js";
