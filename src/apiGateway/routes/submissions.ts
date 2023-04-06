@@ -12,7 +12,7 @@ const getRouter = () => {
 
 	targetsRouter.route(getSubmissionsRoute(":targetId"))
 		.get(handler.index)
-		// .post(upload.fields([{name: "photo"}]), TargetHandler.store);
+		.post(upload.fields([{name: "photo"}]), handler.store);
 
 	return targetsRouter;
 };

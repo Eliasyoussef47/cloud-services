@@ -7,6 +7,9 @@ import { toDataUrl } from "@/shared/utils/general.js";
 import { Environment } from "@/shared/operation/Environment.js";
 import crypto from "crypto";
 import { z } from "zod";
+import { Submission } from "@/submissionsService/models/Submission.js";
+
+export type RouteParams = Pick<Submission, "targetId">;
 
 const storeBodySchema = z.object({
 	userId: z.string()
