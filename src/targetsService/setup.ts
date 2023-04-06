@@ -3,8 +3,8 @@ import { Environment } from "@/shared/operation/Environment.js";
 import ServicesRegistry, { Services } from "@/targetsService/ServiceRegistry.js";
 import TargetRepository from "@/targetsService/persistence/mongoose/TargetRepository.js";
 import UserRepository from "@/shared/persistence/mongoose/UserRepository.js";
-import { MessageBroker } from "@/shared/MessageBroker/helperClasses.js";
 import { TargetsServiceMessageBroker } from "@/targetsService/MessageBroker/MessageBroker.js";
+import { MessageBroker } from "@/shared/MessageBroker/MessageBrokerGod.js";
 
 async function setupMessageBroker() {
 	const messageBroker = new MessageBroker();

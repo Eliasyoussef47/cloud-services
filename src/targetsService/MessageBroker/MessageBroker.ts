@@ -2,8 +2,8 @@ import { ConsumeMessage } from "amqplib";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
 import { TargetCreatedBody, TargetCreatedMessage, UserCreatedMessage, userCreatedMessageSchema } from "@/shared/MessageBroker/messages.js";
 import ServicesRegistry from "@/targetsService/ServiceRegistry.js";
-import { MessageBroker } from "@/shared/MessageBroker/helperClasses.js";
 import { exchangeAlphaName, ExchangeName } from "@/shared/MessageBroker/constants.js";
+import { MessageBroker } from "@/shared/MessageBroker/MessageBrokerGod.js";
 
 export class TargetsServiceMessageBroker {
 	private _messageBroker: MessageBroker;

@@ -1,11 +1,11 @@
 import Database from "@/shared/persistence/mongoose/Database.js";
 import { Environment } from "@/shared/operation/Environment.js";
 import UserRepository from "@/shared/persistence/mongoose/UserRepository.js";
-import { MessageBroker } from "@/shared/MessageBroker/helperClasses.js";
 import TargetRepository from "@/submissionsService/persistence/mongoose/TargetRepository.js";
 import ServicesRegistry, { Services } from "@/submissionsService/ServiceRegistry.js";
 import { SubmissionsServiceMessageBroker } from "@/submissionsService/MessageBroker/SubmissionsServiceMessageBroker.js";
 import SubmissionRepository from "@/submissionsService/persistence/mongoose/SubmissionRepository.js";
+import { MessageBroker } from "@/shared/MessageBroker/MessageBrokerGod.js";
 
 async function setupMessageBroker() {
 	const messageBroker = new MessageBroker();

@@ -1,8 +1,8 @@
-import { MessageBroker } from "@/shared/MessageBroker/helperClasses.js";
 import ITargetRepository from "@/submissionsService/persistence/ITargetRepository.js";
 import IUserRepository from "@/shared/persistence/IUserRepository.js";
 import ISubmissionRepository from "@/submissionsService/persistence/ISubmissionRepository.js";
 import { SubmissionsServiceMessageBroker } from "@/submissionsService/MessageBroker/SubmissionsServiceMessageBroker.js";
+import { MessageBroker } from "@/shared/MessageBroker/MessageBrokerGod.js";
 
 export interface Services {
 	targetRepository: ITargetRepository;

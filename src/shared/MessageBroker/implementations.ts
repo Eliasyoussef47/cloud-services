@@ -1,8 +1,8 @@
 import { IMessagePublisher } from "@/shared/MessageBroker/MessageBroker.js";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
-import { MessageBroker } from "@/shared/MessageBroker/helperClasses.js";
 import { UserCreatedBody, UserCreatedMessage } from "@/shared/MessageBroker/messages.js";
 import { exchangeAlphaName, ExchangeName } from "@/shared/MessageBroker/constants.js";
+import { MessageBroker } from "@/shared/MessageBroker/MessageBrokerGod.js";
 
 export class AuthServiceMessageBroker implements IMessagePublisher {
 	private _messageBroker: MessageBroker;

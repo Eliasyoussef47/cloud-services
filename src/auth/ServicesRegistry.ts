@@ -1,6 +1,6 @@
 import IUserRepository from "@/auth/persistence/IUserRepository.js";
 import { AuthServiceMessageBroker } from "@/shared/MessageBroker/implementations.js";
-import { MessageBroker } from "@/shared/MessageBroker/helperClasses.js";
+import { MessageBroker } from "@/shared/MessageBroker/MessageBrokerGod.js";
 
 export interface Services {
 	userRepository: IUserRepository;

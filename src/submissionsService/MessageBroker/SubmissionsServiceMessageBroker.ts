@@ -1,9 +1,9 @@
 import { ConsumeMessage } from "amqplib";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
 import { messageBrokerMessageBaseSchema, TargetCreatedMessage, targetCreatedMessageSchema, UserCreatedMessage, userCreatedMessageSchema } from "@/shared/MessageBroker/messages.js";
-import { MessageBroker } from "@/shared/MessageBroker/helperClasses.js";
 import { exchangeAlphaName, ExchangeName } from "@/shared/MessageBroker/constants.js";
 import ServicesRegistry from "@/submissionsService/ServiceRegistry.js";
+import { MessageBroker } from "@/shared/MessageBroker/MessageBrokerGod.js";
 
 export class SubmissionsServiceMessageBroker {
 	private _messageBroker: MessageBroker;

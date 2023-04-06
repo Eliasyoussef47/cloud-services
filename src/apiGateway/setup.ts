@@ -3,7 +3,7 @@ import UserRepository from "@/auth/persistence/mongoose/UserRepository.js";
 import Database from "@/shared/persistence/mongoose/Database.js";
 import { Environment } from "@/shared/operation/Environment.js";
 import { AuthServiceMessageBroker } from "@/shared/MessageBroker/implementations.js";
-import { MessageBroker } from "@/shared/MessageBroker/helperClasses.js";
+import { MessageBroker } from "@/shared/MessageBroker/MessageBrokerGod.js";
 
 async function setupMessageBroker() {
 	const messageBroker = new MessageBroker();
