@@ -1,12 +1,14 @@
 import { IAssertsExchanges, IAssertsQueues, IHasExchangeAlpha, IHasExchangeBravo, IHasExchangeCharlie, IMessageBrokerUser, IMessagePublisher } from "@/shared/MessageBroker/MessageBroker.js";
 import { Channel, Connection, Replies } from "amqplib";
-import { exchangeAlphaName, ExchangeName, submissionsServicesQueueName, submissionsServicesQueueParams, targetsServiceQueueParams, targetsServicesQueueName } from "@/shared/MessageBroker/constants.js";
+import { exchangeAlphaName, ExchangeName, submissionServiceCallbackQueueName, submissionServiceCallbackQueueParams, submissionsServicesQueueName, submissionsServicesQueueParams, targetsServiceQueueParams, targetsServiceRpcQueueName, targetsServiceRpcQueueParams, targetsServicesQueueName } from "@/shared/MessageBroker/constants.js";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
 import { BindExchange_A_B, BindExchange_A_C, ExchangeAlphaAsserter, ExchangeBravoAsserter, ExchangeCharlieAsserter, MessageBrokerUser } from "@/shared/MessageBroker/helperClasses.js";
 
 export class MessageBroker implements IMessageBrokerUser, IMessagePublisher, IAssertsExchanges, IAssertsQueues, IHasExchangeAlpha, IHasExchangeBravo, IHasExchangeCharlie {
 	public targetsServiceQueue: Replies.AssertQueue | undefined;
 	public submissionsServiceQueue: Replies.AssertQueue | undefined;
+	public targetsServiceRpcQueue: Replies.AssertQueue | undefined;
+	public submissionServiceCallbackQueue: Replies.AssertQueue | undefined;
 	private readonly _messageBrokerUser: MessageBrokerUser;
 	private _exchangeAlphaAsserter: ExchangeAlphaAsserter;
 	private _exchangeBravoAsserter: ExchangeBravoAsserter;
@@ -120,7 +122,7 @@ export class MessageBroker implements IMessageBrokerUser, IMessagePublisher, IAs
 
 			const exchangeBravo = this._exchangeBravoAsserter.exchangeBravo;
 			if (!exchangeBravo) {
-				console.error(`Asserting queue "${targetsServicesQueueName}" failed. Exchange bravo was not found..`);
+				console.error(`Asserting queue "${targetsServicesQueueName}" failed. Exchange bravo was not found.`);
 				return false;
 			}
 
@@ -150,7 +152,7 @@ export class MessageBroker implements IMessageBrokerUser, IMessagePublisher, IAs
 
 			const exchangeBravo = this._exchangeBravoAsserter.exchangeBravo;
 			if (!exchangeBravo) {
-				console.error(`Asserting queue "${submissionsServicesQueueName}" failed. Exchange bravo was not found..`);
+				console.error(`Asserting queue "${submissionsServicesQueueName}" failed. Exchange bravo was not found.`);
 				return false;
 			}
 
@@ -174,10 +176,50 @@ export class MessageBroker implements IMessageBrokerUser, IMessagePublisher, IAs
 		}
 	}
 
+	public async setupTargetsServiceRpcQueue(): Promise<boolean> {
+		try {
+			const channel = this._messageBrokerUser.channel;
+			if (!channel) {
+				console.error(`Asserting queue "${targetsServiceRpcQueueName}" failed. No channel found.`);
+				return false;
+			}
+
+			this.targetsServiceRpcQueue = await channel.assertQueue(...targetsServiceRpcQueueParams);
+			// TODO: Is it needed to set the prefetch to 1?
+
+			return true;
+		} catch (e) {
+			console.error(`Asserting queue "${targetsServiceRpcQueueName}" failed: `);
+			console.error(e);
+
+			return false;
+		}
+	}
+
+	public async setupSubmissionServiceCallbackQueue(): Promise<boolean> {
+		try {
+			const channel = this._messageBrokerUser.channel;
+			if (!channel) {
+				console.error(`Asserting queue "${submissionServiceCallbackQueueName}" failed. No channel found.`);
+				return false;
+			}
+
+			this.submissionServiceCallbackQueue = await channel.assertQueue(...submissionServiceCallbackQueueParams);
+
+			return true;
+		} catch (e) {
+			console.error(`Asserting queue "${submissionServiceCallbackQueueName}" failed: `);
+			console.error(e);
+
+			return false;
+		}
+	}
+
 	// TODO: Add RPC queues.
 	public async setupQueues(): Promise<boolean> {
 		await this.setupTargetsServiceQueue();
 		await this.setupSubmissionsServiceQueue();
+		await this.setupTargetsServiceRpcQueue();
 
 		return true;
 	}
@@ -190,5 +232,9 @@ export class MessageBroker implements IMessageBrokerUser, IMessagePublisher, IAs
 
 	public publish(routingKey: RoutingKey, msg: string, exchange: ExchangeName = exchangeAlphaName): boolean {
 		return this._messageBrokerUser.publish(routingKey, msg, exchange);
+	}
+
+	public publishToQueue(queueName: string, correlationId: string, msg: string): boolean {
+		return this._messageBrokerUser.publishToQueue(queueName, correlationId, msg);
 	}
 }

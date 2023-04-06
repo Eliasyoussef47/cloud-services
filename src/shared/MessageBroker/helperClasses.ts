@@ -37,7 +37,23 @@ export class MessageBrokerUser implements IMessageBrokerUser, IMessagePublisher 
 			// Messages are persistent so they are written to disk. This ensures that messages are not lost after system restart.
 			return channel.publish(exchange, routingKey, Buffer.from(msg), { persistent: true });
 		} catch (error) {
-			console.log("Error while publishing : " + error);
+			console.error("Error while publishing : " + error);
+			return false;
+		}
+	}
+
+	public publishToQueue(queueName: string, correlationId: string, msg: string): boolean {
+		try {
+			const channel = this.channel;
+			if (!channel) {
+				return false;
+				// throw new CustomError("Channel not constructed.");
+			}
+
+			// Messages are persistent so they are written to disk. This ensures that messages are not lost after system restart.
+			return channel.sendToQueue(queueName, Buffer.from(msg), { persistent: true, correlationId: correlationId });
+		} catch (error) {
+			console.error("Error while sending to queue: ", error);
 			return false;
 		}
 	}

@@ -16,10 +16,13 @@ export const exchangeCharlieParams: AssertExchangeParams = [exchangeCharlieName,
 
 export const targetsServicesQueueName = "webs.targetsServiceQueue";
 export const submissionsServicesQueueName = "webs.submissionsServiceQueue";
-// export const targetsServicesTargetsUploadedQueueName = "targets.uploaded.targetsService";
+export const targetsServiceRpcQueueName = "webs.targetsService.rpc";
+export const submissionServiceCallbackQueueName = "webs.submissionService.callbackQueue";
 
 export type AssertQueueParams = Parameters<Channel["assertQueue"]>;
 
 export const targetsServiceQueueParams: AssertQueueParams = [targetsServicesQueueName, { durable: true }];
 export const submissionsServicesQueueParams: AssertQueueParams = [submissionsServicesQueueName, { durable: true }];
+export const targetsServiceRpcQueueParams: AssertQueueParams = [targetsServiceRpcQueueName, { durable: true }];
+export const submissionServiceCallbackQueueParams: AssertQueueParams = [submissionServiceCallbackQueueName, { durable: true }];
 // export const targetsServicesTargetsUploadedQueueParams: AssertQueueParams = [targetsServicesTargetsUploadedQueueName, { durable: true }];

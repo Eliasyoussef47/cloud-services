@@ -13,6 +13,7 @@ export interface IMessageBrokerUser {
 
 export interface IMessagePublisher {
 	publish(routingKey: RoutingKey, msg: string, exchange?: ExchangeName): boolean;
+	publishToQueue(queueName: string, correlationId: string, msg: string): boolean;
 }
 
 export interface IAssertsExchanges {

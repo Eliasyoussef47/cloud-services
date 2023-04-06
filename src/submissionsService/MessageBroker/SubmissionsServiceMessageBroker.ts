@@ -32,6 +32,19 @@ export class SubmissionsServiceMessageBroker {
 				this.submissionsServiceQueueListener(msg);
 			}).then();
 
+			const submissionServiceCallbackQueue = this._messageBroker.submissionServiceCallbackQueue;
+			if (!submissionServiceCallbackQueue) {
+				return;
+			}
+
+			channel.consume(submissionServiceCallbackQueue.queue, (msg) => {
+				if (!msg) {
+					return;
+				}
+
+				this.submissionServiceCallbackQueueListener(msg);
+			}).then();
+
 		} catch (error) {
 			console.log(`Error in consume: ${error}`);
 		}
@@ -96,5 +109,29 @@ export class SubmissionsServiceMessageBroker {
 
 	private async consumeUserCreated(message: UserCreatedMessage) {
 		void ServicesRegistry.getInstance().userRepository.create({ customId: message.data.customId });
+	}
+
+	private submissionServiceCallbackQueueListener(msg: ConsumeMessage) {
+		// TODO: Validate message.
+		// TODO: Setup message.
+		// TODO: Send message so that it goes to the images service.
+
+		const channel = this._messageBroker.channel;
+		if (!channel) {
+			return;
+		}
+
+		let messageObject: any;
+
+		const messageContentString = msg.content.toString();
+		try {
+			messageObject = JSON.parse(messageContentString);
+		} catch (e) {
+			channel.reject(msg, false);
+
+			console.warn("Message received from the message broker wasn't JSON:");
+			console.warn(e);
+			return;
+		}
 	}
 }
