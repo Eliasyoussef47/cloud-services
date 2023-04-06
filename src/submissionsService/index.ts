@@ -26,13 +26,11 @@ app.set("env", process.env.NODE_ENV);
 app.use(cors());
 app.use(express.json());
 app.use(databaseHealth);
-app.get('/users/:userId/books/:bookId', (req, res) => {
-	res.send(req.params)
-})
+
 // TODO: User based authorization.
 app.use(uploadedSubmissionsPath, express.static("uploads/submissionsService"));
 
-// setupGatewayAuthenticationMiddlewares(app, AuthServiceAlpha.getInstance());
+setupGatewayAuthenticationMiddlewares(app, AuthServiceAlpha.getInstance());
 
 app.use(authenticatedRouter);
 

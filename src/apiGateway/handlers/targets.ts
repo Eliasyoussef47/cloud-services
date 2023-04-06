@@ -50,7 +50,6 @@ export default class TargetHandler {
 	};
 
 	public static store: RequestHandler = async (req, res, next) => {
-		// TODO: Better validation is possible.
 		const reqBody = storeBodySchema.parse(req.body);
 		const uploadedFiles = storeFilesSchema.parse(req.files);
 		const uploadedFile = uploadedFiles.photo[0];

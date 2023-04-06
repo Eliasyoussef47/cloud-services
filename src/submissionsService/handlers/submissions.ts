@@ -6,10 +6,7 @@ import { promises as fs } from "fs";
 import { toDataUrl } from "@/shared/utils/general.js";
 import { Environment } from "@/shared/operation/Environment.js";
 import crypto from "crypto";
-import { toZod } from "tozod";
-import { StoreBody } from "@/shared/types/targetsService/index.js";
 import { z } from "zod";
-import { StoreResponseBody } from "@/targetsService/handlers/targets.js";
 
 const storeBodySchema = z.object({
 	userId: z.string()
@@ -17,9 +14,9 @@ const storeBodySchema = z.object({
 
 export default class SubmissionHandler {
 	public static index: RequestHandler = async (req, res) => {
+		// TODO: User based authorization?
 		const submissions = await ServicesRegistry.getInstance().submissionRepository.getByTargetId(res.locals.target.customId);
 
-		// TODO: Remove mongoDB property from toObject.
 		const responseBody = {
 			status: "success",
 			data: {

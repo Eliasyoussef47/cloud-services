@@ -1,8 +1,8 @@
 import express from "express";
 import multer from "multer";
 import mime from "mime-types";
-import TargetHandler from "@/submissionsService/handlers/targets.js";
 import SubmissionHandler from "@/submissionsService/handlers/submissions.js";
+import { getTarget } from "@/submissionsService/middlewares/getTarget.js";
 
 export const submissionRouter = express.Router();
 
@@ -14,11 +14,17 @@ const storage = multer.diskStorage({
 	}
 });
 
-const upload = multer({storage});
-submissionRouter.route("/targets/:targetId/submissions")
-	.all(TargetHandler.getTarget)
+export type SubmissionsRoute<T extends string> = `/targets/${T}/submissions`;
+
+export function getSubmissionsRoute<T extends string>(path: T): SubmissionsRoute<T> {
+	return `/targets/${path}/submissions`;
+}
+
+const upload = multer({ storage });
+submissionRouter.route(getSubmissionsRoute(":targetId"))
+	.all(getTarget)
 	.get(SubmissionHandler.index)
-	.post(upload.fields([{name: "photo"}]), SubmissionHandler.store);
+	.post(upload.fields([{ name: "photo" }]), SubmissionHandler.store);
 
 // submissionRouter.route("/:id")
 // 	.get(TargetHandler.show)
