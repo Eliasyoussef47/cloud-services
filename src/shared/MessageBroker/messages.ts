@@ -1,9 +1,9 @@
 import { ResponseBody, ServiceStatus } from "@/shared/types/Response.js";
-import { User } from "@/targetsService/models/User.js";
 import { Target } from "@/targetsService/models/Target.js";
 import { toZod } from "tozod";
 import { z } from "zod";
 import { responseBodySchema } from "@/shared/validation/response.js";
+import { User } from "@/auth/models/User.js";
 
 export const resourceTypes = ["User", "Target", "Submission"] as const;
 export type ResourceType = typeof resourceTypes[number];
@@ -33,7 +33,7 @@ export interface MessageBrokerMessageBase<DataT extends object | null, TStatus e
 
 export const messageBrokerMessageBaseSchema = responseBodySchema.extend({
 	type: resourceTypeSchema
-});
+}).passthrough();
 
 export type UserCreatedBody = Pick<User, | "customId">;
 

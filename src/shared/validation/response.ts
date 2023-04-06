@@ -21,5 +21,5 @@ const serviceStatusSchema = z.custom<ServiceStatus>(() => {
 
 export const responseBodySchema = z.object({
 	status: serviceStatusSchema,
-	data: z.null(z.unknown())
+	data: z.object({}).passthrough().nullable()
 });

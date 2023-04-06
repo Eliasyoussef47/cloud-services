@@ -1,4 +1,4 @@
-import IUserRepository from "@/targetsService/persistence/IUserRepository.js";
+import IUserRepository from "@/shared/persistence/IUserRepository.js";
 import ITargetRepository from "@/targetsService/persistence/ITargetRepository.js";
 import { TargetsServiceMessageBroker } from "@/targetsService/MessageBroker/MessageBroker.js";
 import { MessageBroker } from "@/shared/MessageBroker/helperClasses.js";

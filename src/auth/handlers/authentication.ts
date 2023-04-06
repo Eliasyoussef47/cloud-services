@@ -40,7 +40,7 @@ export default class AuthenticationHandler {
 		const loginJwt = await AuthServiceBeta.getInstance().login(loginForm);
 
 		if (!loginJwt) {
-			throw createHttpError(401);
+			throw createHttpError(401, "Login info are wrong.");
 		}
 
 		const responseBody = {

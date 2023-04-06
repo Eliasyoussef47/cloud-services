@@ -1,6 +1,6 @@
 import { ConsumeMessage } from "amqplib";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
-import { UserCreatedMessage, userCreatedMessageSchema } from "@/shared/MessageBroker/messages.js";
+import { TargetCreatedBody, TargetCreatedMessage, UserCreatedMessage, userCreatedMessageSchema } from "@/shared/MessageBroker/messages.js";
 import ServicesRegistry from "@/targetsService/ServiceRegistry.js";
 import { MessageBroker } from "@/shared/MessageBroker/helperClasses.js";
 import { exchangeAlphaName, ExchangeName } from "@/shared/MessageBroker/constants.js";
@@ -67,7 +67,18 @@ export class TargetsServiceMessageBroker {
 			return;
 		}
 
-		const messageObject = JSON.parse(msg.content.toString());
+		const messageContentString = msg.content.toString();
+		let messageObject;
+		try {
+			messageObject = JSON.parse(messageContentString);
+		} catch (e) {
+			channel.reject(msg, false);
+
+			console.warn("Message received from the message broker wasn't JSON:");
+			console.warn(e);
+			return;
+		}
+
 		const parsedMessage = userCreatedMessageSchema.safeParse(messageObject);
 
 		if (!parsedMessage.success) {
@@ -79,7 +90,20 @@ export class TargetsServiceMessageBroker {
 		await this.consumeUserCreated(parsedMessage.data);
 	}
 
+	public publishTargetCreated(message: TargetCreatedBody): boolean {
+		const completeMessage: TargetCreatedMessage = {
+			type: "Target",
+			status: "created",
+			data: message
+		};
+		return this.publishTargetCreatedBase(completeMessage);
+	}
+
 	private async consumeUserCreated(message: UserCreatedMessage) {
 		await ServicesRegistry.getInstance().userRepository.create({ customId: message.data.customId });
+	}
+
+	private publishTargetCreatedBase(message: TargetCreatedMessage): boolean {
+		return this.publish("targets.*.created", JSON.stringify(message));
 	}
 }

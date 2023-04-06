@@ -1,10 +1,11 @@
 import Database from "@/shared/persistence/mongoose/Database.js";
 import { Environment } from "@/shared/operation/Environment.js";
-import ServicesRegistry, { Services } from "@/targetsService/ServiceRegistry.js";
-import TargetRepository from "@/targetsService/persistence/mongoose/TargetRepository.js";
 import UserRepository from "@/shared/persistence/mongoose/UserRepository.js";
 import { MessageBroker } from "@/shared/MessageBroker/helperClasses.js";
-import { TargetsServiceMessageBroker } from "@/targetsService/MessageBroker/MessageBroker.js";
+import TargetRepository from "@/submissionsService/persistence/mongoose/TargetRepository.js";
+import ServicesRegistry, { Services } from "@/submissionsService/ServiceRegistry.js";
+import { SubmissionsServiceMessageBroker } from "@/submissionsService/MessageBroker/SubmissionsServiceMessageBroker.js";
+import SubmissionRepository from "@/submissionsService/persistence/mongoose/SubmissionRepository.js";
 
 async function setupMessageBroker() {
 	const messageBroker = new MessageBroker();
@@ -12,23 +13,24 @@ async function setupMessageBroker() {
 	await messageBroker.connect(Environment.getInstance().envFile.MESSAGE_BROKER_URL);
 	await messageBroker.createChannel();
 
-	const targetsServiceMessageBroker = new TargetsServiceMessageBroker(messageBroker);
+	const submissionsServiceMessageBroker = new SubmissionsServiceMessageBroker(messageBroker);
 	await messageBroker.setup();
-	void targetsServiceMessageBroker.consume();
-	return { messageBroker, targetsServiceMessageBroker: targetsServiceMessageBroker };
+	void submissionsServiceMessageBroker.consume();
+	return { messageBroker, submissionsServiceMessageBroker };
 }
 
 export async function setupDependencies() {
-	await Database.setup(Environment.getInstance().envFile.TARGETS_DATABASE_PATH);
+	await Database.setup(Environment.getInstance().envFile.SUBMISSIONS_DATABASE_PATH);
 	const dbConnection = Database.getInstance().connection;
 
-	const { messageBroker, targetsServiceMessageBroker } = await setupMessageBroker();
+	const { messageBroker, submissionsServiceMessageBroker } = await setupMessageBroker();
 
 	const services: Services = {
 		targetRepository: new TargetRepository(dbConnection),
 		userRepository: new UserRepository(dbConnection),
+		submissionRepository: new SubmissionRepository(dbConnection),
 		messageBroker: messageBroker,
-		targetsServiceMessageBroker: targetsServiceMessageBroker
+		submissionsServiceMessageBroker
 	}
 	ServicesRegistry.setupInitial(services);
 }

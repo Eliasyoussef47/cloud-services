@@ -1,7 +1,7 @@
 import * as process from "process";
 import { toZod } from "tozod";
 import z from "zod";
-import { uploadedTargetsPath } from "@/shared/constants.js";
+import { uploadedSubmissionsPath, uploadedTargetsPath } from "@/shared/constants.js";
 
 export interface Env {
 	JWT_USERS_SECRET: string;
@@ -17,6 +17,7 @@ export interface Env {
 	JWT_EXPIRES_IN: number;
 	AUTH_DATABASE_PATH: string;
 	TARGETS_DATABASE_PATH: string;
+	SUBMISSIONS_DATABASE_PATH: string;
 }
 
 export const stringWithValueSchema = z.string().min(1, "Environment variable must have a value.");
@@ -36,6 +37,7 @@ export const envFileSchema: toZod<Env> = z.object({
 	JWT_EXPIRES_IN: z.coerce.number(),
 	AUTH_DATABASE_PATH: urlSchema,
 	TARGETS_DATABASE_PATH: urlSchema,
+	SUBMISSIONS_DATABASE_PATH: urlSchema,
 });
 
 export class Environment {
@@ -54,8 +56,16 @@ export class Environment {
 		return new URL(this.#envFile.TARGETS_SERVICE_URL);
 	}
 
+	public get submissionServiceUrl(): URL {
+		return new URL(this.#envFile.SUBMISSIONS_SERVICE_URL);
+	}
+
 	public get targetUploadsUrl(): URL {
 		return new URL(uploadedTargetsPath, this.targetServiceUrl);
+	}
+
+	public get submissionUploadsUrl(): URL {
+		return new URL(uploadedSubmissionsPath, this.submissionServiceUrl);
 	}
 
 	public get envFile(): Env {
@@ -84,7 +94,8 @@ export class Environment {
 			IMAGE_RECOGNITION_SERVICE_URL: process.env.IMAGE_RECOGNITION_SERVICE_URL || "",
 			JWT_EXPIRES_IN: Number(process.env.JWT_EXPIRES_IN) || 10800,
 			AUTH_DATABASE_PATH: process.env.AUTH_DATABASE_PATH || "",
-			TARGETS_DATABASE_PATH: process.env.TARGETS_DATABASE_PATH || ""
+			TARGETS_DATABASE_PATH: process.env.TARGETS_DATABASE_PATH || "",
+			SUBMISSIONS_DATABASE_PATH: process.env.SUBMISSIONS_DATABASE_PATH || ""
 		}
 
 		envFileSchema.parse(envFile);

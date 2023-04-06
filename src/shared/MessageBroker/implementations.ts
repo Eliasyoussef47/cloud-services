@@ -11,12 +11,6 @@ export class AuthServiceMessageBroker implements IMessagePublisher {
 		this._messageBroker = messageBroker;
 	}
 
-	public async assertExchanges(): Promise<boolean> {
-		await this._messageBroker.assertExchangeAlpha();
-
-		return true;
-	}
-
 	public publish(routingKey: RoutingKey, msg: string, exchange: ExchangeName = exchangeAlphaName): boolean {
 		return this._messageBroker.publish(routingKey, msg);
 	}

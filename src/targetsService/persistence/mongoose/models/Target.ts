@@ -1,7 +1,7 @@
 import { MongooseBase, MongooseWithTimestamps } from "@/shared/types/database/mongoose/mongoose.js";
 import { Target } from "@/targetsService/models/Target.js";
 import { DefaultSchemaOptions, type Model, Schema, SchemaTypes } from "mongoose";
-import UserRepository from "@/targetsService/persistence/mongoose/UserRepository.js";
+import UserRepository from "@/shared/persistence/mongoose/UserRepository.js";
 
 type MongooseTarget = MongooseBase & MongooseWithTimestamps & Target;
 export type TargetModelType = Model<MongooseTarget>;
@@ -14,6 +14,5 @@ export const targetSchema = new Schema<MongooseTarget, TargetModelType, Target, 
 	base64Encoded: { type: SchemaTypes.String, required: true },
 	locationName: { type: SchemaTypes.String, required: true },
 	externalUploadId: { type: SchemaTypes.String, default: null },
-
 }, { timestamps: true });
 targetSchema.set("toObject", { versionKey: false, useProjection: true });

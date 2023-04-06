@@ -48,6 +48,7 @@ export default class TargetHandler {
 			base64Encoded: fileDataUrl,
 			locationName: reqBody.locationName
 		});
+		ServicesRegistry.getInstance().targetsServiceMessageBroker.publishTargetCreated({ customId: newTarget.customId });
 
 		const responseBody = {
 			status: "success",
@@ -60,8 +61,6 @@ export default class TargetHandler {
 		} satisfies ResponseBody<StoreResponseBody>;
 
 		res.json(responseBody);
-
-		// TODO: Publish message to message broker.
 	};
 
 	public static show: RequestHandler = async (req, res) => {

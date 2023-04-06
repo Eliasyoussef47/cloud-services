@@ -1,6 +1,6 @@
 import { DefaultSchemaOptions, type Model, Schema, SchemaTypes } from "mongoose";
 import { MongooseBase } from "@/shared/types/database/mongoose/mongoose.js";
-import { User } from "@/targetsService/models/User.js";
+import { User } from "@/shared/persistence/mongoose/models/User.js";
 
 type MongooseUser = MongooseBase & User;
 export type UserModelType = Model<MongooseUser>;

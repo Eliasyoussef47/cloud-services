@@ -2,7 +2,7 @@ import { IAssertsExchanges, IAssertsQueues, IHasExchangeAlpha, IHasExchangeBravo
 import amqp, { Channel, Connection, Replies } from "amqplib";
 import { CustomError } from "@/shared/types/errors/CustomError.js";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
-import { exchangeAlphaName, exchangeAlphaParams, exchangeBravoName, exchangeBravoParams, exchangeCharlieName, exchangeCharlieParams, ExchangeName, targetsServiceQueueParams, targetsServicesQueueName } from "@/shared/MessageBroker/constants.js";
+import { exchangeAlphaName, exchangeAlphaParams, exchangeBravoName, exchangeBravoParams, exchangeCharlieName, exchangeCharlieParams, ExchangeName, submissionsServicesQueueName, submissionsServicesQueueParams, targetsServiceQueueParams, targetsServicesQueueName } from "@/shared/MessageBroker/constants.js";
 
 export class MessageBrokerUser implements IMessageBrokerUser, IMessagePublisher {
 	public connection: Connection | undefined;
@@ -250,6 +250,7 @@ export class BindExchange_A_C implements IHasExchangeAlpha, IHasExchangeCharlie 
 
 export class MessageBroker implements IMessageBrokerUser, IMessagePublisher, IAssertsExchanges, IAssertsQueues, IHasExchangeAlpha, IHasExchangeBravo, IHasExchangeCharlie {
 	public targetsServiceQueue: Replies.AssertQueue | undefined;
+	public submissionsServiceQueue: Replies.AssertQueue | undefined;
 	private readonly _messageBrokerUser: MessageBrokerUser;
 	private _exchangeAlphaAsserter: ExchangeAlphaAsserter;
 	private _exchangeBravoAsserter: ExchangeBravoAsserter;
@@ -383,11 +384,52 @@ export class MessageBroker implements IMessageBrokerUser, IMessagePublisher, IAs
 		}
 	}
 
+	public async setupSubmissionsServiceQueue(): Promise<boolean> {
+		try {
+			const channel = this._messageBrokerUser.channel;
+			if (!channel) {
+				console.error(`Asserting queue "${submissionsServicesQueueName}" failed. No channel found.`);
+				return false;
+			}
+
+			const exchangeBravo = this._exchangeBravoAsserter.exchangeBravo;
+			if (!exchangeBravo) {
+				console.error(`Asserting queue "${submissionsServicesQueueName}" failed. Exchange bravo was not found..`);
+				return false;
+			}
+
+			this.submissionsServiceQueue = await channel.assertQueue(...submissionsServicesQueueParams);
+
+			const pattern1: RoutingKey = "submissions.image.uploaded";
+			await channel.bindQueue(this.submissionsServiceQueue.queue, exchangeBravo.exchange, pattern1);
+
+			const pattern2: RoutingKey = "users.*.created";
+			await channel.bindQueue(this.submissionsServiceQueue.queue, exchangeBravo.exchange, pattern2);
+
+			const pattern3: RoutingKey = "targets.*.created";
+			await channel.bindQueue(this.submissionsServiceQueue.queue, exchangeBravo.exchange, pattern3);
+
+			return true;
+		} catch (e) {
+			console.error(`Asserting queue "${submissionsServicesQueueName}" failed: `);
+			console.error(e);
+
+			return false;
+		}
+	}
+
 	// TODO: Add RPC queues.
 	public async setupQueues(): Promise<boolean> {
 		await this.setupTargetsServiceQueue();
+		await this.setupSubmissionsServiceQueue();
 
 		return true;
+	}
+
+	public async setup() {
+		await this.assertExchanges();
+		await this.bindExchanges();
+		await this.setupQueues();
 	}
 
 	public publish(routingKey: RoutingKey, msg: string, exchange: ExchangeName = exchangeAlphaName): boolean {
