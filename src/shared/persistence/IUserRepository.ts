@@ -1,4 +1,4 @@
-import { User } from "@/shared/persistence/mongoose/models/User.js";
+import { User } from "@/shared/models/User.js";
 import { IPersistent } from "@/shared/types/database/database.js";
 
 export interface UserPersistent extends User, IPersistent<User> {

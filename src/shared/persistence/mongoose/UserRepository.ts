@@ -2,7 +2,7 @@ import { User } from "@/auth/models/User.js";
 import { Connection } from "mongoose";
 import { MyHydratedDocument } from "@/shared/types/database/mongoose/mongoose.js";
 import IUserRepository, { CreateParams, UserPersistent } from "@/shared/persistence/IUserRepository.js";
-import { UserModelType, userSchema } from "@/targetsService/persistence/mongoose/models/User.js";
+import { UserModelType, userSchema } from "@/shared/persistence/mongoose/models/User.js";
 import { DatabaseError } from "@/shared/types/errors/ServiceError.js";
 
 export default class UserRepository implements IUserRepository {
