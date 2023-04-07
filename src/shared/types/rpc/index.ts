@@ -23,7 +23,7 @@ export interface RpcResponse<BodyT extends object | null = null> {
 	body: BodyT;
 }
 
-export type TargetRpcRequest = RpcRequest<Submission>;
+export type TargetRpcRequest = RpcRequest<{submission: Submission}>;
 
 export const requestLineSchema: toZod<RequestLine> = z.object({
 	method: z.string(),
@@ -35,13 +35,15 @@ export const rpcRequestSchema = z.object({
 	body: z.object({}).passthrough().nullable()
 });
 
-export const customSubmissionBodySchema = z.custom<Submission>((val) => {
+export const submissionBodyCustomSchema = z.custom<Submission>((val) => {
 	return z.object({}).passthrough().nullable().safeParse(val).success
 });
 
 export const targetRpcRequestSchema = rpcRequestSchema.extend({
 	// Fake validation.
-	body: customSubmissionBodySchema
+	body: z.object({
+		submission: submissionBodyCustomSchema
+	})
 }).passthrough();
 
 export const statusLineSchema: toZod<StatusLine> = z.object({
@@ -60,3 +62,15 @@ export type TargetRpcResponseBody = {
 };
 
 export type TargetRpcResponse = RpcResponse<TargetRpcResponseBody>;
+
+export const targetBodyCustomSchema = z.custom<Target>((val) => {
+	return z.object({}).passthrough().nullable().safeParse(val).success
+});
+
+export const targetRpcResponseSchema = rpcResponseSchema.extend({
+	// Fake validation.
+	body: z.object({
+		submission: submissionBodyCustomSchema,
+		target: targetBodyCustomSchema
+	})
+}).passthrough();

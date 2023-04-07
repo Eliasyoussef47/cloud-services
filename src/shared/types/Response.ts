@@ -7,7 +7,7 @@ export type ServiceError = typeof serviceError[number];
 export const serviceStatus = [...serviceSucces, ...serviceError];
 export type ServiceStatus = typeof serviceStatus[number];
 
-export interface ResponseBody<DataT extends object | null = null, TStatus extends ServiceStatus = ServiceStatus> {
+export interface ResponseBody<DataT extends (object | null) = object | null, TStatus extends ServiceStatus = ServiceStatus> {
 	status: TStatus;
 	data: DataT
 }

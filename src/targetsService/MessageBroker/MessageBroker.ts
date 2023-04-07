@@ -2,9 +2,10 @@ import { ConsumeMessage } from "amqplib";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
 import { TargetCreatedBody, TargetCreatedMessage, UserCreatedMessage, userCreatedMessageSchema } from "@/shared/MessageBroker/messages.js";
 import ServicesRegistry from "@/targetsService/ServiceRegistry.js";
-import { exchangeAlphaName, ExchangeName } from "@/shared/MessageBroker/constants.js";
+import { exchangeAlphaName, ExchangeName, submissionServiceCallbackQueueName } from "@/shared/MessageBroker/constants.js";
 import { MessageBroker } from "@/shared/MessageBroker/MessageBrokerGod.js";
 import { TargetRpcRequest, targetRpcRequestSchema, TargetRpcResponse } from "@/shared/types/rpc/index.js";
+import { Options } from "amqplib/properties.js";
 
 export class TargetsServiceMessageBroker {
 	private _messageBroker: MessageBroker;
@@ -53,24 +54,15 @@ export class TargetsServiceMessageBroker {
 				this.userCreatedListener(msg);
 			}).then();
 
-		} catch (error) {
-			console.log(`Error in consume: ${error}`);
-		}
-	}
-
-	public async consumeRpc(): Promise<void> {
-		try {
-			const channel = this._messageBroker.channel;
-			if (!channel) {
-				return;
-			}
-
 			const targetsServiceRpcQueue = this._messageBroker.targetsServiceRpcQueue;
 			if (!targetsServiceRpcQueue) {
 				return;
 			}
 
 			channel.consume(targetsServiceRpcQueue.queue, (msg) => {
+				if (!msg) {
+					return;
+				}
 				this.targetsServiceRpcQueueListener(msg);
 			}).then();
 
@@ -129,17 +121,15 @@ export class TargetsServiceMessageBroker {
 		return this.publish("targets.*.created", JSON.stringify(message));
 	}
 
-	private targetsServiceRpcQueueListener(msg: ConsumeMessage | null) {
-		if (!msg) {
-			return;
-		}
-
+	private targetsServiceRpcQueueListener(msg: ConsumeMessage) {
 		const channel = this._messageBroker.channel;
 		if (!channel) {
 			return;
 		}
 
+		// The queue we should reply to with the respons.
 		const replyTo = msg.properties.replyTo;
+		// The id of the requested target
 		const correlationId = msg.properties.correlationId;
 		if (!replyTo || !correlationId) {
 			channel.reject(msg, false);
@@ -163,19 +153,20 @@ export class TargetsServiceMessageBroker {
 
 		const messageParsed = targetRpcRequestSchema.safeParse(messageObject);
 
-		// If the message doesn't have the correct format.
+		// If the message has the correct format.
 		if (messageParsed.success) {
 			channel.ack(msg);
-			void this.consumeRpcTargetRequested(replyTo, correlationId, messageParsed.data);
+			void this.consumeRpcTargetRequest(replyTo, correlationId, messageParsed.data);
 			return;
 		}
 
+		// If the message doesn't have the correct format rejects the message (dispose of it).
 		channel.reject(msg, false);
 		console.warn("Message received from the message broker was unprocessable.");
 	}
 
-	private async consumeRpcTargetRequested(replyTo: string, correlationId: string, msg: TargetRpcRequest) {
-		const target = await ServicesRegistry.getInstance().targetRepository.get(msg.body.targetId);
+	private async consumeRpcTargetRequest(replyTo: string, correlationId: string, msg: TargetRpcRequest) {
+		const target = await ServicesRegistry.getInstance().targetRepository.get(msg.body.submission.targetId);
 
 		if (!target) {
 			return;
@@ -188,10 +179,14 @@ export class TargetsServiceMessageBroker {
 			},
 			body: {
 				target: target,
-				submission: msg.body
+				submission: msg.body.submission
 			}
 		};
 
-		this._messageBroker.publishToQueue(replyTo, correlationId, JSON.stringify(rpcResponse));
+		const messageOptions: Options.Publish = {
+			correlationId: correlationId,
+		};
+
+		this._messageBroker.publishToQueue(replyTo, JSON.stringify(rpcResponse), messageOptions);
 	}
 }

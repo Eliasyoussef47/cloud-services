@@ -1,6 +1,7 @@
 import { Channel, Connection, Replies } from "amqplib";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
 import { ExchangeName } from "@/shared/MessageBroker/constants.js";
+import { Options } from "amqplib/properties.js";
 
 export interface IMessageBrokerUser {
 	connection: Connection | undefined;
@@ -13,7 +14,7 @@ export interface IMessageBrokerUser {
 
 export interface IMessagePublisher {
 	publish(routingKey: RoutingKey, msg: string, exchange?: ExchangeName): boolean;
-	publishToQueue(queueName: string, correlationId: string, msg: string): boolean;
+	publishToQueue(queueName: string, msg: string, options: Options.Publish): boolean;
 }
 
 export interface IAssertsExchanges {

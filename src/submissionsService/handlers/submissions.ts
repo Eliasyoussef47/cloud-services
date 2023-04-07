@@ -58,5 +58,7 @@ export default class SubmissionHandler {
 		} satisfies ResponseBody;
 
 		res.json(responseBody);
+
+		ServicesRegistry.getInstance().submissionsServiceMessageBroker.publishSubmissionTargetRequest(newSubmission.toObject());
 	};
 }

@@ -3,6 +3,7 @@ import amqp, { Channel, Connection, Replies } from "amqplib";
 import { CustomError } from "@/shared/types/errors/CustomError.js";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
 import { exchangeAlphaName, exchangeAlphaParams, exchangeBravoName, exchangeBravoParams, exchangeCharlieName, exchangeCharlieParams, ExchangeName } from "@/shared/MessageBroker/constants.js";
+import { Options } from "amqplib/properties.js";
 
 export class MessageBrokerUser implements IMessageBrokerUser, IMessagePublisher {
 	public connection: Connection | undefined;
@@ -42,7 +43,7 @@ export class MessageBrokerUser implements IMessageBrokerUser, IMessagePublisher 
 		}
 	}
 
-	public publishToQueue(queueName: string, correlationId: string, msg: string): boolean {
+	public publishToQueue(queueName: string, msg: string, options: Options.Publish = {}): boolean {
 		try {
 			const channel = this.channel;
 			if (!channel) {
@@ -50,8 +51,9 @@ export class MessageBrokerUser implements IMessageBrokerUser, IMessagePublisher 
 				// throw new CustomError("Channel not constructed.");
 			}
 
+			const completeOptions: Options.Publish = { ...{ persistent: true }, ...options };
 			// Messages are persistent so they are written to disk. This ensures that messages are not lost after system restart.
-			return channel.sendToQueue(queueName, Buffer.from(msg), { persistent: true, correlationId: correlationId });
+			return channel.sendToQueue(queueName, Buffer.from(msg), completeOptions);
 		} catch (error) {
 			console.error("Error while sending to queue: ", error);
 			return false;

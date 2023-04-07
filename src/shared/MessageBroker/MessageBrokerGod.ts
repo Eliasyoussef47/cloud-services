@@ -3,6 +3,7 @@ import { Channel, Connection, Replies } from "amqplib";
 import { exchangeAlphaName, ExchangeName, submissionServiceCallbackQueueName, submissionServiceCallbackQueueParams, submissionsServicesQueueName, submissionsServicesQueueParams, targetsServiceQueueParams, targetsServiceRpcQueueName, targetsServiceRpcQueueParams, targetsServicesQueueName } from "@/shared/MessageBroker/constants.js";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
 import { BindExchange_A_B, BindExchange_A_C, ExchangeAlphaAsserter, ExchangeBravoAsserter, ExchangeCharlieAsserter, MessageBrokerUser } from "@/shared/MessageBroker/helperClasses.js";
+import { Options } from "amqplib/properties.js";
 
 export class MessageBroker implements IMessageBrokerUser, IMessagePublisher, IAssertsExchanges, IAssertsQueues, IHasExchangeAlpha, IHasExchangeBravo, IHasExchangeCharlie {
 	public targetsServiceQueue: Replies.AssertQueue | undefined;
@@ -220,6 +221,7 @@ export class MessageBroker implements IMessageBrokerUser, IMessagePublisher, IAs
 		await this.setupTargetsServiceQueue();
 		await this.setupSubmissionsServiceQueue();
 		await this.setupTargetsServiceRpcQueue();
+		await this.setupSubmissionServiceCallbackQueue();
 
 		return true;
 	}
@@ -234,7 +236,7 @@ export class MessageBroker implements IMessageBrokerUser, IMessagePublisher, IAs
 		return this._messageBrokerUser.publish(routingKey, msg, exchange);
 	}
 
-	public publishToQueue(queueName: string, correlationId: string, msg: string): boolean {
-		return this._messageBrokerUser.publishToQueue(queueName, correlationId, msg);
+	public publishToQueue(queueName: string, msg: string, options: Options.Publish = {}): boolean {
+		return this._messageBrokerUser.publishToQueue(queueName, msg, options);
 	}
 }
