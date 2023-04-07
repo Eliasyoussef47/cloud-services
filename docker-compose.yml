@@ -31,9 +31,9 @@ services:
       - MONGO_URL=mongodb://mongo:27017
       - DB_NAME=cloud-services
       - API_GATEWAY_URL=http://127.0.0.1:3000
-      - TARGETS_SERVICE_URL=http://127.0.0.1:3001
-      - SUBMISSIONS_SERVICE_URL=http://127.0.0.1:3003
-      - IMAGE_RECOGNITION_SERVICE_URL=http://127.0.0.1:3004
+      - TARGETS_SERVICE_URL=http://targets:3001
+      - SUBMISSIONS_SERVICE_URL=http://submissions:3003
+      - IMAGE_RECOGNITION_SERVICE_URL=http://image-recognition:3004
       - AUTH_DATABASE_PATH=mongodb://mongo:27017/auth_service
       - TARGETS_DATABASE_PATH=mongodb://mongo:27017/targets_service
       - SUBMISSIONS_DATABASE_PATH=mongodb://mongo:27017/submissions_service
@@ -47,6 +47,10 @@ services:
     depends_on:
       - mongo
       - rabbitmq
+      - image-recognition
+      - submissions
+      - targets
+    restart: on-failure
 
   image-recognition:
     build:
@@ -61,9 +65,9 @@ services:
       - MONGO_URL=mongodb://mongo:27017
       - DB_NAME=cloud-services
       - API_GATEWAY_URL=http://127.0.0.1:3000
-      - TARGETS_SERVICE_URL=http://127.0.0.1:3001
-      - SUBMISSIONS_SERVICE_URL=http://127.0.0.1:3003
-      - IMAGE_RECOGNITION_SERVICE_URL=http://127.0.0.1:3004
+      - TARGETS_SERVICE_URL=http://targets:3001
+      - SUBMISSIONS_SERVICE_URL=http://submissions:3003
+      - IMAGE_RECOGNITION_SERVICE_URL=http://image-recognition:3004
       - AUTH_DATABASE_PATH=mongodb://mongo:27017/auth_service
       - TARGETS_DATABASE_PATH=mongodb://mongo:27017/targets_service
       - SUBMISSIONS_DATABASE_PATH=mongodb://mongo:27017/submissions_service
@@ -77,6 +81,7 @@ services:
     depends_on:
       - mongo
       - rabbitmq
+    restart: on-failure
 
   submissions:
     build:
@@ -91,9 +96,9 @@ services:
       - MONGO_URL=mongodb://mongo:27017
       - DB_NAME=cloud-services
       - API_GATEWAY_URL=http://127.0.0.1:3000
-      - TARGETS_SERVICE_URL=http://127.0.0.1:3001
-      - SUBMISSIONS_SERVICE_URL=http://127.0.0.1:3003
-      - IMAGE_RECOGNITION_SERVICE_URL=http://127.0.0.1:3004
+      - TARGETS_SERVICE_URL=http://targets:3001
+      - SUBMISSIONS_SERVICE_URL=http://submissions:3003
+      - IMAGE_RECOGNITION_SERVICE_URL=http://image-recognition:3004
       - AUTH_DATABASE_PATH=mongodb://mongo:27017/auth_service
       - TARGETS_DATABASE_PATH=mongodb://mongo:27017/targets_service
       - SUBMISSIONS_DATABASE_PATH=mongodb://mongo:27017/submissions_service
@@ -107,6 +112,7 @@ services:
     depends_on:
       - mongo
       - rabbitmq
+    restart: on-failure
 
   targets:
     build:
@@ -121,9 +127,9 @@ services:
       - MONGO_URL=mongodb://mongo:27017
       - DB_NAME=cloud-services
       - API_GATEWAY_URL=http://127.0.0.1:3000
-      - TARGETS_SERVICE_URL=http://127.0.0.1:3001
-      - SUBMISSIONS_SERVICE_URL=http://127.0.0.1:3003
-      - IMAGE_RECOGNITION_SERVICE_URL=http://127.0.0.1:3004
+      - TARGETS_SERVICE_URL=http://targets:3001
+      - SUBMISSIONS_SERVICE_URL=http://submissions:3003
+      - IMAGE_RECOGNITION_SERVICE_URL=http://image-recognition:3004
       - AUTH_DATABASE_PATH=mongodb://mongo:27017/auth_service
       - TARGETS_DATABASE_PATH=mongodb://mongo:27017/targets_service
       - SUBMISSIONS_DATABASE_PATH=mongodb://mongo:27017/submissions_service
@@ -137,3 +143,4 @@ services:
     depends_on:
       - mongo
       - rabbitmq
+    restart: on-failure
