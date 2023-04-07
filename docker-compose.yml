@@ -1,5 +1,5 @@
 # docker-compose.yml
-version: '2'
+version: '3.9'
 
 services:
   mongo:
@@ -10,15 +10,130 @@ services:
     volumes:
       - ./data/db:/data/db
 
-  app:
-    build: .
-    command: sh -c "npm install && npm run dev"
+  rabbitmq:
+    image: rabbitmq:3
+    healthcheck: # check if service bus is up and healthy. Note: The timings have been decreased from default in order to speed up startup time for dependant services
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: apiGateway.dockerfile
+    command: sh -c "npm install && npm run apiGateway"
     ports:
       - 3000:3000
     volumes:
       - ./:/cloud-services
     environment:
-      - MONGO_URL=mongodb://127.0.0.1:27017
+      - MONGO_URL=mongodb://mongo:27017
       - DB_NAME=cloud-services
+      - API_GATEWAY_URL=http://127.0.0.1:3000
+      - TARGETS_SERVICE_URL=http://127.0.0.1:3001
+      - SUBMISSIONS_SERVICE_URL=http://127.0.0.1:3003
+      - IMAGE_RECOGNITION_SERVICE_URL=http://127.0.0.1:3004
+      - AUTH_DATABASE_PATH=mongodb://mongo:27017/auth_service
+      - TARGETS_DATABASE_PATH=mongodb://mongo:27017/targets_service
+      - SUBMISSIONS_DATABASE_PATH=mongodb://mongo:27017/submissions_service
+      - MESSAGE_BROKER_URL=amqp://rabbitmq:5672
+      - JWT_USERS_SECRET=789
+      - JWT_GATEWAY_SECRET=456
+      - SERVICES_API_KEY=123
+      - JWT_EXPIRES_IN=10800
+      - IMAGGA_API_KEY=acc_2f45991556a390d
+      - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
     depends_on:
       - mongo
+      - rabbitmq
+
+  image-recognition:
+    build:
+      context: .
+      dockerfile: imageRecognition.dockerfile
+    command: sh -c "npm install && npm run imageRecognition"
+    ports:
+      - 3004:3004
+    volumes:
+      - ./:/cloud-services
+    environment:
+      - MONGO_URL=mongodb://mongo:27017
+      - DB_NAME=cloud-services
+      - API_GATEWAY_URL=http://127.0.0.1:3000
+      - TARGETS_SERVICE_URL=http://127.0.0.1:3001
+      - SUBMISSIONS_SERVICE_URL=http://127.0.0.1:3003
+      - IMAGE_RECOGNITION_SERVICE_URL=http://127.0.0.1:3004
+      - AUTH_DATABASE_PATH=mongodb://mongo:27017/auth_service
+      - TARGETS_DATABASE_PATH=mongodb://mongo:27017/targets_service
+      - SUBMISSIONS_DATABASE_PATH=mongodb://mongo:27017/submissions_service
+      - MESSAGE_BROKER_URL=amqp://rabbitmq:5672
+      - JWT_USERS_SECRET=789
+      - JWT_GATEWAY_SECRET=456
+      - SERVICES_API_KEY=123
+      - JWT_EXPIRES_IN=10800
+      - IMAGGA_API_KEY=acc_2f45991556a390d
+      - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
+    depends_on:
+      - mongo
+      - rabbitmq
+
+  submissions:
+    build:
+      context: .
+      dockerfile: submissions.dockerfile
+    command: sh -c "npm install && npm run submissions"
+    ports:
+      - 3003:3003
+    volumes:
+      - ./:/cloud-services
+    environment:
+      - MONGO_URL=mongodb://mongo:27017
+      - DB_NAME=cloud-services
+      - API_GATEWAY_URL=http://127.0.0.1:3000
+      - TARGETS_SERVICE_URL=http://127.0.0.1:3001
+      - SUBMISSIONS_SERVICE_URL=http://127.0.0.1:3003
+      - IMAGE_RECOGNITION_SERVICE_URL=http://127.0.0.1:3004
+      - AUTH_DATABASE_PATH=mongodb://mongo:27017/auth_service
+      - TARGETS_DATABASE_PATH=mongodb://mongo:27017/targets_service
+      - SUBMISSIONS_DATABASE_PATH=mongodb://mongo:27017/submissions_service
+      - MESSAGE_BROKER_URL=amqp://rabbitmq:5672
+      - JWT_USERS_SECRET=789
+      - JWT_GATEWAY_SECRET=456
+      - SERVICES_API_KEY=123
+      - JWT_EXPIRES_IN=10800
+      - IMAGGA_API_KEY=acc_2f45991556a390d
+      - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
+    depends_on:
+      - mongo
+      - rabbitmq
+
+  targets:
+    build:
+      context: .
+      dockerfile: targets.dockerfile
+    command: sh -c "npm install && npm run targets"
+    ports:
+      - 3001:3001
+    volumes:
+      - ./:/cloud-services
+    environment:
+      - MONGO_URL=mongodb://mongo:27017
+      - DB_NAME=cloud-services
+      - API_GATEWAY_URL=http://127.0.0.1:3000
+      - TARGETS_SERVICE_URL=http://127.0.0.1:3001
+      - SUBMISSIONS_SERVICE_URL=http://127.0.0.1:3003
+      - IMAGE_RECOGNITION_SERVICE_URL=http://127.0.0.1:3004
+      - AUTH_DATABASE_PATH=mongodb://mongo:27017/auth_service
+      - TARGETS_DATABASE_PATH=mongodb://mongo:27017/targets_service
+      - SUBMISSIONS_DATABASE_PATH=mongodb://mongo:27017/submissions_service
+      - MESSAGE_BROKER_URL=amqp://rabbitmq:5672
+      - JWT_USERS_SECRET=789
+      - JWT_GATEWAY_SECRET=456
+      - SERVICES_API_KEY=123
+      - JWT_EXPIRES_IN=10800
+      - IMAGGA_API_KEY=acc_2f45991556a390d
+      - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
+    depends_on:
+      - mongo
+      - rabbitmq
