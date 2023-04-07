@@ -12,7 +12,7 @@ const circuitBreakerOptions: CircuitBreakerOptions = {
 	timeout: 10000, // If our function takes longer than 10 seconds, trigger a failure
 	errorThresholdPercentage: 10, // When 50% of requests fail, trip the circuit
 	resetTimeout: 10000, // After 3 seconds, try again.
-	rollingCountTimeout: 10000,
+	rollingCountTimeout: 1000,
 	rollingCountBuckets: 1,
 	capacity: 2
 };
@@ -22,7 +22,7 @@ const imageRecognition = new ImageRecognition();
 const imageSimilarityCircuitBreaker = new CircuitBreaker(imageRecognition.getImageSimilarity, circuitBreakerOptions);
 imageSimilarityCircuitBreaker.on("failure", () => console.log(`Imagga circuit breaker: failed`));
 imageSimilarityCircuitBreaker.on("timeout", () => console.log(`Imagga circuit breaker: timed out`));
-imageSimilarityCircuitBreaker.on("reject", () => console.log(`Imagga circuit breaker: rejected`));
+// imageSimilarityCircuitBreaker.on("reject", () => console.log(`Imagga circuit breaker: rejected`));
 imageSimilarityCircuitBreaker.on("open", () => console.log(`Imagga circuit breaker: opened`));
 imageSimilarityCircuitBreaker.on("halfOpen", () => console.log(`Imagga circuit breaker: halfOpened`));
 imageSimilarityCircuitBreaker.on("close", () => console.log(`Imagga circuit breaker: closed`));
@@ -117,12 +117,12 @@ export class ImageRecognitionServiceMessageBroker {
 		// TODO: Parse message.
 		const parsedMessage = <ScoreCalculationRequestMessage> messageObject;
 		let similarityDistance: number | null = null;
-		// const queueStats = await channel.checkQueue(imagesToProcessQueueName);
-		// console.log("messages in queue: ", queueStats.messageCount);
 
 		try {
 			similarityDistance = await imageSimilarityCircuitBreaker.fire(parsedMessage.data.target.base64Encoded, parsedMessage.data.submission.base64Encoded);
 		} catch (e) {
+			const queueStats = await channel.checkQueue(imagesToProcessQueueName);
+			console.log("Messages in queue: ", queueStats.messageCount);
 			// console.error("imageSimilarity", e);
 		}
 
