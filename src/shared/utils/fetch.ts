@@ -40,18 +40,19 @@ export function getServicesAuthHeaders() {
 }
 
 export async function printResponse(response: Response) {
+	const clonedResponse = response.clone();
 	console.log("Response:");
-	console.log("Status: ", response.status);
-	console.log("Headers: ", response.headers);
+	console.log("Status: ", clonedResponse.status);
+	console.log("Headers: ", clonedResponse.headers);
 
-	const contentType = response.headers.get("Content-Type") ?? "";
+	const contentType = clonedResponse.headers.get("Content-Type") ?? "";
 	const contentTypeMimeType = mime.extension(contentType);
 
 	if (contentTypeMimeType === "json") {
-		const body = await response.json();
+		const body = await clonedResponse.json();
 		console.log("Body: ", body);
 	} else {
-		const body = await response.text();
+		const body = await clonedResponse.text();
 		console.log("Body: ", body);
 	}
 }

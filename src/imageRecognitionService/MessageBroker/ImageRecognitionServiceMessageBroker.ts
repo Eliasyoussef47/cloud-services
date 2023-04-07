@@ -1,10 +1,31 @@
 import { MessageBroker } from "@/shared/MessageBroker/MessageBrokerGod.js";
 import { ConsumeMessage } from "amqplib";
-import { ScoreCalculationRequest, ScoreCalculationRequestMessage, ScoreCalculationResponse, ScoreCalculationResponseMessage } from "@/shared/MessageBroker/messages.js";
+import { ScoreCalculationRequestMessage, ScoreCalculationResponseMessage } from "@/shared/MessageBroker/messages.js";
 import { ImageRecognition } from "@/imageRecognitionService/businessLogic/ImageRecognition.js";
 import { Submission } from "@/submissionsService/models/Submission.js";
 import { Target } from "@/targetsService/models/Target.js";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
+import CircuitBreaker, { Options as CircuitBreakerOptions } from "opossum";
+import { imagesToProcessQueueName } from "@/shared/MessageBroker/constants.js";
+
+const circuitBreakerOptions: CircuitBreakerOptions = {
+	timeout: 10000, // If our function takes longer than 10 seconds, trigger a failure
+	errorThresholdPercentage: 10, // When 50% of requests fail, trip the circuit
+	resetTimeout: 10000, // After 3 seconds, try again.
+	rollingCountTimeout: 10000,
+	rollingCountBuckets: 1,
+	capacity: 2
+};
+
+const imageRecognition = new ImageRecognition();
+
+const imageSimilarityCircuitBreaker = new CircuitBreaker(imageRecognition.getImageSimilarity, circuitBreakerOptions);
+imageSimilarityCircuitBreaker.on("failure", () => console.log(`Imagga circuit breaker: failed`));
+imageSimilarityCircuitBreaker.on("timeout", () => console.log(`Imagga circuit breaker: timed out`));
+imageSimilarityCircuitBreaker.on("reject", () => console.log(`Imagga circuit breaker: rejected`));
+imageSimilarityCircuitBreaker.on("open", () => console.log(`Imagga circuit breaker: opened`));
+imageSimilarityCircuitBreaker.on("halfOpen", () => console.log(`Imagga circuit breaker: halfOpened`));
+imageSimilarityCircuitBreaker.on("close", () => console.log(`Imagga circuit breaker: closed`));
 
 export class ImageRecognitionServiceMessageBroker {
 	private _messageBroker: MessageBroker;
@@ -56,6 +77,25 @@ export class ImageRecognitionServiceMessageBroker {
 		}
 	}
 
+	public publishScoreCalculationResponse(submissionId: Submission["customId"], targetId: Target["customId"], score: number | null) {
+		const scoreCalculationResponse: ScoreCalculationResponseMessage = {
+			type: "Submission",
+			status: "scoreCalculated",
+			data: {
+				submission: {
+					customId: submissionId,
+					score: score
+				},
+				target: {
+					customId: targetId
+				}
+			}
+		};
+		const routingKey: RoutingKey = "submissions.image.scoreCalculated";
+
+		this._messageBroker.publish(routingKey, JSON.stringify(scoreCalculationResponse));
+	}
+
 	private async scoreCalculationRequestListener(msg: ConsumeMessage) {
 		const channel = this._messageBroker.channel;
 		if (!channel) {
@@ -76,33 +116,22 @@ export class ImageRecognitionServiceMessageBroker {
 
 		// TODO: Parse message.
 		const parsedMessage = <ScoreCalculationRequestMessage> messageObject;
-		const imageRecognition = new ImageRecognition();
-		const similarityDistance = await imageRecognition.getImageSimilarity(parsedMessage.data.target.base64Encoded, parsedMessage.data.submission.base64Encoded);
+		let similarityDistance: number | null = null;
+		// const queueStats = await channel.checkQueue(imagesToProcessQueueName);
+		// console.log("messages in queue: ", queueStats.messageCount);
+
+		try {
+			similarityDistance = await imageSimilarityCircuitBreaker.fire(parsedMessage.data.target.base64Encoded, parsedMessage.data.submission.base64Encoded);
+		} catch (e) {
+			// console.error("imageSimilarity", e);
+		}
+
 		if (similarityDistance) {
 			channel.ack(msg);
+
+			this.publishScoreCalculationResponse(parsedMessage.data.submission.customId, parsedMessage.data.target.customId, similarityDistance);
 		} else {
 			channel.reject(msg, true);
 		}
-
-		this.publishScoreCalculationResponse(parsedMessage.data.submission.customId, parsedMessage.data.target.customId, similarityDistance);
-	}
-
-	public publishScoreCalculationResponse(submissionId: Submission["customId"], targetId: Target["customId"], score: number | null) {
-		const scoreCalculationResponse: ScoreCalculationResponseMessage = {
-			type: "Submission",
-			status: "scoreCalculated",
-			data: {
-				submission: {
-					customId: submissionId,
-					score: score
-				},
-				target: {
-					customId: targetId
-				}
-			}
-		};
-		const routingKey: RoutingKey = "submissions.image.scoreCalculated";
-
-		this._messageBroker.publish(routingKey, JSON.stringify(scoreCalculationResponse));
 	}
 }

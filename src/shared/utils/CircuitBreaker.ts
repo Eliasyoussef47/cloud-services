@@ -33,7 +33,7 @@ export const attachStandardCircuitBreakerCallbacks = (circuitBreaker: CircuitBre
 	circuitBreaker.on("fallback", (result) => {
 		console.log(`${circuitBreakerName}: fallback: `, result);
 	});
-	circuitBreaker.on("success", () => console.log(`${circuitBreakerName}: success`));
+	// circuitBreaker.on("success", () => console.log(`${circuitBreakerName}: success`));
 	circuitBreaker.on("failure", () => console.log(`${circuitBreakerName}: failed`));
 	circuitBreaker.on("timeout", () => console.log(`${circuitBreakerName}: timed out`));
 	circuitBreaker.on("reject", () => console.log(`${circuitBreakerName}: rejected`));

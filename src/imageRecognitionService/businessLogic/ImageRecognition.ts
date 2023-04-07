@@ -1,8 +1,7 @@
 import { Environment } from "@/shared/operation/Environment.js";
-import ServicesRegistry from "@/imageRecognitionService/ServicesRegistry.js";
 import { imagesSimilarityResponseSchema } from "@/imageRecognitionService/types/imagga.js";
-import { basicAuth } from "@/shared/utils/general.js";
 import { printResponse } from "@/shared/utils/fetch.js";
+import ImaggaError from "@/imageRecognitionService/types/errors/ImaggaError.js";
 
 export class ImageRecognition {
 	/**
@@ -10,6 +9,7 @@ export class ImageRecognition {
 	 * @param imageBase64A
 	 * @param imageBase64B
 	 * @return The distance between the two images.
+	 * @throws {ImaggaError} When the response from the Imagga API doesn't have a 200 (ok) status code.
 	 */
 	public async getImageSimilarity(imageBase64A: string, imageBase64B: string): Promise<number | null> {
 		const myHeaders = new Headers();
@@ -36,8 +36,9 @@ export class ImageRecognition {
 
 		if (!response.ok) {
 			console.warn("Imagga request not ok:");
-			void printResponse(response);
-			return null;
+			// void printResponse(response);
+			const responseText = await response.text();
+			throw new ImaggaError(responseText);
 		}
 
 		let responseJson: any;

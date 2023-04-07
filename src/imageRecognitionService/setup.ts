@@ -8,6 +8,7 @@ async function setupMessageBroker() {
 	// TODO: Check first if the connection and channel was established.
 	await messageBroker.connect(Environment.getInstance().envFile.MESSAGE_BROKER_URL);
 	await messageBroker.createChannel();
+	messageBroker.channel?.prefetch(1);
 
 	const imageRecognitionServiceMessageBroker = new ImageRecognitionServiceMessageBroker(messageBroker);
 	await messageBroker.setup();
