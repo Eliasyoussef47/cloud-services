@@ -80,6 +80,8 @@ export class ImageRecognitionServiceMessageBroker {
 		const similarityDistance = await imageRecognition.getImageSimilarity(parsedMessage.data.target.base64Encoded, parsedMessage.data.submission.base64Encoded);
 		if (similarityDistance) {
 			channel.ack(msg);
+		} else {
+			channel.reject(msg, true);
 		}
 
 		this.publishScoreCalculationResponse(parsedMessage.data.submission.customId, parsedMessage.data.target.customId, similarityDistance);
