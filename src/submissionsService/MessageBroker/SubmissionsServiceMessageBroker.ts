@@ -1,22 +1,19 @@
 import { ConsumeMessage } from "amqplib";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
-import { messageBrokerMessageBaseSchema, TargetCreatedMessage, targetCreatedMessageSchema, UserCreatedMessage, userCreatedMessageSchema } from "@/shared/MessageBroker/messages.js";
-import { exchangeAlphaName, ExchangeName, submissionServiceCallbackQueueName, targetsServiceRpcQueueName } from "@/shared/MessageBroker/constants.js";
+import { messageBrokerMessageBaseSchema, ScoreCalculationRequestMessage, ScoreCalculationResponseMessage, scoreCalculationResponseSchema, TargetCreatedMessage, targetCreatedMessageSchema, UserCreatedMessage, userCreatedMessageSchema } from "@/shared/MessageBroker/messages.js";
+import { submissionServiceCallbackQueueName, targetsServiceRpcQueueName } from "@/shared/MessageBroker/constants.js";
 import ServicesRegistry from "@/submissionsService/ServiceRegistry.js";
 import { MessageBroker } from "@/shared/MessageBroker/MessageBrokerGod.js";
 import { TargetRpcRequest, TargetRpcResponse, targetRpcResponseSchema } from "@/shared/types/rpc/index.js";
 import { Submission } from "@/submissionsService/models/Submission.js";
 import { Options } from "amqplib/properties.js";
+import { Target } from "@/targetsService/models/Target.js";
 
 export class SubmissionsServiceMessageBroker {
 	private _messageBroker: MessageBroker;
 
 	constructor(messageBroker: MessageBroker) {
 		this._messageBroker = messageBroker;
-	}
-
-	public publish(routingKey: RoutingKey, msg: string, exchange: ExchangeName = exchangeAlphaName): boolean {
-		return this._messageBroker.publish(routingKey, msg, exchange);
 	}
 
 	public async consume(): Promise<void> {
@@ -32,6 +29,9 @@ export class SubmissionsServiceMessageBroker {
 			}
 
 			channel.consume(submissionsServiceQueue.queue, (msg) => {
+				if (!msg) {
+					return;
+				}
 				this.submissionsServiceQueueListener(msg);
 			}).then();
 
@@ -52,11 +52,7 @@ export class SubmissionsServiceMessageBroker {
 		}
 	}
 
-	public async submissionsServiceQueueListener(msg: ConsumeMessage | null): Promise<void> {
-		if (!msg) {
-			return;
-		}
-
+	public async submissionsServiceQueueListener(msg: ConsumeMessage): Promise<void> {
 		const channel = this._messageBroker.channel;
 		if (!channel) {
 			return;
@@ -101,8 +97,54 @@ export class SubmissionsServiceMessageBroker {
 			return;
 		}
 
+		// Test if the message is about a newly created user.
+		const parsedScoreCalculationResponseSchema = scoreCalculationResponseSchema.safeParse(messageParsed.data);
+		if (parsedScoreCalculationResponseSchema.success) {
+			channel.ack(msg);
+			void this.consumeScoreCalculationResponse(parsedScoreCalculationResponseSchema.data);
+			return;
+		}
+
 		channel.reject(msg, false);
 		console.warn("Message received from the message broker was unprocessable.");
+	}
+
+	public async consumeRpcTargetResponse(correlationId: string, msg: TargetRpcResponse) {
+		this.publishScoreCalculationRequest(msg.body.submission, msg.body.target);
+	}
+
+	public publishSubmissionTargetRequest(submission: Submission): boolean {
+		const requestMessage: TargetRpcRequest = {
+			request: {
+				method: "get",
+				requestUri: "target"
+			},
+			body: {
+				submission: submission
+			}
+		};
+
+		const messageOptions: Options.Publish = {
+			correlationId: submission.targetId,
+			replyTo: submissionServiceCallbackQueueName
+		};
+
+		return this._messageBroker.publishToQueue(targetsServiceRpcQueueName, JSON.stringify(requestMessage), messageOptions);
+	}
+
+	public publishScoreCalculationRequest(submission: Submission, target: Target): boolean {
+		const scoreCalculationRequest: ScoreCalculationRequestMessage = {
+			type: "Submission",
+			status: "scoreCalculationRequested",
+			data: {
+				submission: submission,
+				target: target
+			}
+		};
+
+		const routingKey: RoutingKey = "submissions.image.scoreCalculationRequested";
+
+		return this._messageBroker.publish(routingKey, JSON.stringify(scoreCalculationRequest));
 	}
 
 	private async consumeTargetCreated(message: TargetCreatedMessage) {
@@ -153,26 +195,15 @@ export class SubmissionsServiceMessageBroker {
 		}
 	}
 
-	public async consumeRpcTargetResponse(correlationId: string, msg: TargetRpcResponse) {
-		console.log("Rpc response:", msg);
-	}
+	private async consumeScoreCalculationResponse(message: ScoreCalculationResponseMessage) {
+		const submissionInDatabase = await ServicesRegistry.getInstance().submissionRepository.get(message.data.submission.customId);
 
-	public publishSubmissionTargetRequest(submission: Submission): boolean {
-		const requestMessage: TargetRpcRequest = {
-			request: {
-				method: "get",
-				requestUri: "target"
-			},
-			body: {
-				submission: submission
-			}
-		};
+		if (!submissionInDatabase) {
+			console.warn("The submission id that was received as score calculation response wasn't found in the database.");
+			return;
+		}
 
-		const messageOptions: Options.Publish = {
-			correlationId: submission.targetId,
-			replyTo: submissionServiceCallbackQueueName
-		};
-
-		return this._messageBroker.publishToQueue(targetsServiceRpcQueueName, JSON.stringify(requestMessage), messageOptions);
+		submissionInDatabase.score = message.data.submission.score;
+		void submissionInDatabase.save();
 	}
 }

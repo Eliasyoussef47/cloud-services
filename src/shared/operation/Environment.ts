@@ -2,6 +2,7 @@ import * as process from "process";
 import { toZod } from "tozod";
 import z from "zod";
 import { uploadedSubmissionsPath, uploadedTargetsPath } from "@/shared/constants.js";
+import { basicAuth } from "@/shared/utils/general.js";
 
 export interface Env {
 	JWT_USERS_SECRET: string;
@@ -66,6 +67,10 @@ export class Environment {
 
 	public get submissionUploadsUrl(): URL {
 		return new URL(uploadedSubmissionsPath, this.submissionServiceUrl);
+	}
+
+	public get imaggaAuthToken(): string {
+		return basicAuth(this.#envFile.IMAGGA_API_KEY, this.#envFile.IMAGGA_API_SECRET);
 	}
 
 	public get envFile(): Env {

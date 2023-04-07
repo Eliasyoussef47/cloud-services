@@ -4,6 +4,7 @@ import { toZod } from "tozod";
 import { z } from "zod";
 import { responseBodySchema } from "@/shared/validation/response.js";
 import { User } from "@/auth/models/User.js";
+import { Submission } from "@/submissionsService/models/Submission.js";
 
 export const resourceTypes = ["User", "Target", "Submission"] as const;
 export type ResourceType = typeof resourceTypes[number];
@@ -57,7 +58,7 @@ export const targetCreatedBodySchema: toZod<TargetCreatedBody> = z.object({
 
 export type TargetCreatedMessage = MessageBrokerMessageBase<TargetCreatedBody, "created", "Target">;
 
-export const targetCreatedMessageSchema = z.object({
+export const targetCreatedMessageSchema = responseBodySchema.extend({
 	type: z.literal("Target"),
 	status: z.literal("created"),
 	data: targetCreatedBodySchema
@@ -66,3 +67,33 @@ export const targetCreatedMessageSchema = z.object({
 export type MessageBrokerMessage =
 	| UserCreatedMessage
 	| TargetCreatedMessage
+
+export interface ScoreCalculationRequest {
+	submission: Submission,
+	target: Target
+}
+
+export type ScoreCalculationRequestMessage = MessageBrokerMessageBase<ScoreCalculationRequest, "scoreCalculationRequested", "Submission">;
+
+export interface ScoreCalculationResponse {
+	submission: Pick<Submission, "customId" | "score">,
+	target: Pick<Target, "customId">
+}
+
+export type ScoreCalculationResponseMessage = MessageBrokerMessageBase<ScoreCalculationResponse, "scoreCalculated", "Submission">;
+
+export const scoreCalculatedBodySchema: toZod<ScoreCalculationResponse> = z.object({
+	submission: z.object({
+		customId: z.string(),
+		score: z.number().nullable()
+	}),
+	target: z.object({
+		customId: z.string()
+	})
+});
+
+export const scoreCalculationResponseSchema = responseBodySchema.extend({
+	type: z.literal("Submission"),
+	status: z.literal("scoreCalculated"),
+	data: scoreCalculatedBodySchema
+});

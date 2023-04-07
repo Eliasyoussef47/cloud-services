@@ -1,5 +1,6 @@
 import createHttpError from "http-errors";
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
+import mime from "mime-types";
 
 /**
  * Used as to perform the HTTP requests to the microservices.
@@ -36,4 +37,21 @@ export function getServicesAuthHeaders() {
 	myHeaders.append("Authorization", `Bearer ${AuthServiceBeta.getInstance().gatewayJwt}`);
 
 	return myHeaders
+}
+
+export async function printResponse(response: Response) {
+	console.log("Response:");
+	console.log("Status: ", response.status);
+	console.log("Headers: ", response.headers);
+
+	const contentType = response.headers.get("Content-Type") ?? "";
+	const contentTypeMimeType = mime.extension(contentType);
+
+	if (contentTypeMimeType === "json") {
+		const body = await response.json();
+		console.log("Body: ", body);
+	} else {
+		const body = await response.text();
+		console.log("Body: ", body);
+	}
 }

@@ -18,6 +18,7 @@ export const targetsServicesQueueName = "webs.targetsServiceQueue";
 export const submissionsServicesQueueName = "webs.submissionsServiceQueue";
 export const targetsServiceRpcQueueName = "webs.targetsService.rpc";
 export const submissionServiceCallbackQueueName = "webs.submissionService.callbackQueue";
+export const imagesToProcessQueueName = "webs.imagesToProcess";
 
 export type AssertQueueParams = Parameters<Channel["assertQueue"]>;
 
@@ -25,4 +26,4 @@ export const targetsServiceQueueParams: AssertQueueParams = [targetsServicesQueu
 export const submissionsServicesQueueParams: AssertQueueParams = [submissionsServicesQueueName, { durable: true }];
 export const targetsServiceRpcQueueParams: AssertQueueParams = [targetsServiceRpcQueueName, { durable: true }];
 export const submissionServiceCallbackQueueParams: AssertQueueParams = [submissionServiceCallbackQueueName, { durable: true }];
-// export const targetsServicesTargetsUploadedQueueParams: AssertQueueParams = [targetsServicesTargetsUploadedQueueName, { durable: true }];
+export const imagesToProcessQueueParams: AssertQueueParams = [imagesToProcessQueueName, { durable: true }];

@@ -17,7 +17,7 @@ Environment.setup();
 await setupDependencies();
 AuthServiceAlpha.setup();
 
-const port = Number(Environment.getInstance().submissionServiceUrl.port) || 3001;
+const port = Number(Environment.getInstance().submissionServiceUrl.port) || 3003;
 
 const app = express();
 

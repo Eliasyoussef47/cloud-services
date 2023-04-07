@@ -5,3 +5,7 @@ export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 export const toDataUrl = (mimeType: string, buffer: Buffer) => {
 	return `data:${mimeType};base64,${buffer.toString("base64")}`
 }
+
+export function basicAuth(username: string, password: string) {
+	return btoa(`${username}:${password}`);
+}

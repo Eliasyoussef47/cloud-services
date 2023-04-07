@@ -37,7 +37,6 @@ export class TargetsServiceMessageBroker {
 		return this._messageBroker.publish(routingKey, msg, exchange);
 	}
 
-	// TODO: Filter consumed messages.
 	public async consume(): Promise<void> {
 		try {
 			const channel = this._messageBroker.channel;

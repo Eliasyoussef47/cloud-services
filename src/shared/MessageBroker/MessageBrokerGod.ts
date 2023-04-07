@@ -1,6 +1,6 @@
 import { IAssertsExchanges, IAssertsQueues, IHasExchangeAlpha, IHasExchangeBravo, IHasExchangeCharlie, IMessageBrokerUser, IMessagePublisher } from "@/shared/MessageBroker/MessageBroker.js";
 import { Channel, Connection, Replies } from "amqplib";
-import { exchangeAlphaName, ExchangeName, submissionServiceCallbackQueueName, submissionServiceCallbackQueueParams, submissionsServicesQueueName, submissionsServicesQueueParams, targetsServiceQueueParams, targetsServiceRpcQueueName, targetsServiceRpcQueueParams, targetsServicesQueueName } from "@/shared/MessageBroker/constants.js";
+import { exchangeAlphaName, ExchangeName, imagesToProcessQueueName, imagesToProcessQueueParams, submissionServiceCallbackQueueName, submissionServiceCallbackQueueParams, submissionsServicesQueueName, submissionsServicesQueueParams, targetsServiceQueueParams, targetsServiceRpcQueueName, targetsServiceRpcQueueParams, targetsServicesQueueName } from "@/shared/MessageBroker/constants.js";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
 import { BindExchange_A_B, BindExchange_A_C, ExchangeAlphaAsserter, ExchangeBravoAsserter, ExchangeCharlieAsserter, MessageBrokerUser } from "@/shared/MessageBroker/helperClasses.js";
 import { Options } from "amqplib/properties.js";
@@ -10,6 +10,7 @@ export class MessageBroker implements IMessageBrokerUser, IMessagePublisher, IAs
 	public submissionsServiceQueue: Replies.AssertQueue | undefined;
 	public targetsServiceRpcQueue: Replies.AssertQueue | undefined;
 	public submissionServiceCallbackQueue: Replies.AssertQueue | undefined;
+	public imagesToProcessQueue: Replies.AssertQueue | undefined;
 	private readonly _messageBrokerUser: MessageBrokerUser;
 	private _exchangeAlphaAsserter: ExchangeAlphaAsserter;
 	private _exchangeBravoAsserter: ExchangeBravoAsserter;
@@ -157,10 +158,16 @@ export class MessageBroker implements IMessageBrokerUser, IMessagePublisher, IAs
 				return false;
 			}
 
+			const exchangeCharlie = this._exchangeCharlieAsserter.exchangeCharlie;
+			if (!exchangeCharlie) {
+				console.error(`Asserting queue "${submissionsServicesQueueName}" failed. Exchange charlie was not found.`);
+				return false;
+			}
+
 			this.submissionsServiceQueue = await channel.assertQueue(...submissionsServicesQueueParams);
 
-			const pattern1: RoutingKey = "submissions.image.uploaded";
-			await channel.bindQueue(this.submissionsServiceQueue.queue, exchangeBravo.exchange, pattern1);
+			const pattern1: RoutingKey = "submissions.image.scoreCalculated";
+			await channel.bindQueue(this.submissionsServiceQueue.queue, exchangeCharlie.exchange, pattern1);
 
 			const pattern2: RoutingKey = "users.*.created";
 			await channel.bindQueue(this.submissionsServiceQueue.queue, exchangeBravo.exchange, pattern2);
@@ -216,12 +223,40 @@ export class MessageBroker implements IMessageBrokerUser, IMessagePublisher, IAs
 		}
 	}
 
-	// TODO: Add RPC queues.
+	public async setupImagesToProcessQueue(): Promise<boolean> {
+		try {
+			const channel = this._messageBrokerUser.channel;
+			if (!channel) {
+				console.error(`Asserting queue "${imagesToProcessQueueName}" failed. No channel found.`);
+				return false;
+			}
+
+			const exchangeBravo = this._exchangeBravoAsserter.exchangeBravo;
+			if (!exchangeBravo) {
+				console.error(`Asserting queue "${imagesToProcessQueueName}" failed. Exchange bravo was not found.`);
+				return false;
+			}
+
+			this.imagesToProcessQueue = await channel.assertQueue(...imagesToProcessQueueParams);
+
+			const pattern1: RoutingKey = "*.image.scoreCalculationRequested";
+			await channel.bindQueue(this.imagesToProcessQueue.queue, exchangeBravo.exchange, pattern1);
+
+			return true;
+		} catch (e) {
+			console.error(`Asserting queue "${imagesToProcessQueueName}" failed: `);
+			console.error(e);
+
+			return false;
+		}
+	}
+
 	public async setupQueues(): Promise<boolean> {
 		await this.setupTargetsServiceQueue();
 		await this.setupSubmissionsServiceQueue();
 		await this.setupTargetsServiceRpcQueue();
 		await this.setupSubmissionServiceCallbackQueue();
+		await this.setupImagesToProcessQueue();
 
 		return true;
 	}
