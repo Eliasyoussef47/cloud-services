@@ -91,7 +91,8 @@ export class AuthServiceBeta extends AuthServiceBase {
 	public getGatewayJwt(user: User): string {
 		const gatewayJwtPayload: GatewayJwtPayloadManual = {
 			key: Environment.getInstance().envFile.SERVICES_API_KEY,
-			sub: user.customId
+			sub: user.customId,
+			role: user.role
 		};
 
 		return jwt.sign(gatewayJwtPayload, <string> this.gatewayJwtOptions.secretOrKey);

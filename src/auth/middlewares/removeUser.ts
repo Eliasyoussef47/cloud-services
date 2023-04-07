@@ -11,4 +11,6 @@ export const removeUser: RequestHandler = (req, res, next) => {
 
 	res.on('finish', afterResponse);
 	res.on('close', afterResponse);
+
+	next();
 };

@@ -4,6 +4,7 @@ import { Environment } from "@/shared/operation/Environment.js";
 import createHttpError from "http-errors";
 import { AuthServiceBase } from "@/auth/AuthServiceBase.js";
 import { NoUndefinedField, Optional } from "@/shared/types/utility.js";
+import { User } from "@/auth/models/User.js";
 
 export interface LoginForm {
 	username: string;
@@ -14,7 +15,10 @@ export type UserJwtPayload = Required<Pick<JwtPayload, "iat" | "exp" | "sub">>;
 
 export type GatewayJwtPayload = {
 	key: string;
+	role: string;
 } & NoUndefinedField<Required<Pick<JwtPayload, "sub" | "iat">>>;
+
+export type GatewayJwtUser = Pick<User, "customId" | "role">
 
 export type GatewayJwtPayloadManual = Optional<GatewayJwtPayload, "iat">;
 
@@ -30,13 +34,19 @@ export class AuthServiceAlpha extends AuthServiceBase {
 		super(gatewayJwtOptions);
 
 		this._authenticateGatewayStrategy = new JwtStrategy(this.gatewayJwtOptions, (payload, done) => {
+			const typedPayload = payload as GatewayJwtPayload;
 			const verificationResult = this.verifyGatewayToken(payload);
 
 			if (!verificationResult) {
 				done(createHttpError(401), false);
 			}
 
-			done(null, {});
+			const jwtUser: GatewayJwtUser = {
+				customId: typedPayload.sub,
+				role: payload.role
+			}
+
+			done(null, jwtUser);
 		});
 	}
 
