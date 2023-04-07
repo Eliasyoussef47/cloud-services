@@ -11,5 +11,6 @@ export const userSchema = new Schema<MongooseUser, UserModelType, User, UserMode
 	opaqueId: { type: SchemaTypes.String, required: true },
 	username: { type: SchemaTypes.String, required: true, unique: true },
 	password: { type: SchemaTypes.String, required: true },
+	role: { type: SchemaTypes.String, required: true, default: "user" }
 });
 userSchema.set("toObject", { versionKey: false, useProjection: true });

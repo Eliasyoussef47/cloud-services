@@ -3,6 +3,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { Environment } from "@/shared/operation/Environment.js";
 import createHttpError from "http-errors";
 import { AuthServiceBase } from "@/auth/AuthServiceBase.js";
+import { NoUndefinedField, Optional } from "@/shared/types/utility.js";
 
 export interface LoginForm {
 	username: string;
@@ -13,7 +14,9 @@ export type UserJwtPayload = Required<Pick<JwtPayload, "iat" | "exp" | "sub">>;
 
 export type GatewayJwtPayload = {
 	key: string;
-} & Pick<JwtPayload, "iat">;
+} & NoUndefinedField<Required<Pick<JwtPayload, "sub" | "iat">>>;
+
+export type GatewayJwtPayloadManual = Optional<GatewayJwtPayload, "iat">;
 
 /**
  * Responsible for authentication in microservices.

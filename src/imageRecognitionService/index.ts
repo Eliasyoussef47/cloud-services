@@ -20,7 +20,7 @@ await setupDependencies();
 
 // setupGatewayAuthenticationMiddlewares(app, AuthServiceAlpha.getInstance());
 
-// TODO: Routing in imageRecognitionService?
+// TODO: HTTP in imageRecognitionService?
 // app.use(authenticatedRouter);
 
 // attachErrorHandlers(app);

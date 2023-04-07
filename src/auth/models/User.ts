@@ -14,6 +14,7 @@ export interface User {
 	opaqueId: string;
 	username: string;
 	password: string;
+	role: string;
 }
 
 export const userResourceSchema: toZod<Pick<User, "opaqueId" | "username">> = z.object({

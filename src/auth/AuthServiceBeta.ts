@@ -1,7 +1,7 @@
 import { CustomError } from "@/shared/types/errors/CustomError.js";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import { GatewayJwtPayload, LoginForm, UserJwtPayload } from "@/auth/AuthServiceAlpha.js";
+import { GatewayJwtPayloadManual, LoginForm, UserJwtPayload } from "@/auth/AuthServiceAlpha.js";
 import { Strategy as JwtStrategy, StrategyOptions } from "passport-jwt";
 import { Environment } from "@/shared/operation/Environment.js";
 import createHttpError from "http-errors";
@@ -31,8 +31,6 @@ export class AuthServiceBeta extends AuthServiceBase {
 
 	private readonly jwtExpiresIn: number = 10800;
 
-	private readonly _gatewayJwt: string;
-
 	constructor(gatewayJwtOptions: StrategyOptions, userJwtOptions: StrategyOptions) {
 		super(gatewayJwtOptions);
 
@@ -42,18 +40,14 @@ export class AuthServiceBeta extends AuthServiceBase {
 		this._authenticateUserStrategy = new JwtStrategy(this.userJwtOptions, (payload, done) => {
 			this.getMatchingUser(payload)
 				.then((value) => {
+					ServicesRegistry.getInstance().user = value;
 					return done(null, value);
 				})
 				.catch((e) => {
+					ServicesRegistry.getInstance().user = undefined;
 					done(createHttpError(407, e), false);
 				});
 		});
-
-		const gatewayJwtPayload: GatewayJwtPayload = {
-			key: Environment.getInstance().envFile.SERVICES_API_KEY
-		};
-
-		this._gatewayJwt = jwt.sign(gatewayJwtPayload, <string> this.gatewayJwtOptions.secretOrKey);
 	}
 
 	public get userJwtOptions(): StrategyOptions {
@@ -62,10 +56,6 @@ export class AuthServiceBeta extends AuthServiceBase {
 
 	public get authenticateUserStrategy(): JwtStrategy {
 		return this._authenticateUserStrategy;
-	}
-
-	public get gatewayJwt(): string {
-		return this._gatewayJwt;
 	}
 
 	public static getInstance(): AuthServiceBeta {
@@ -98,7 +88,15 @@ export class AuthServiceBeta extends AuthServiceBase {
 		return crypto.timingSafeEqual(hashedPasswordBuf, suppliedPasswordBuf);
 	}
 
-	// TODO: Use database.
+	public getGatewayJwt(user: User): string {
+		const gatewayJwtPayload: GatewayJwtPayloadManual = {
+			key: Environment.getInstance().envFile.SERVICES_API_KEY,
+			sub: user.customId
+		};
+
+		return jwt.sign(gatewayJwtPayload, <string> this.gatewayJwtOptions.secretOrKey);
+	}
+
 	/**
 	 *
 	 * @param payload
@@ -120,7 +118,7 @@ export class AuthServiceBeta extends AuthServiceBase {
 		const password = AuthServiceBeta.createPassword(loginForm.password);
 
 		// TODO: username must be unique.
-		return await ServicesRegistry.getInstance().userRepository.create({customId, opaqueId, username: loginForm.username, password});
+		return await ServicesRegistry.getInstance().userRepository.create({ customId, opaqueId, username: loginForm.username, password });
 	}
 
 	public async login(loginForm: LoginForm): Promise<string | undefined> {
