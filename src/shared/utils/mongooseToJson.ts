@@ -9,4 +9,12 @@ mongoose.plugin((schema) => {
 			delete ret._id;
 		}
 	};
+	// @ts-ignore
+	schema.options.toObject = {
+		versionKey: false,
+		// @ts-ignore
+		transform(doc, ret) {
+			delete ret._id;
+		}
+	};
 });
