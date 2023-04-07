@@ -17,6 +17,10 @@ export type StoreArgs = StoreBody & {
 	photo: Blob;
 };
 
+export type ShowArgs = {
+	id: Target["customId"]
+}
+
 export default class Targets {
 	/**
 	 *
@@ -55,4 +59,17 @@ export default class Targets {
 
 		return await defaultServiceCall(url, fetchInit);
 	}
+
+	public static async show(args: ShowArgs): Promise<Response> {
+		const fetchInit: RequestInit = {
+			method: "get",
+			headers: getServicesAuthHeaders()
+		};
+
+		let url = new URL(Environment.getInstance().targetServiceUrl);
+		url = new URL(args.id, url);
+
+		return await defaultServiceCall(url, fetchInit);
+	}
+
 }

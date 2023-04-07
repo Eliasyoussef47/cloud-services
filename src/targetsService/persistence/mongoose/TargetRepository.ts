@@ -52,6 +52,21 @@ export default class TargetRepository implements ITargetRepository {
 			throw new DatabaseError("No database connection");
 		}
 
-		return await model.findOne(<Pick<Target, "customId">> { customId: customId }).exec() as MyHydratedDocument<Target>;
+		const filter: Pick<Target, "customId"> = {
+			customId: customId
+		};
+		return await model.findOne(filter).exec() as MyHydratedDocument<Target>;
+	}
+
+	public async getByUserId(userId: string): Promise<TargetPersistent[]> {
+		const model = this._model;
+		if (!model) {
+			throw new DatabaseError("No database connection");
+		}
+
+		const filter: Pick<Target, "userId"> = {
+			userId: userId
+		};
+		return await model.find(filter).exec() as MyHydratedDocument<Target>[];
 	}
 }

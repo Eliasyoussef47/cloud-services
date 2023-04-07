@@ -10,6 +10,7 @@ import crypto from "crypto";
 import { promises as fs } from "fs";
 import { StoreBody } from "@/shared/types/targetsService/index.js";
 import { toDataUrl } from "@/shared/utils/general.js";
+import { GatewayJwtUser } from "@/auth/AuthServiceAlpha.js";
 
 const storeBodySchema: toZod<StoreBody> = baseStoreBodySchema.extend({
 	userId: z.string()
@@ -20,10 +21,13 @@ export type StoreResponseBody = Pick<Target, "customId" | "source" | "locationNa
 // TODO: Validation.
 export default class TargetHandler {
 	public static index: RequestHandler = async (req, res) => {
+		const user = <GatewayJwtUser> req.user;
+		const targets = await ServicesRegistry.getInstance().targetRepository.getByUserId(user.customId);
+
 		const responseBody = {
 			status: "success",
 			data: {
-				message: "index"
+				targets: targets
 			}
 		} satisfies ResponseBody;
 
@@ -64,11 +68,12 @@ export default class TargetHandler {
 		ServicesRegistry.getInstance().targetsServiceMessageBroker.publishTargetCreated({ customId: newTarget.customId });
 	};
 
+	// TODO: Validate url param.
 	public static show: RequestHandler = async (req, res) => {
 		const responseBody = {
 			status: "success",
 			data: {
-				message: "show"
+				target: res.locals.target
 			}
 		} satisfies ResponseBody;
 

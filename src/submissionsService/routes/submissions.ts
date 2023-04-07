@@ -14,10 +14,10 @@ const storage = multer.diskStorage({
 	}
 });
 
-export type SubmissionsRoute<T extends string> = `/targets/${T}/submissions`;
+export type SubmissionsRoute<T extends string = "targetId"> = `/targets/${T}/submissions`;
 
-export function getSubmissionsRoute<T extends string>(path: T): SubmissionsRoute<T> {
-	return `/targets/${path}/submissions`;
+export function getSubmissionsRoute<T extends string>(param: T): SubmissionsRoute<T> {
+	return `/targets/${param}/submissions`;
 }
 
 const upload = multer({ storage });

@@ -1,4 +1,4 @@
-import { RequestHandler } from "express-serve-static-core";
+import { RequestHandler, RouteParameters } from "express-serve-static-core";
 import CircuitBreaker, { Options as CircuitBreakerOptions } from "opossum";
 import Targets, { IndexArgs, StoreArgs } from "@/apiGateway/businessLogic/targets.js";
 import { attachStandardCircuitBreakerCallbacks } from "@/shared/utils/CircuitBreaker.js";
@@ -19,7 +19,10 @@ attachStandardCircuitBreakerCallbacks(indexCircuitBreaker);
 const storeCircuitBreaker = new CircuitBreaker(Targets.store, circuitBreakerOptions);
 attachStandardCircuitBreakerCallbacks(storeCircuitBreaker);
 
-const indexParamsSchema: toZod<IndexArgs> = z.object({
+const showCircuitBreaker = new CircuitBreaker(Targets.show, circuitBreakerOptions);
+attachStandardCircuitBreakerCallbacks(storeCircuitBreaker);
+
+const indexQuerySchema: toZod<IndexArgs> = z.object({
 	locationName: z.string().optional()
 });
 
@@ -27,11 +30,11 @@ const indexParamsSchema: toZod<IndexArgs> = z.object({
 export default class TargetHandler {
 	// TODO: Validation.
 	public static index: RequestHandler<IndexArgs> = async (req, res, next) => {
-		const parsedParams = indexParamsSchema.parse(req.params);
+		const parsedQueries = indexQuerySchema.parse(req.query);
 
 		let fireResult: Response;
 		try {
-			fireResult = await indexCircuitBreaker.fire(parsedParams);
+			fireResult = await indexCircuitBreaker.fire(parsedQueries);
 		} catch (e) {
 			console.log("Service breaker rejected: ", e);
 			next(e);
@@ -82,8 +85,28 @@ export default class TargetHandler {
 		}
 	};
 
-	public static show: RequestHandler = async (req, res) => {
+	public static show: RequestHandler<RouteParameters<"/targets/:id">> = async (req, res, next) => {
+		// TODO: Validate route params.
+		const parsedQueries = indexQuerySchema.parse(req.query);
 
+		let fireResult: Response;
+		try {
+			fireResult = await showCircuitBreaker.fire({ id: req.params.id });
+		} catch (e) {
+			console.log("Service breaker rejected: ", e);
+			next(e);
+			return;
+		}
+
+		try {
+			const responseJson = await fireResult.json();
+
+			res.status(fireResult.status).json(responseJson);
+		} catch (e) {
+			console.log("Response from service wasn't json: ", e);
+			next(e);
+			return;
+		}
 	};
 
 	public static update: RequestHandler = async (req, res) => {
