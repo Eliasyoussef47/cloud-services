@@ -23,7 +23,8 @@ export async function setupDependencies() {
 	const services: Services = {
 		userRepository: new UserRepository(Database.getInstance().connection),
 		messageBroker: messageBroker,
-		authServiceMessageBroker: authServiceMessageBroker
+		authServiceMessageBroker: authServiceMessageBroker,
+		user: undefined
 	}
 
 	ServicesRegistry.setupInitial(services);

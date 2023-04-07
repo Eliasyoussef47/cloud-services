@@ -203,7 +203,7 @@ export class BindExchange_A_B implements IHasExchangeAlpha, IHasExchangeBravo {
 			const pattern1: RoutingKey = "*.*.created";
 			await channel.bindExchange(exchangeBravo.exchange, exchangeAlpha.exchange, pattern1);
 
-			const pattern2: RoutingKey = "*.image.created";
+			const pattern2: RoutingKey = "*.image.scoreCalculationRequested";
 			await channel.bindExchange(exchangeBravo.exchange, exchangeAlpha.exchange, pattern2);
 
 			return true;
@@ -256,7 +256,7 @@ export class BindExchange_A_C implements IHasExchangeAlpha, IHasExchangeCharlie 
 				return false;
 			}
 
-			const pattern: RoutingKey = "submissions.image.scoreCalculated";
+			const pattern: RoutingKey = "*.image.scoreCalculated";
 			await channel.bindExchange(exchangeCharlie.exchange, exchangeAlpha.exchange, pattern);
 
 			return true;

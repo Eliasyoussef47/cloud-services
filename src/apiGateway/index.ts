@@ -10,6 +10,7 @@ import { setupUserAuthenticationMiddlewares } from "@/auth/middlewares/authentic
 import { getAuthenticatedRouter, nonAuthenticatedRouter } from "@/apiGateway/routes/router.js";
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
 import { setupDependencies } from "@/apiGateway/setup.js";
+import { removeUser } from "@/auth/middlewares/removeUser.js";
 
 // TODO: Database health check.
 // TODO: Message broker health check.
@@ -27,6 +28,7 @@ app.set("env", process.env.NODE_ENV);
 
 app.use(cors());
 app.use(express.json());
+app.use(removeUser);
 
 app.use(nonAuthenticatedRouter);
 

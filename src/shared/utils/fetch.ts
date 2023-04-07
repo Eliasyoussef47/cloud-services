@@ -1,5 +1,8 @@
 import createHttpError from "http-errors";
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
+import mime from "mime-types";
+import ServicesRegistry from "@/auth/ServicesRegistry.js";
+import { CustomError } from "@/shared/types/errors/CustomError.js";
 
 /**
  * Used as to perform the HTTP requests to the microservices.
@@ -32,8 +35,32 @@ export async function defaultServiceCall(url: URL, fetchInit: RequestInit) {
 }
 
 export function getServicesAuthHeaders() {
+	const currentUser = ServicesRegistry.getInstance().user;
+
+	if (!currentUser) {
+		throw new CustomError("No current user");
+	}
+
 	const myHeaders = new Headers();
-	myHeaders.append("Authorization", `Bearer ${AuthServiceBeta.getInstance().gatewayJwt}`);
+	myHeaders.append("Authorization", `Bearer ${AuthServiceBeta.getInstance().getGatewayJwt(currentUser)}`);
 
 	return myHeaders
+}
+
+export async function printResponse(response: Response) {
+	const clonedResponse = response.clone();
+	console.log("Response:");
+	console.log("Status: ", clonedResponse.status);
+	console.log("Headers: ", clonedResponse.headers);
+
+	const contentType = clonedResponse.headers.get("Content-Type") ?? "";
+	const contentTypeMimeType = mime.extension(contentType);
+
+	if (contentTypeMimeType === "json") {
+		const body = await clonedResponse.json();
+		console.log("Body: ", body);
+	} else {
+		const body = await clonedResponse.text();
+		console.log("Body: ", body);
+	}
 }

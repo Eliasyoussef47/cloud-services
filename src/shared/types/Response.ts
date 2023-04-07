@@ -1,4 +1,4 @@
-export const serviceSucces = ["success", "created"] as const;
+export const serviceSucces = ["success", "created", "scoreCalculated", "scoreCalculationRequested"] as const;
 export type ServiceSuccess = typeof serviceSucces[number];
 
 export const serviceError = ["failure", "validationError"] as const;
