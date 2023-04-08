@@ -10,7 +10,6 @@ import crypto from "crypto";
 import { promises as fs } from "fs";
 import { StoreBody } from "@/shared/types/targetsService/index.js";
 import { toDataUrl } from "@/shared/utils/general.js";
-import { GatewayJwtUser } from "@/auth/AuthServiceAlpha.js";
 import { TargetCreatedBody } from "@/shared/MessageBroker/messages.js";
 import { TargetPersistent } from "@/targetsService/persistence/ITargetRepository.js";
 
@@ -23,14 +22,15 @@ export type StoreResponseBody = Pick<Target, "customId" | "source" | "locationNa
 // TODO: Validation.
 export default class TargetHandler {
 	public static index: RequestHandler = async (req, res) => {
-		const user = <GatewayJwtUser> req.user;
+		// const user = <GatewayJwtUser> req.user;
 
 		let targets: TargetPersistent[];
-		if (user.role == "admin") {
-			targets = await ServicesRegistry.getInstance().targetRepository.getAll();
-		} else {
-			targets = await ServicesRegistry.getInstance().targetRepository.getByUserId(user.customId);
-		}
+		// if (user.role == "admin") {
+		// 	targets = await ServicesRegistry.getInstance().targetRepository.getAll();
+		// } else {
+		// 	targets = await ServicesRegistry.getInstance().targetRepository.getByUserId(user.customId);
+		// }
+		targets = await ServicesRegistry.getInstance().targetRepository.getAll();
 
 		const responseBody = {
 			status: "success",
