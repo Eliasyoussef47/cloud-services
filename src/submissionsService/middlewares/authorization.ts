@@ -7,6 +7,7 @@ import { Submission } from "@/submissionsService/models/Submission.js";
 import { Target } from "@/submissionsService/models/Target.js";
 import ServicesRegistry from "@/submissionsService/ServiceRegistry.js";
 import createHttpError from "http-errors";
+import { TargetPersistent } from "@/submissionsService/persistence/ITargetRepository.js";
 
 export const ownsSubmission: RequestHandler = async (req, res, next) => {
 	if (res.locals.authorizationState === AuthorizationState.GRANTED) {
@@ -23,7 +24,12 @@ export const ownsSubmission: RequestHandler = async (req, res, next) => {
 		throw new CustomError("User wasn't found in the locals.");
 	}
 
-	const belongsToTarget = await ServicesRegistry.getInstance().targetRepository.get(submission.targetId);
+	let belongsToTarget: TargetPersistent | null = null;
+	try {
+		belongsToTarget = await ServicesRegistry.getInstance().targetRepository.get(submission.targetId);
+	} catch (e) {
+		console.error("Error while getting a target.", e);
+	}
 
 	if (!belongsToTarget) {
 		throw createHttpError<404>(404, "The target that this submission belongs to wasn't found");

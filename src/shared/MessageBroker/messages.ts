@@ -65,9 +65,24 @@ export const targetCreatedMessageSchema = responseBodySchema.extend({
 	data: targetCreatedBodySchema
 });
 
+export type TargetDeletedBody = Pick<Target, "customId">
+
+export const targetDeletedBodySchema: toZod<TargetDeletedBody> = z.object({
+	customId: z.string()
+});
+
+export type TargetDeletedMessage = MessageBrokerMessageBase<TargetDeletedBody, "deleted", "Target">;
+
+export const targetDeletedMessageSchema = responseBodySchema.extend({
+	type: z.literal("Target"),
+	status: z.literal("deleted"),
+	data: targetDeletedBodySchema
+});
+
 export type MessageBrokerMessage =
 	| UserCreatedMessage
 	| TargetCreatedMessage
+	| TargetDeletedMessage;
 
 export interface ScoreCalculationRequest {
 	submission: Submission,

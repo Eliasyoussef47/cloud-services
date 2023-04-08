@@ -7,10 +7,16 @@ import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
 import { userResourceSchema } from "@/auth/models/User.js";
 import z from "zod";
 import ServicesRegistry from "@/auth/ServicesRegistry.js";
+import { UserPersistent } from "@/auth/persistence/IUserRepository.js";
 
 export const registerFormSchema = loginFormSchema.merge(z.object({
 	username: z.string().refine(async (val) => {
-		const foundUser = await ServicesRegistry.getInstance().userRepository.getByUsername(val);
+		let foundUser: UserPersistent | null = null;
+		try {
+			foundUser = await ServicesRegistry.getInstance().userRepository.getByUsername(val);
+		} catch (e) {
+			console.error("Error while getting a target.", e);
+		}
 		return !foundUser;
 	}, {message: "The username must be unique."})
 }));
@@ -20,6 +26,9 @@ export default class AuthenticationHandler {
 		const loginForm: LoginForm = await registerFormSchema.parseAsync(req.body);
 
 		const newUser = await AuthServiceBeta.getInstance().register(loginForm);
+		if (!newUser) {
+			throw createHttpError(500);
+		}
 		const userResource = userResourceSchema.parse(newUser);
 
 		const responseBody = {

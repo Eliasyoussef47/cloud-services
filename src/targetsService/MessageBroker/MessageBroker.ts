@@ -1,11 +1,12 @@
 import { ConsumeMessage } from "amqplib";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
-import { TargetCreatedBody, TargetCreatedMessage, UserCreatedMessage, userCreatedMessageSchema } from "@/shared/MessageBroker/messages.js";
+import { TargetCreatedBody, TargetCreatedMessage, TargetDeletedBody, TargetDeletedMessage, UserCreatedMessage, userCreatedMessageSchema } from "@/shared/MessageBroker/messages.js";
 import ServicesRegistry from "@/targetsService/ServiceRegistry.js";
-import { exchangeAlphaName, ExchangeName, submissionServiceCallbackQueueName } from "@/shared/MessageBroker/constants.js";
+import { exchangeAlphaName, ExchangeName } from "@/shared/MessageBroker/constants.js";
 import { MessageBroker } from "@/shared/MessageBroker/MessageBrokerGod.js";
 import { TargetRpcRequest, targetRpcRequestSchema, TargetRpcResponse } from "@/shared/types/rpc/index.js";
 import { Options } from "amqplib/properties.js";
+import { TargetPersistent } from "@/targetsService/persistence/ITargetRepository.js";
 
 export class TargetsServiceMessageBroker {
 	private _messageBroker: MessageBroker;
@@ -112,12 +113,29 @@ export class TargetsServiceMessageBroker {
 		return this.publishTargetCreatedBase(completeMessage);
 	}
 
+	public publishTargetDeleted(message: TargetDeletedBody): boolean {
+		const completeMessage: TargetDeletedMessage = {
+			type: "Target",
+			status: "deleted",
+			data: message
+		};
+		return this.publishTargetDeletedBase(completeMessage);
+	}
+
 	private async consumeUserCreated(message: UserCreatedMessage) {
-		await ServicesRegistry.getInstance().userRepository.create({ customId: message.data.customId });
+		try {
+			await ServicesRegistry.getInstance().userRepository.create({ customId: message.data.customId });
+		} catch (e) {
+			console.error("Error while creating a user.", e);
+		}
 	}
 
 	private publishTargetCreatedBase(message: TargetCreatedMessage): boolean {
 		return this.publish("targets.*.created", JSON.stringify(message));
+	}
+
+	private publishTargetDeletedBase(message: TargetDeletedMessage) {
+		return this.publish("targets.*.deleted", JSON.stringify(message));
 	}
 
 	private targetsServiceRpcQueueListener(msg: ConsumeMessage) {
@@ -165,7 +183,12 @@ export class TargetsServiceMessageBroker {
 	}
 
 	private async consumeRpcTargetRequest(replyTo: string, correlationId: string, msg: TargetRpcRequest) {
-		const target = await ServicesRegistry.getInstance().targetRepository.get(msg.body.submission.targetId);
+		let target: TargetPersistent | null = null;
+		try {
+			target = await ServicesRegistry.getInstance().targetRepository.get(msg.body.submission.targetId);
+		} catch (e) {
+			console.error("Error while getting a target.", e);
+		}
 
 		if (!target) {
 			return;

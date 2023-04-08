@@ -28,7 +28,7 @@ export default class SubmissionRepository implements ISubmissionRepository {
 	public async create(createArgs: CreateArgs): Promise<SubmissionPersistent> {
 		const model = this._model;
 		if (!model) {
-			throw new DatabaseError("No database connection");
+			throw new DatabaseError("No database connection.");
 		}
 
 		const newRecord = new model(createArgs);
@@ -39,7 +39,7 @@ export default class SubmissionRepository implements ISubmissionRepository {
 	public async get(customId: string): Promise<SubmissionPersistent | null> {
 		const model = this._model;
 		if (!model) {
-			throw new DatabaseError("No database connection");
+			throw new DatabaseError("No database connection.");
 		}
 
 		const filter: Pick<Submission, "customId"> = { customId: customId };
@@ -49,7 +49,7 @@ export default class SubmissionRepository implements ISubmissionRepository {
 	public async getByTargetId(targetId: string): Promise<SubmissionPersistent[]> {
 		const model = this._model;
 		if (!model) {
-			throw new DatabaseError("No database connection");
+			throw new DatabaseError("No database connection.");
 		}
 
 		const filter: Pick<Submission, "targetId"> = {
@@ -61,32 +61,33 @@ export default class SubmissionRepository implements ISubmissionRepository {
 	public async getByFiltered(filter: Partial<Submission>): Promise<SubmissionPersistent[]> {
 		const model = this._model;
 		if (!model) {
-			throw new DatabaseError("No database connection");
+			throw new DatabaseError("No database connection.");
 		}
 
 		return await model.find(filter).exec() as MyHydratedDocument<Submission>[];
 	}
 
-	public async deleteOne(filter: Partial<Submission>): Promise<boolean> {
-		const model = this._model;
-		if (!model) {
-			throw new DatabaseError("No database connection");
-		}
-
-		const result = await model.deleteOne(filter).exec();
-		return result.deletedCount > 0;
-	}
-
 	public async deleteById(id: Submission["customId"]): Promise<boolean> {
 		const model = this._model;
 		if (!model) {
-			throw new DatabaseError("No database connection");
+			throw new DatabaseError("No database connection.");
 		}
+		console.log("id", id);
 
 		const filter: Pick<Submission, "customId"> = {
 			customId: id
 		};
 		const result = await model.deleteOne(filter).exec();
+		return result.deletedCount > 0;
+	}
+
+	public async deleteMany(filter: Partial<Submission>): Promise<boolean> {
+		const model = this._model;
+		if (!model) {
+			throw new DatabaseError("No database connection.");
+		}
+
+		const result = await model.deleteMany(filter).exec();
 		return result.deletedCount > 0;
 	}
 }

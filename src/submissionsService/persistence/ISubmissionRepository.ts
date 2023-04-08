@@ -21,5 +21,6 @@ export default interface ISubmissionRepository {
 	create(createArgs: CreateArgs): Promise<SubmissionPersistent>;
 
 	deleteById(id: Submission["customId"]): Promise<boolean>;
-	deleteOne(filter: Partial<Submission>): Promise<boolean>;
+
+	deleteMany(filter: Partial<Submission>): Promise<boolean>;
 }

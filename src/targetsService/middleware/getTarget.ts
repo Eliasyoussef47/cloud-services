@@ -2,6 +2,7 @@ import { RequestHandler, RouteParameters } from "express-serve-static-core";
 import { stringWithValueSchema } from "@/shared/operation/Environment.js";
 import createHttpError from "http-errors";
 import ServicesRegistry from "@/targetsService/ServiceRegistry.js";
+import { TargetPersistent } from "@/targetsService/persistence/ITargetRepository.js";
 
 /**
  * Fetches the requested target from the database and set it in res.locals.target. This makes it possible for
@@ -14,7 +15,12 @@ export const getTarget: RequestHandler<RouteParameters<"/targets/:id">> = async 
 	const targetIdParam = req.params.id;
 	const targetId = stringWithValueSchema.parse(targetIdParam);
 
-	const targetInDb = await ServicesRegistry.getInstance().targetRepository.get(targetId);
+	let targetInDb: TargetPersistent | null = null;
+	try {
+		targetInDb = await ServicesRegistry.getInstance().targetRepository.get(targetId);
+	} catch (e) {
+		console.error("Error while getting a target.", e);
+	}
 
 	if (!targetInDb) {
 		throw createHttpError(404);

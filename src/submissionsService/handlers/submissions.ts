@@ -27,13 +27,23 @@ export default class SubmissionHandler {
 
 		// TODO: The admin check can be replaced with a mongoose model method. Or simply a method in a plain old Javascript object.
 		if (user.role == "admin" || user.customId == target.userId) {
-			submissions = await ServicesRegistry.getInstance().submissionRepository.getByTargetId(target.customId);
+			try {
+				submissions = await ServicesRegistry.getInstance().submissionRepository.getByTargetId(target.customId);
+			} catch (e) {
+				console.error("Error while getting submissions.", e);
+				throw e;
+			}
 		} else {
 			const filter: Partial<Submission> = {
 				userId: user.customId,
 				targetId: target.customId
 			};
-			submissions = await ServicesRegistry.getInstance().submissionRepository.getByFiltered(filter);
+			try {
+				submissions = await ServicesRegistry.getInstance().submissionRepository.getByFiltered(filter);
+			} catch (e) {
+				console.error("Error while getting submissions.", e);
+				throw e;
+			}
 		}
 
 		const responseBody = {
@@ -56,13 +66,21 @@ export default class SubmissionHandler {
 		const fileDataUrl = toDataUrl(uploadedFile.mimetype, readFile);
 
 		const fileUrl = new URL(uploadedFile.filename, Environment.getInstance().submissionUploadsUrl);
-		const newSubmission = await ServicesRegistry.getInstance().submissionRepository.create({
-			customId: crypto.randomUUID(),
-			userId: reqBody.userId,
-			targetId: res.locals.target.customId,
-			source: fileUrl.toString(),
-			base64Encoded: fileDataUrl
-		});
+
+		let newSubmission: SubmissionPersistent;
+
+		try {
+			newSubmission = await ServicesRegistry.getInstance().submissionRepository.create({
+				customId: crypto.randomUUID(),
+				userId: reqBody.userId,
+				targetId: res.locals.target.customId,
+				source: fileUrl.toString(),
+				base64Encoded: fileDataUrl
+			});
+		} catch (e) {
+			console.error("Error while creating a submission.", e);
+			throw e;
+		}
 
 		const responseBody = {
 			status: "success",
@@ -92,7 +110,13 @@ export default class SubmissionHandler {
 	};
 
 	public static destroy: RequestHandler<RouteParameters<"/submissions/:id">> = async (req, res) => {
-		const deletionSuccess = await ServicesRegistry.getInstance().submissionRepository.deleteById(req.params.id);
+		let deletionSuccess: boolean;
+		try {
+			deletionSuccess = await ServicesRegistry.getInstance().submissionRepository.deleteById(req.params.id);
+		} catch (e) {
+			console.error("Error while deleting a submission.", e);
+			throw e;
+		}
 
 		const responseBody = {
 			status: "success",

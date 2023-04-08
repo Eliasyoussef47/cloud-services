@@ -175,6 +175,9 @@ export class MessageBroker implements IMessageBrokerUser, IMessagePublisher, IAs
 			const pattern3: RoutingKey = "targets.*.created";
 			await channel.bindQueue(this.submissionsServiceQueue.queue, exchangeBravo.exchange, pattern3);
 
+			const pattern4: RoutingKey = "targets.*.deleted";
+			await channel.bindQueue(this.submissionsServiceQueue.queue, exchangeBravo.exchange, pattern4);
+
 			return true;
 		} catch (e) {
 			console.error(`Asserting queue "${submissionsServicesQueueName}" failed: `);

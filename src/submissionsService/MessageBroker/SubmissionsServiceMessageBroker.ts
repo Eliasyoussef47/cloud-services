@@ -1,6 +1,6 @@
 import { ConsumeMessage } from "amqplib";
 import { RoutingKey } from "@/shared/MessageBroker/RoutingKey.js";
-import { messageBrokerMessageBaseSchema, ScoreCalculationRequestMessage, ScoreCalculationResponseMessage, scoreCalculationResponseSchema, TargetCreatedMessage, targetCreatedMessageSchema, UserCreatedMessage, userCreatedMessageSchema } from "@/shared/MessageBroker/messages.js";
+import { messageBrokerMessageBaseSchema, ScoreCalculationRequestMessage, ScoreCalculationResponseMessage, scoreCalculationResponseSchema, TargetCreatedMessage, targetCreatedMessageSchema, TargetDeletedMessage, targetDeletedMessageSchema, UserCreatedMessage, userCreatedMessageSchema } from "@/shared/MessageBroker/messages.js";
 import { submissionServiceCallbackQueueName, targetsServiceRpcQueueName } from "@/shared/MessageBroker/constants.js";
 import ServicesRegistry from "@/submissionsService/ServiceRegistry.js";
 import { MessageBroker } from "@/shared/MessageBroker/MessageBrokerGod.js";
@@ -9,6 +9,7 @@ import { Submission } from "@/submissionsService/models/Submission.js";
 import { Options } from "amqplib/properties.js";
 import { Target } from "@/targetsService/models/Target.js";
 import { CreateArgs } from "@/submissionsService/persistence/ITargetRepository.js";
+import { SubmissionPersistent } from "@/submissionsService/persistence/ISubmissionRepository.js";
 
 export class SubmissionsServiceMessageBroker {
 	private _messageBroker: MessageBroker;
@@ -98,11 +99,19 @@ export class SubmissionsServiceMessageBroker {
 			return;
 		}
 
-		// Test if the message is about a newly created user.
+		// Test if the message is the result of the score calculation.
 		const parsedScoreCalculationResponseSchema = scoreCalculationResponseSchema.safeParse(messageParsed.data);
 		if (parsedScoreCalculationResponseSchema.success) {
 			channel.ack(msg);
 			void this.consumeScoreCalculationResponse(parsedScoreCalculationResponseSchema.data);
+			return;
+		}
+
+		// Test if the message is the result of the score calculation.
+		const parsedMessageTargetDeleted = targetDeletedMessageSchema.safeParse(messageParsed.data);
+		if (parsedMessageTargetDeleted.success) {
+			await this.consumeTargetDeleted(parsedMessageTargetDeleted.data);
+			channel.ack(msg);
 			return;
 		}
 
@@ -153,11 +162,27 @@ export class SubmissionsServiceMessageBroker {
 			customId: message.data.customId,
 			userId: message.data.userId
 		};
-		void ServicesRegistry.getInstance().targetRepository.create(createArgs);
+		try {
+			void ServicesRegistry.getInstance().targetRepository.create(createArgs);
+		} catch (e) {
+			console.error("Error while creating target.", e);
+		}
 	}
 
 	private async consumeUserCreated(message: UserCreatedMessage) {
-		void ServicesRegistry.getInstance().userRepository.create({ customId: message.data.customId });
+		try {
+			void ServicesRegistry.getInstance().userRepository.create({ customId: message.data.customId });
+		} catch (e) {
+			console.error("Error while creating a user.", e);
+		}
+	}
+
+	private async consumeTargetDeleted(message: TargetDeletedMessage) {
+		try {
+			await void ServicesRegistry.getInstance().targetRepository.deleteById(message.data.customId);
+		} catch (e) {
+			console.error("Error while deleting target.", e);
+		}
 	}
 
 	private submissionServiceCallbackQueueListener(msg: ConsumeMessage) {
@@ -201,7 +226,13 @@ export class SubmissionsServiceMessageBroker {
 	}
 
 	private async consumeScoreCalculationResponse(message: ScoreCalculationResponseMessage) {
-		const submissionInDatabase = await ServicesRegistry.getInstance().submissionRepository.get(message.data.submission.customId);
+		let submissionInDatabase: SubmissionPersistent | null;
+		try {
+			submissionInDatabase = await ServicesRegistry.getInstance().submissionRepository.get(message.data.submission.customId);
+		} catch (e) {
+			console.error("Error while getting a submission.", e);
+			return;
+		}
 
 		if (!submissionInDatabase) {
 			console.warn("The submission id that was received as score calculation response wasn't found in the database.");

@@ -203,6 +203,9 @@ export class BindExchange_A_B implements IHasExchangeAlpha, IHasExchangeBravo {
 			const pattern1: RoutingKey = "*.*.created";
 			await channel.bindExchange(exchangeBravo.exchange, exchangeAlpha.exchange, pattern1);
 
+			const pattern3: RoutingKey = "*.*.deleted";
+			await channel.bindExchange(exchangeBravo.exchange, exchangeAlpha.exchange, pattern3);
+
 			const pattern2: RoutingKey = "*.image.scoreCalculationRequested";
 			await channel.bindExchange(exchangeBravo.exchange, exchangeAlpha.exchange, pattern2);
 

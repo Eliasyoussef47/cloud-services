@@ -105,7 +105,13 @@ export class AuthServiceBeta extends AuthServiceBase {
 	 * @throws {CustomError}
 	 */
 	public async getMatchingUser(payload: UserJwtPayload): Promise<User> {
-		const foundUser = await ServicesRegistry.getInstance().userRepository.getByOpaqueId(payload.sub);
+		let foundUser: UserPersistent | null;
+		try {
+			foundUser = await ServicesRegistry.getInstance().userRepository.getByOpaqueId(payload.sub);
+		} catch (e) {
+			console.error("Error while getting a user.", e);
+			throw e;
+		}
 
 		if (!foundUser) {
 			throw new CustomError("Invalid user");
@@ -119,12 +125,21 @@ export class AuthServiceBeta extends AuthServiceBase {
 		const opaqueId = crypto.randomUUID();
 		const password = AuthServiceBeta.createPassword(loginForm.password);
 
-		// TODO: username must be unique.
-		return await ServicesRegistry.getInstance().userRepository.create({ customId, opaqueId, username: loginForm.username, password });
+		try {
+			return await ServicesRegistry.getInstance().userRepository.create({ customId, opaqueId, username: loginForm.username, password });
+		} catch (e) {
+			console.error("Error while creating user.", e);
+			return undefined;
+		}
 	}
 
 	public async login(loginForm: LoginForm): Promise<{ jwt: string; user: UserPersistent } | undefined> {
-		const foundUser = await ServicesRegistry.getInstance().userRepository.getByUsername(loginForm.username);
+		let foundUser: UserPersistent | null = null;
+		try {
+			foundUser = await ServicesRegistry.getInstance().userRepository.getByUsername(loginForm.username);
+		} catch (e) {
+			console.error("Error while getting a user.", e);
+		}
 
 		if (!foundUser) {
 			return undefined;

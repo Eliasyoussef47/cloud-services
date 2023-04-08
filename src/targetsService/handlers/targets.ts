@@ -10,7 +10,7 @@ import crypto from "crypto";
 import { promises as fs } from "fs";
 import { StoreBody } from "@/shared/types/targetsService/index.js";
 import { toDataUrl } from "@/shared/utils/general.js";
-import { TargetCreatedBody } from "@/shared/MessageBroker/messages.js";
+import { TargetCreatedBody, TargetDeletedBody } from "@/shared/MessageBroker/messages.js";
 import { TargetPersistent } from "@/targetsService/persistence/ITargetRepository.js";
 
 const storeBodySchema: toZod<StoreBody> = baseStoreBodySchema.extend({
@@ -22,15 +22,14 @@ export type StoreResponseBody = Pick<Target, "customId" | "source" | "locationNa
 // TODO: Validation.
 export default class TargetHandler {
 	public static index: RequestHandler = async (req, res) => {
-		// const user = <GatewayJwtUser> req.user;
+		let targets: TargetPersistent[] = [];
 
-		let targets: TargetPersistent[];
-		// if (user.role == "admin") {
-		// 	targets = await ServicesRegistry.getInstance().targetRepository.getAll();
-		// } else {
-		// 	targets = await ServicesRegistry.getInstance().targetRepository.getByUserId(user.customId);
-		// }
-		targets = await ServicesRegistry.getInstance().targetRepository.getAll();
+		try {
+			targets = await ServicesRegistry.getInstance().targetRepository.getAll();
+		} catch (e) {
+			console.error("Error while getting a all targets.", e);
+			throw e;
+		}
 
 		const responseBody = {
 			status: "success",
@@ -52,13 +51,20 @@ export default class TargetHandler {
 		const fileDataUrl = toDataUrl(uploadedFile.mimetype, readFile);
 
 		const fileUrl = new URL(uploadedFile.filename, Environment.getInstance().targetUploadsUrl);
-		const newTarget = await ServicesRegistry.getInstance().targetRepository.create({
-			customId: crypto.randomUUID(),
-			userId: reqBody.userId,
-			source: fileUrl.toString(),
-			base64Encoded: fileDataUrl,
-			locationName: reqBody.locationName
-		});
+
+		let newTarget: TargetPersistent;
+		try {
+			newTarget = await ServicesRegistry.getInstance().targetRepository.create({
+				customId: crypto.randomUUID(),
+				userId: reqBody.userId,
+				source: fileUrl.toString(),
+				base64Encoded: fileDataUrl,
+				locationName: reqBody.locationName
+			});
+		} catch (e) {
+			console.error("Error while creating a target.", e);
+			throw e;
+		}
 
 		const responseBody = {
 			status: "success",
@@ -104,7 +110,13 @@ export default class TargetHandler {
 	};
 
 	public static destroy: RequestHandler = async (req, res) => {
-		const deletionSuccess = await ServicesRegistry.getInstance().targetRepository.deleteById(req.params.id);
+		let deletionSuccess: boolean = false;
+		try {
+			deletionSuccess = await ServicesRegistry.getInstance().targetRepository.deleteById(req.params.id);
+		} catch (e) {
+			console.error("Error while deleting a target.", e);
+			throw e;
+		}
 
 		const responseBody = {
 			status: "success",
@@ -114,6 +126,12 @@ export default class TargetHandler {
 		} satisfies ResponseBody;
 
 		res.json(responseBody);
+
+		const messageBody: TargetDeletedBody = {
+			customId: req.params.id
+		};
+
+		ServicesRegistry.getInstance().targetsServiceMessageBroker.publishTargetDeleted(messageBody);
 	};
 }
 

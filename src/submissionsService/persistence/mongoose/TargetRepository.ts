@@ -4,6 +4,7 @@ import { Target } from "@/submissionsService/models/Target.js";
 import { TargetModelType, targetSchema } from "@/submissionsService/persistence/mongoose/models/Target.js";
 import { MyHydratedDocument } from "@/shared/types/database/mongoose/mongoose.js";
 import { DatabaseError } from "@/shared/types/errors/ServiceError.js";
+import { DeleteResult } from "mongodb";
 
 export default class TargetRepository implements ITargetRepository {
 	public static readonly modelName = "Target";
@@ -51,5 +52,21 @@ export default class TargetRepository implements ITargetRepository {
 		}
 
 		return await model.findOne(<Pick<Target, "customId">> { customId: customId }).exec() as MyHydratedDocument<Target>;
+	}
+
+	public async deleteById(id: Target["customId"]): Promise<boolean> {
+		const model = this._model;
+		if (!model) {
+			throw new DatabaseError("No database connection.");
+		}
+
+		const foundRecord = await model.findOne(<Pick<Target, "customId">> { customId: id });
+
+		if (!foundRecord) {
+			return false;
+		}
+
+		const result: DeleteResult = await foundRecord.deleteOne();
+		return result.deletedCount > 0;
 	}
 }
