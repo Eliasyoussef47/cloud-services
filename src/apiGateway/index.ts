@@ -11,6 +11,7 @@ import { getAuthenticatedRouter, nonAuthenticatedRouter } from "@/apiGateway/rou
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
 import { setupDependencies } from "@/apiGateway/setup.js";
 import { removeUser } from "@/auth/middlewares/removeUser.js";
+import promBundle from "express-prom-bundle";
 
 // TODO: Database health check.
 // TODO: Message broker health check.
@@ -22,7 +23,17 @@ AuthServiceBeta.setup();
 
 const port = Number(Environment.getInstance().apiGatewayUrl.port) || 3000;
 
+const metricsMiddleware = promBundle({
+	includePath: true,
+	includeStatusCode: true,
+	promClient: {
+		collectDefaultMetrics: {}
+	}
+});
+
 const app = express();
+
+app.use(metricsMiddleware);
 
 app.set("env", process.env.NODE_ENV);
 

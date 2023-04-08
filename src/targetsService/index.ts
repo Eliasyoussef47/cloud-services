@@ -10,6 +10,7 @@ import { attachErrorHandlers } from "@/shared/operation/errorHandling.js";
 import { authenticatedRouter } from "@/targetsService/routes/router.js";
 import { uploadedTargetsPath } from "@/shared/constants.js";
 import { setupDependencies } from "@/targetsService/setup.js";
+import promBundle from "express-prom-bundle";
 import { authorizationSetup } from "@/shared/authorization/AuthorizationHandler.js";
 import { isAdmin } from "@/shared/authorization/index.js";
 
@@ -20,7 +21,17 @@ AuthServiceAlpha.setup();
 
 const port = Number(Environment.getInstance().targetServiceUrl.port) || 3001;
 
+const metricsMiddleware = promBundle({
+	includePath: true,
+	includeStatusCode: true,
+	promClient: {
+		collectDefaultMetrics: {}
+	}
+});
+
 const app = express();
+
+app.use(metricsMiddleware);
 
 app.set("env", process.env.NODE_ENV);
 
