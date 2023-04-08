@@ -11,6 +11,8 @@ import { setupDependencies } from "@/submissionsService/setup.js";
 import { uploadedSubmissionsPath } from "@/shared/constants.js";
 import { databaseHealth } from "@/submissionsService/middlewares/DatabaseHealth.js";
 import { authenticatedRouter } from "@/submissionsService/routes/router.js";
+import { authorizationSetup } from "@/shared/authorization/AuthorizationHandler.js";
+import { isAdmin } from "@/shared/authorization/index.js";
 
 dotenv.config();
 Environment.setup();
@@ -31,6 +33,9 @@ app.use(databaseHealth);
 app.use(uploadedSubmissionsPath, express.static("uploads/submissionsService"));
 
 setupGatewayAuthenticationMiddlewares(app, AuthServiceAlpha.getInstance());
+
+app.use(authorizationSetup);
+app.use(isAdmin);
 
 app.use(authenticatedRouter);
 

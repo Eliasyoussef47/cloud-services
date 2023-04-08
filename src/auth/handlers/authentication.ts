@@ -47,7 +47,7 @@ export default class AuthenticationHandler {
 			status: "success",
 			data: {
 				token: loginJwt.jwt,
-				// user: loginJwt.user
+				user: loginJwt.user
 			},
 		} satisfies ResponseBody;
 

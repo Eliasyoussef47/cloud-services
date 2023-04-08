@@ -26,8 +26,8 @@ export default class SubmissionHandler {
 
 		let submissions: SubmissionPersistent[];
 
-		// TODO: This can be replaced with a mongoose model method. Or simply a method in a plain old Javascript object.
-		if (user.role == "admin") {
+		// TODO: The admin check can be replaced with a mongoose model method. Or simply a method in a plain old Javascript object.
+		if (user.role == "admin" || user.customId == target.userId) {
 			submissions = await ServicesRegistry.getInstance().submissionRepository.getByTargetId(target.customId);
 		} else {
 			const filter: Partial<Submission> = {

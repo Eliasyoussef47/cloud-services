@@ -4,6 +4,7 @@ import mime from "mime-types";
 import SubmissionHandler from "@/submissionsService/handlers/submissions.js";
 import { getTarget } from "@/submissionsService/middlewares/getTarget.js";
 import { getSubmission } from "@/submissionsService/middlewares/getSubmission.js";
+import { ownsSubmission } from "@/submissionsService/middlewares/authorization.js";
 
 export const submissionRouter = express.Router();
 
@@ -27,7 +28,7 @@ export function getTargetsSubmissionsRoute<T extends string>(param: T): TargetSu
 }
 
 submissionRouter.route(getSubmissionsRoute(":id"))
-	.all(getSubmission)
+	.all(getSubmission, ownsSubmission)
 	.get(SubmissionHandler.show)
 
 const upload = multer({ storage });
