@@ -4,7 +4,7 @@ export type anyWord = "*";
 export type restOfTopic = "#";
 export type resource = "targets" | "submissions" | "users" | anyWord;
 export type section = "image" | anyWord;
-export type event = "created" | "uploaded" | "scoreCalculated" | "scoreCalculationRequested" | anyWord;
+export type event = "created" | "uploaded" | "scoreCalculated" | "scoreCalculationRequested" | "deleted" | anyWord;
 
 export type RoutingKeyPart = anyWord
 	| restOfTopic
