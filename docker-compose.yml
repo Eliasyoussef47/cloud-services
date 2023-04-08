@@ -24,13 +24,13 @@ services:
       dockerfile: apiGateway.dockerfile
     command: sh -c "npm install && npm run apiGateway"
     ports:
-      - 3000:3000
+      - 4242:4242
     volumes:
       - ./:/cloud-services
     environment:
       - MONGO_URL=mongodb://mongo:27017
       - DB_NAME=cloud-services
-      - API_GATEWAY_URL=http://127.0.0.1:3000
+      - API_GATEWAY_URL=http://127.0.0.1:4242
       - TARGETS_SERVICE_URL=http://targets:3001
       - SUBMISSIONS_SERVICE_URL=http://submissions:3003
       - IMAGE_RECOGNITION_SERVICE_URL=http://image-recognition:3004
@@ -64,7 +64,7 @@ services:
     environment:
       - MONGO_URL=mongodb://mongo:27017
       - DB_NAME=cloud-services
-      - API_GATEWAY_URL=http://127.0.0.1:3000
+      - API_GATEWAY_URL=http://127.0.0.1:4242
       - TARGETS_SERVICE_URL=http://targets:3001
       - SUBMISSIONS_SERVICE_URL=http://submissions:3003
       - IMAGE_RECOGNITION_SERVICE_URL=http://image-recognition:3004
@@ -95,7 +95,7 @@ services:
     environment:
       - MONGO_URL=mongodb://mongo:27017
       - DB_NAME=cloud-services
-      - API_GATEWAY_URL=http://127.0.0.1:3000
+      - API_GATEWAY_URL=http://127.0.0.1:4242
       - TARGETS_SERVICE_URL=http://targets:3001
       - SUBMISSIONS_SERVICE_URL=http://submissions:3003
       - IMAGE_RECOGNITION_SERVICE_URL=http://image-recognition:3004
@@ -126,7 +126,7 @@ services:
     environment:
       - MONGO_URL=mongodb://mongo:27017
       - DB_NAME=cloud-services
-      - API_GATEWAY_URL=http://127.0.0.1:3000
+      - API_GATEWAY_URL=http://127.0.0.1:4242
       - TARGETS_SERVICE_URL=http://targets:3001
       - SUBMISSIONS_SERVICE_URL=http://submissions:3003
       - IMAGE_RECOGNITION_SERVICE_URL=http://image-recognition:3004
@@ -144,3 +144,18 @@ services:
       - mongo
       - rabbitmq
     restart: on-failure
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    ports:
+      - 9090:9090
+    command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yml
+  grafana:
+    build: ./grafana
+    ports:
+      - 3000:3000
+volumes:
+  prometheus-data:

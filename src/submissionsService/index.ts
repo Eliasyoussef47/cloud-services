@@ -11,6 +11,7 @@ import { setupDependencies } from "@/submissionsService/setup.js";
 import { uploadedSubmissionsPath } from "@/shared/constants.js";
 import { databaseHealth } from "@/submissionsService/middlewares/DatabaseHealth.js";
 import { authenticatedRouter } from "@/submissionsService/routes/router.js";
+import promBundle from "express-prom-bundle";
 
 dotenv.config();
 Environment.setup();
@@ -19,7 +20,17 @@ AuthServiceAlpha.setup();
 
 const port = Number(Environment.getInstance().submissionServiceUrl.port) || 3003;
 
+const metricsMiddleware = promBundle({
+	includePath: true,
+	includeStatusCode: true,
+	promClient: {
+		collectDefaultMetrics: {}
+	}
+});
+
 const app = express();
+
+app.use(metricsMiddleware);
 
 app.set("env", process.env.NODE_ENV);
 
