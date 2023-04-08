@@ -64,3 +64,7 @@ export async function printResponse(response: Response) {
 		console.log("Body: ", body);
 	}
 }
+
+export const setUrlSearchParams = (url: URL, params: URLSearchParams) => {
+	return new URL(`${url.origin}${url.pathname}?${params.toString()}`);
+}

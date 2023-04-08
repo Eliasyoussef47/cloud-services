@@ -2,7 +2,7 @@ import { Environment } from "@/shared/operation/Environment.js";
 import { makeTypedFormData, makeTypedSearchParams } from "@/types/Http.js";
 import { StoreBody } from "@/shared/types/targetsService/index.js";
 import { Target } from "@/targetsService/models/Target.js";
-import { defaultServiceCall, getServicesAuthHeaders } from "@/shared/utils/fetch.js";
+import { defaultServiceCall, getServicesAuthHeaders, setUrlSearchParams } from "@/shared/utils/fetch.js";
 
 // export type ServiceCallArgsAlpha<TQueryParams extends Record<string, unknown> = Record<string, unknown>> = {
 // 	queryParams: TQueryParams;
@@ -64,7 +64,7 @@ export default class Targets {
 		return await defaultServiceCall(url, fetchInit);
 	}
 
-	public static async show(args: ShowArgs): Promise<Response> {
+	public static async show(args: ShowArgs, searchParams: URLSearchParams): Promise<Response> {
 		const fetchInit: RequestInit = {
 			method: "get",
 			headers: getServicesAuthHeaders()
@@ -72,6 +72,7 @@ export default class Targets {
 
 		let url = new URL(Environment.getInstance().targetServiceUrl);
 		url = new URL(args.id, url);
+		url = setUrlSearchParams(url, searchParams);
 
 		return await defaultServiceCall(url, fetchInit);
 	}

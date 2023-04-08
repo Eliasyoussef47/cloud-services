@@ -8,8 +8,7 @@ import { storeBodySchema, storeFilesSchema } from "@/shared/validation/targets.j
 import { User } from "@/auth/models/User.js";
 import { indexCaller as submissionsIndexCaller } from "@/apiGateway/handlers/submissions.js"
 import { IndexResponseBody } from "@/submissionsService/handlers/submissions.js";
-import { ShowResponseBody as TargetsShowResponseBody } from "@/targetsService/handlers/targets.js";
-import { Target } from "@/targetsService/models/Target.js";
+import { ShowQueries as TargetShowQueries, ShowResponseBody as TargetsShowResponseBody, TargetResource } from "@/targetsService/handlers/targets.js";
 import { Submission } from "@/submissionsService/models/Submission.js";
 import { ResponseBody } from "@/shared/types/Response.js";
 import { isTrue, noError } from "@/shared/utils/general.js";
@@ -37,16 +36,26 @@ const indexQuerySchema: toZod<IndexArgs> = z.object({
 	locationName: z.string().optional()
 });
 
-export type Target_Submissions = Target & {
-	submissions?: Submission[]
+export type Target_Submissions = TargetResource & {
+	submissions?: Submission[];
 }
 
 export type ShowResponseBody = ResponseBody<{ target: Target_Submissions }>;
 
-async function showCaller(targetId: string): Promise<ServiceCallResult<TargetsShowResponseBody>> {
+export type ShowQueries = TargetShowQueries & {
+	submissions?: string;
+}
+
+/**
+ *
+ * @param targetId
+ * @param urlSearchParams
+ * @throws Whatever indexCircuitBreaker or Request.json throw.
+ */
+async function showCaller(targetId: string, urlSearchParams: URLSearchParams): Promise<ServiceCallResult<TargetsShowResponseBody>> {
 	let fireResult: Response;
 	try {
-		fireResult = await showCircuitBreaker.fire({ id: targetId });
+		fireResult = await showCircuitBreaker.fire({ id: targetId }, urlSearchParams);
 	} catch (e) {
 		console.log("Service breaker rejected: ", e);
 		throw e;
@@ -63,7 +72,7 @@ async function showCaller(targetId: string): Promise<ServiceCallResult<TargetsSh
 	return {
 		statusCode: fireResult.status,
 		body: targetsResponseJson
-	}
+	};
 }
 
 export default class TargetHandler {
@@ -124,15 +133,15 @@ export default class TargetHandler {
 		}
 	};
 
-	public static show: RequestHandler<RouteParameters<"/targets/:id">, {}, {}, { submissions: string, base64Encoded: string }> = async (req, res, next) => {
+	public static show: RequestHandler<RouteParameters<"/targets/:id">, {}, {}, ShowQueries> = async (req, res, next) => {
 		// TODO: Validate route params.
 		const targetId: string = req.params.id;
 
-		let targetsResponse: ServiceCallResult<TargetsShowResponseBody>;
+		let targetResponse: ServiceCallResult<TargetsShowResponseBody>;
 		try {
-			targetsResponse = await showCaller(targetId);
-			if (targetsResponse.statusCode >= 400) {
-				res.status(targetsResponse.statusCode).json(targetsResponse.body);
+			targetResponse = await showCaller(targetId, new URLSearchParams(req.query));
+			if (targetResponse.statusCode >= 400) {
+				res.status(targetResponse.statusCode).json(targetResponse.body);
 				return;
 			}
 		} catch (e) {
@@ -140,7 +149,7 @@ export default class TargetHandler {
 			return;
 		}
 
-		const targetFromService = targetsResponse.body.data.target;
+		const targetFromService = targetResponse.body.data.target;
 		let submissionsFromService: Submission[] | undefined = undefined;
 
 		if (isTrue(req.query.submissions)) {
@@ -171,7 +180,7 @@ export default class TargetHandler {
 			}
 		} satisfies ShowResponseBody
 
-		res.status(targetsResponse.statusCode).json(response);
+		res.status(targetResponse.statusCode).json(response);
 	};
 
 	public static update: RequestHandler = async (req, res) => {

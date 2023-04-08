@@ -1,5 +1,5 @@
 import { RequestHandler } from "express-serve-static-core";
-import { ResponseBody } from "@/shared/types/Response.js";
+import { ResourceFilter, ResponseBody } from "@/shared/types/Response.js";
 import { storeBodySchema as baseStoreBodySchema, storeFilesSchema } from "@/shared/validation/targets.js";
 import { Environment } from "@/shared/operation/Environment.js";
 import { Target } from "@/targetsService/models/Target.js";
@@ -9,16 +9,22 @@ import { toZod } from "tozod";
 import crypto from "crypto";
 import { promises as fs } from "fs";
 import { StoreBody } from "@/shared/types/targetsService/index.js";
-import { toDataUrl } from "@/shared/utils/general.js";
+import { isTrue, preferTrue, toDataUrl } from "@/shared/utils/general.js";
 import { TargetCreatedBody, TargetDeletedBody } from "@/shared/MessageBroker/messages.js";
 import { TargetPersistent } from "@/targetsService/persistence/ITargetRepository.js";
+import { ChangeTypes, Optional } from "@/shared/types/utility.js";
+import { createTargetResourceSchema, PartialTarget } from "@/targetsService/resources/Target.js";
+import createHttpError from "http-errors";
 
 const storeBodySchema: toZod<StoreBody> = baseStoreBodySchema.extend({
 	userId: z.string()
 });
 
-export type StoreResponseBody = Pick<Target, "customId" | "source" | "locationName" | "createdAt">;
-export type ShowResponseBody = ResponseBody<{ target: Target }>;
+export type TargetResource = Optional<Target, "base64Encoded" | "externalUploadId">;
+export type StoreResponseBody = Pick<TargetResource, "customId" | "source" | "locationName" | "createdAt">;
+export type ShowResponseBody = ResponseBody<{ target: TargetResource }>;
+
+export type ShowQueries = ChangeTypes<Partial<Target>, string>;
 
 // TODO: Validation.
 export default class TargetHandler {
@@ -88,11 +94,33 @@ export default class TargetHandler {
 	};
 
 	// TODO: Validate url param.
-	public static show: RequestHandler = async (req, res) => {
+	public static show: RequestHandler<"/:id", {}, {}, ShowQueries> = async (req, res) => {
+		const target = res.locals.target as Target;
+
+		const resourceFilter = {
+			customId: preferTrue(req.query.customId),
+			userId: preferTrue(req.query.userId),
+			source: preferTrue(req.query.source),
+			base64Encoded: preferTrue(req.query.base64Encoded),
+			locationName: preferTrue(req.query.locationName),
+			externalUploadId: preferTrue(req.query.externalUploadId),
+			createdAt: preferTrue(req.query.createdAt),
+			updatedAt: preferTrue(req.query.updatedAt),
+		} satisfies ResourceFilter<PartialTarget>;
+		console.log("resourceFilter", resourceFilter);
+
+		const resourceSchema = createTargetResourceSchema(resourceFilter);
+		const parseResult = resourceSchema.safeParse(target);
+
+		if (!parseResult.success) {
+			console.error("Parsing target failed.", parseResult.error);
+			throw createHttpError(500);
+		}
+
 		const responseBody = {
 			status: "success",
 			data: {
-				target: res.locals.target
+				target: parseResult.data
 			}
 		} satisfies ShowResponseBody;
 

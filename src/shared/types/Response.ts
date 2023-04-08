@@ -1,3 +1,5 @@
+import { ChangeTypes } from "@/shared/types/utility.js";
+
 export const serviceSucces = ["success", "created", "scoreCalculated", "deleted", "scoreCalculationRequested"] as const;
 export type ServiceSuccess = typeof serviceSucces[number];
 
@@ -29,3 +31,5 @@ export const toStatusMessage = (statusCode: number): ServiceStatus => {
 
 	return "success";
 }
+
+export type ResourceFilter<T> = Partial<ChangeTypes<T, boolean | undefined>>;

@@ -6,4 +6,5 @@ export interface Submission {
 	base64Encoded: string;
 	score: number | null;
 	createdAt: Date;
+	updatedAt: Date;
 }

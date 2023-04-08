@@ -10,10 +10,43 @@ export function basicAuth(username: string, password: string) {
 	return btoa(`${username}:${password}`);
 }
 
-export function isTrue(value: string) {
+/**
+ * Converts a string to its boolean equivalent.
+ * @param value
+ * @param defaultValue
+ */
+export function isTrue(value: string | undefined, defaultValue: boolean = false) {
+	if (!value) {
+		return defaultValue;
+	}
+
 	return /(true)|(1)/gi.test(value);
+}
+
+/**
+ * Wrapper around {isTrue} to set the default value to `true`.
+ * @param value
+ */
+export function preferTrue(value: string | undefined) {
+	return isTrue(value, true);
 }
 
 export function noError(statusCode: number): boolean {
 	return statusCode >= 200 && statusCode < 300;
 }
+
+const getParamsWithKeyStripped = (urlParams: URLSearchParams, keyToRemove: string) => {
+	const submissionUrlParams = new URLSearchParams();
+
+	for (const [key, value] of urlParams.entries()) {
+		const re = new RegExp(`^${keyToRemove}\\.`, "g");
+		if (!re.test(key)) {
+			continue;
+		}
+
+		const newKey = key.replace(re, "");
+		submissionUrlParams.append(newKey, value);
+	}
+
+	return submissionUrlParams;
+};
