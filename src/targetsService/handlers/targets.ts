@@ -12,7 +12,7 @@ import { StoreBody } from "@/shared/types/targetsService/index.js";
 import { preferTrue, toDataUrl } from "@/shared/utils/general.js";
 import { TargetCreatedBody, TargetDeletedBody } from "@/shared/MessageBroker/messages.js";
 import { TargetPersistent } from "@/targetsService/persistence/ITargetRepository.js";
-import { ChangeTypes, Optional } from "@/shared/types/utility.js";
+import { ChangeTypes } from "@/shared/types/utility.js";
 import { createTargetResourceSchema, PartialTarget } from "@/targetsService/resources/Target.js";
 import createHttpError from "http-errors";
 
@@ -20,15 +20,15 @@ const storeBodySchema: toZod<StoreBody> = baseStoreBodySchema.extend({
 	userId: z.string()
 });
 
-export type TargetResource = Optional<Target, "base64Encoded" | "externalUploadId">;
-export type StoreResponseBody = Pick<TargetResource, "customId" | "source" | "locationName" | "createdAt">;
-export type ShowResponseBody = ResponseBody<{ target: TargetResource }>;
+export type StoreResponseBody = Pick<Target, "customId" | "source" | "locationName" | "createdAt">;
+export type ShowResponseBody = ResponseBody<{ target: PartialTarget }>;
+export type IndexResponseBody = ResponseBody<{ targets: PartialTarget[] }>;
 
 export type ShowQueries = ChangeTypes<Partial<Target>, string>;
 
 // TODO: Validation.
 export default class TargetHandler {
-	public static index: RequestHandler = async (req, res) => {
+	public static index: RequestHandler<{}, {}, {}, ShowQueries> = async (req, res) => {
 		let targets: TargetPersistent[] = [];
 
 		try {
@@ -38,12 +38,32 @@ export default class TargetHandler {
 			throw e;
 		}
 
+		const resourceFilter = {
+			customId: preferTrue(req.query.customId),
+			userId: preferTrue(req.query.userId),
+			source: preferTrue(req.query.source),
+			base64Encoded: preferTrue(req.query.base64Encoded),
+			locationName: preferTrue(req.query.locationName),
+			externalUploadId: preferTrue(req.query.externalUploadId),
+			createdAt: preferTrue(req.query.createdAt),
+			updatedAt: preferTrue(req.query.updatedAt),
+		} satisfies ResourceFilter<PartialTarget>;
+
+		const resourceSchema = createTargetResourceSchema(resourceFilter);
+		const resourceArray = z.array(resourceSchema);
+		const parseResult = resourceArray.safeParse(targets);
+
+		if (!parseResult.success) {
+			console.error("Parsing target failed.", parseResult.error);
+			throw createHttpError(500);
+		}
+
 		const responseBody = {
 			status: "success",
 			data: {
-				targets: targets
+				targets: parseResult.data
 			}
-		} satisfies ResponseBody;
+		} satisfies IndexResponseBody;
 
 		res.json(responseBody);
 	};

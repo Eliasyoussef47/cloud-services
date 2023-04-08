@@ -8,11 +8,12 @@ import { storeBodySchema, storeFilesSchema } from "@/shared/validation/targets.j
 import { User } from "@/auth/models/User.js";
 import { indexCaller as submissionsIndexCaller } from "@/apiGateway/handlers/submissions.js"
 import { IndexResponseBody } from "@/submissionsService/handlers/submissions.js";
-import { ShowQueries as TargetShowQueries, ShowResponseBody as TargetsShowResponseBody, TargetResource } from "@/targetsService/handlers/targets.js";
+import { ShowQueries as TargetShowQueries, ShowResponseBody as TargetsShowResponseBody } from "@/targetsService/handlers/targets.js";
 import { Submission } from "@/submissionsService/models/Submission.js";
-import { ResponseBody } from "@/shared/types/Response.js";
+import { ResponseBody, ServiceStatus } from "@/shared/types/Response.js";
 import { isTrue, noError } from "@/shared/utils/general.js";
 import { ServiceCallResult } from "@/apiGateway/types.js";
+import { PartialTarget } from "@/targetsService/resources/Target.js";
 
 const circuitBreakerOptions: CircuitBreakerOptions = {
 	timeout: 3000, // If our function takes longer than 3 seconds, trigger a failure
@@ -33,10 +34,10 @@ const deleteCircuitBreaker = new CircuitBreaker(Targets.destroy, circuitBreakerO
 attachStandardCircuitBreakerCallbacks(deleteCircuitBreaker);
 
 const indexQuerySchema: toZod<IndexArgs> = z.object({
-	locationName: z.string().optional()
+	locationNameQ: z.string().optional()
 });
 
-export type Target_Submissions = TargetResource & {
+export type Target_Submissions = PartialTarget & {
 	submissions?: Submission[];
 }
 
@@ -149,6 +150,7 @@ export default class TargetHandler {
 			return;
 		}
 
+		let responseStatus: ServiceStatus = "success";
 		const targetFromService = targetResponse.body.data.target;
 		let submissionsFromService: Submission[] | undefined = undefined;
 
@@ -158,9 +160,12 @@ export default class TargetHandler {
 				submissionsResponse = await submissionsIndexCaller({ targetId: targetId });
 				if (noError(submissionsResponse.statusCode)) {
 					submissionsFromService = submissionsResponse.body.data.submissions;
+				} else {
+					responseStatus = "partialSuccess";
 				}
 			} catch (e) {
 				console.log("Error while calling submissions service: ", e);
+				responseStatus = "partialSuccess";
 			}
 		}
 
@@ -174,7 +179,7 @@ export default class TargetHandler {
 		}
 
 		const response = {
-			status: "success",
+			status: responseStatus,
 			data: {
 				target: targetWithSubmissions
 			}

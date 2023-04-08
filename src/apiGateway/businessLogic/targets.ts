@@ -11,7 +11,9 @@ import { defaultServiceCall, getServicesAuthHeaders, setUrlSearchParams } from "
 // export type ServiceCallArgs<TQueryParams extends Record<string, unknown>> = Partial<ServiceCallArgsAlpha<TQueryParams>>;
 
 // export type IndexArgs = Omit<ServiceCallArgs<{locationName?: string}>, "headers" | "body">;
-export type IndexArgs = Partial<Pick<Target, "locationName">>;
+export type IndexArgs = {
+	locationNameQ?: string;
+};
 
 export type StoreArgs = StoreBody & {
 	photo: Blob;
@@ -39,7 +41,7 @@ export default class Targets {
 
 		const url = new URL(Environment.getInstance().targetServiceUrl);
 
-		if (args && args.locationName) {
+		if (args && args.locationNameQ) {
 			const searchParams = url.searchParams;
 			makeTypedSearchParams<IndexArgs>(searchParams, args);
 		}
