@@ -11,6 +11,7 @@ import { promises as fs } from "fs";
 import { StoreBody } from "@/shared/types/targetsService/index.js";
 import { toDataUrl } from "@/shared/utils/general.js";
 import { GatewayJwtUser } from "@/auth/AuthServiceAlpha.js";
+import { TargetCreatedBody } from "@/shared/MessageBroker/messages.js";
 
 const storeBodySchema: toZod<StoreBody> = baseStoreBodySchema.extend({
 	userId: z.string()
@@ -65,7 +66,12 @@ export default class TargetHandler {
 
 		res.json(responseBody);
 
-		ServicesRegistry.getInstance().targetsServiceMessageBroker.publishTargetCreated({ customId: newTarget.customId });
+		const messageBody: TargetCreatedBody = {
+			customId: newTarget.customId,
+			userId: newTarget.userId
+		};
+
+		ServicesRegistry.getInstance().targetsServiceMessageBroker.publishTargetCreated(messageBody);
 	};
 
 	// TODO: Validate url param.

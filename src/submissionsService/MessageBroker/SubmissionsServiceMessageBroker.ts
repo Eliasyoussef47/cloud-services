@@ -8,6 +8,7 @@ import { TargetRpcRequest, TargetRpcResponse, targetRpcResponseSchema } from "@/
 import { Submission } from "@/submissionsService/models/Submission.js";
 import { Options } from "amqplib/properties.js";
 import { Target } from "@/targetsService/models/Target.js";
+import { CreateArgs } from "@/submissionsService/persistence/ITargetRepository.js";
 
 export class SubmissionsServiceMessageBroker {
 	private _messageBroker: MessageBroker;
@@ -84,8 +85,8 @@ export class SubmissionsServiceMessageBroker {
 		// Test if the message is about a newly created target.
 		const parsedMessageTargetCreated = targetCreatedMessageSchema.safeParse(messageParsed.data);
 		if (parsedMessageTargetCreated.success) {
+			await this.consumeTargetCreated(parsedMessageTargetCreated.data);
 			channel.ack(msg);
-			void this.consumeTargetCreated(parsedMessageTargetCreated.data);
 			return;
 		}
 
@@ -148,7 +149,11 @@ export class SubmissionsServiceMessageBroker {
 	}
 
 	private async consumeTargetCreated(message: TargetCreatedMessage) {
-		void ServicesRegistry.getInstance().targetRepository.create({ customId: message.data.customId });
+		const createArgs: CreateArgs = {
+			customId: message.data.customId,
+			userId: message.data.userId
+		};
+		void ServicesRegistry.getInstance().targetRepository.create(createArgs);
 	}
 
 	private async consumeUserCreated(message: UserCreatedMessage) {

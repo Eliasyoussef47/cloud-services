@@ -50,10 +50,11 @@ export const userCreatedMessageSchema = responseBodySchema.extend({
 	data: userCreatedBodySchema
 });
 
-export type TargetCreatedBody = Pick<Target, | "customId">;
+export type TargetCreatedBody = Pick<Target, | "customId" | "userId">;
 
 export const targetCreatedBodySchema: toZod<TargetCreatedBody> = z.object({
-	customId: z.string()
+	customId: z.string(),
+	userId: z.string()
 });
 
 export type TargetCreatedMessage = MessageBrokerMessageBase<TargetCreatedBody, "created", "Target">;
