@@ -12,12 +12,12 @@ export type StoreBodyComplete = StoreBody & {
 export type StoreArgs = StoreBodyComplete & Pick<Submission, "targetId">;
 
 export type ShowArgs = {
-	id: Submission["customId"]
-}
+	id: Submission["customId"];
+};
 
 export type DeleteArgs = {
-	id: Submission["customId"]
-}
+	id: Submission["customId"];
+};
 
 export default class Submissions {
 	// TODO: User based authorization.
@@ -64,7 +64,7 @@ export default class Submissions {
 		return await defaultServiceCall(url, fetchInit);
 	}
 
-	public async delete(args: DeleteArgs): Promise<Response> {
+	public async destroy(args: DeleteArgs): Promise<Response> {
 		const fetchInit: RequestInit = {
 			method: "delete",
 			headers: getServicesAuthHeaders()

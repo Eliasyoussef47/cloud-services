@@ -24,7 +24,7 @@ attachStandardCircuitBreakerCallbacks(storeCircuitBreaker);
 const showCircuitBreaker = new CircuitBreaker(submissionsService.show, circuitBreakerOptions);
 attachStandardCircuitBreakerCallbacks(storeCircuitBreaker);
 
-const deleteCircuitBreaker = new CircuitBreaker(submissionsService.delete, circuitBreakerOptions);
+const deleteCircuitBreaker = new CircuitBreaker(submissionsService.destroy, circuitBreakerOptions);
 attachStandardCircuitBreakerCallbacks(deleteCircuitBreaker);
 
 const indexParamsSchema: toZod<IndexArgs> = z.object({
@@ -111,8 +111,7 @@ export default class SubmissionHandler {
 		}
 	}
 
-	public delete: RequestHandler = async (req, res, next) => {
-
+	public destroy: RequestHandler = async (req, res, next) => {
 		let fireResult: Response;
 		try {
 			fireResult = await deleteCircuitBreaker.fire({ id: req.params.id });

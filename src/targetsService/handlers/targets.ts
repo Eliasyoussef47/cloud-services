@@ -104,10 +104,12 @@ export default class TargetHandler {
 	};
 
 	public static destroy: RequestHandler = async (req, res) => {
+		const deletionSuccess = await ServicesRegistry.getInstance().targetRepository.deleteById(req.params.id);
+
 		const responseBody = {
 			status: "success",
 			data: {
-				message: "destroy"
+				success: deletionSuccess
 			}
 		} satisfies ResponseBody;
 

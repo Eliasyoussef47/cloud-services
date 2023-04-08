@@ -12,11 +12,11 @@ const getRouter = () => {
 
 	submissionsRouter.route("/submissions/:id")
 		.get(handler.show)
-		.delete(handler.delete)
+		.delete(handler.destroy)
 
 	submissionsRouter.route(getTargetsSubmissionsRoute(":targetId"))
 		.get(handler.index)
-		.post(upload.fields([{name: "photo"}]), handler.store);
+		.post(upload.fields([{ name: "photo" }]), handler.store);
 
 	return submissionsRouter;
 };

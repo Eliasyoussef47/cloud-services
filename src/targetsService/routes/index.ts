@@ -20,7 +20,6 @@ targetsRouter.route("/")
 	.get(TargetHandler.index)
 	.post(upload.fields([{ name: "photo" }]), TargetHandler.store);
 
-// TODO: User based authorization.
 targetsRouter.route("/:id")
 	.all(getTarget, ownsTarget)
 	.get(TargetHandler.show)

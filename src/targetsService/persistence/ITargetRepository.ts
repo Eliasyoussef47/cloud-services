@@ -16,4 +16,5 @@ export default interface ITargetRepository {
 	getByUserId(userId: string): Promise<TargetPersistent[]>;
 	getAll(): Promise<TargetPersistent[]>;
 	create(createArgs: CreateArgs): Promise<TargetPersistent>
+	deleteById(id: Target["customId"]): Promise<boolean>;
 }

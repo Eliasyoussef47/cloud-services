@@ -15,10 +15,11 @@ const getRouter = () => {
 
 	targetsRouter.route("/targets")
 		.get(TargetHandler.index)
-		.post(upload.fields([{name: "photo"}]), TargetHandler.store);
+		.post(upload.fields([{ name: "photo" }]), TargetHandler.store);
 
 	targetsRouter.route("/targets/:id")
 		.get(TargetHandler.show)
+		.delete(TargetHandler.destroy)
 
 	return targetsRouter;
 };

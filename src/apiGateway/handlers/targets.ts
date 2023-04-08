@@ -22,6 +22,9 @@ attachStandardCircuitBreakerCallbacks(storeCircuitBreaker);
 const showCircuitBreaker = new CircuitBreaker(Targets.show, circuitBreakerOptions);
 attachStandardCircuitBreakerCallbacks(showCircuitBreaker);
 
+const deleteCircuitBreaker = new CircuitBreaker(Targets.destroy, circuitBreakerOptions);
+attachStandardCircuitBreakerCallbacks(deleteCircuitBreaker);
+
 const indexQuerySchema: toZod<IndexArgs> = z.object({
 	locationName: z.string().optional()
 });
@@ -112,8 +115,25 @@ export default class TargetHandler {
 
 	};
 
-	public static destroy: RequestHandler = async (req, res) => {
+	public static destroy: RequestHandler = async (req, res, next) => {
+		let fireResult: Response;
+		try {
+			fireResult = await deleteCircuitBreaker.fire({ id: req.params.id });
+		} catch (e) {
+			console.log("Service breaker rejected: ", e);
+			next(e);
+			return;
+		}
 
+		try {
+			const responseJson = await fireResult.json();
+
+			res.status(fireResult.status).json(responseJson);
+		} catch (e) {
+			console.log("Response from service wasn't json: ", e);
+			next(e);
+			return;
+		}
 	};
 }
 

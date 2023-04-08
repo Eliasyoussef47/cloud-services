@@ -78,4 +78,17 @@ export default class TargetRepository implements ITargetRepository {
 
 		return await model.find({}).exec() as MyHydratedDocument<Target>[];
 	}
+
+	public async deleteById(id: Target["customId"]): Promise<boolean> {
+		const model = this._model;
+		if (!model) {
+			throw new DatabaseError("No database connection.");
+		}
+
+		const filter: Pick<Target, "customId"> = {
+			customId: id
+		};
+		const result = await model.deleteOne(filter).exec();
+		return result.deletedCount > 0;
+	}
 }
