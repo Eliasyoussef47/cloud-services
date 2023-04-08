@@ -31,7 +31,7 @@ export default class TargetRepository implements ITargetRepository {
 	public async create(createArgs: CreateArgs): Promise<TargetPersistent> {
 		const model = this._model;
 		if (!model) {
-			throw new DatabaseError("No database connection");
+			throw new DatabaseError("No database connection.");
 		}
 
 		const data: CreateArgs = {
@@ -49,7 +49,7 @@ export default class TargetRepository implements ITargetRepository {
 	public async get(customId: string): Promise<TargetPersistent | null> {
 		const model = this._model;
 		if (!model) {
-			throw new DatabaseError("No database connection");
+			throw new DatabaseError("No database connection.");
 		}
 
 		const filter: Pick<Target, "customId"> = {
@@ -61,12 +61,21 @@ export default class TargetRepository implements ITargetRepository {
 	public async getByUserId(userId: string): Promise<TargetPersistent[]> {
 		const model = this._model;
 		if (!model) {
-			throw new DatabaseError("No database connection");
+			throw new DatabaseError("No database connection.");
 		}
 
 		const filter: Pick<Target, "userId"> = {
 			userId: userId
 		};
 		return await model.find(filter).exec() as MyHydratedDocument<Target>[];
+	}
+
+	public async getAll(): Promise<TargetPersistent[]> {
+		const model = this._model;
+		if (!model) {
+			throw new DatabaseError("No database connection.");
+		}
+
+		return await model.find({}).exec() as MyHydratedDocument<Target>[];
 	}
 }

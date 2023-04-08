@@ -20,7 +20,6 @@ const storeBodySchema = z.object({
 
 export default class SubmissionHandler {
 	public static index: RequestHandler = async (req, res) => {
-		// TODO: User based authorization?
 		const user = req.user as GatewayJwtUser;
 		const target = res.locals.target as Target;
 

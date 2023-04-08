@@ -12,6 +12,7 @@ import { StoreBody } from "@/shared/types/targetsService/index.js";
 import { toDataUrl } from "@/shared/utils/general.js";
 import { GatewayJwtUser } from "@/auth/AuthServiceAlpha.js";
 import { TargetCreatedBody } from "@/shared/MessageBroker/messages.js";
+import { TargetPersistent } from "@/targetsService/persistence/ITargetRepository.js";
 
 const storeBodySchema: toZod<StoreBody> = baseStoreBodySchema.extend({
 	userId: z.string()
@@ -23,7 +24,13 @@ export type StoreResponseBody = Pick<Target, "customId" | "source" | "locationNa
 export default class TargetHandler {
 	public static index: RequestHandler = async (req, res) => {
 		const user = <GatewayJwtUser> req.user;
-		const targets = await ServicesRegistry.getInstance().targetRepository.getByUserId(user.customId);
+
+		let targets: TargetPersistent[];
+		if (user.role == "admin") {
+			targets = await ServicesRegistry.getInstance().targetRepository.getAll();
+		} else {
+			targets = await ServicesRegistry.getInstance().targetRepository.getByUserId(user.customId);
+		}
 
 		const responseBody = {
 			status: "success",
@@ -36,7 +43,6 @@ export default class TargetHandler {
 	};
 
 	public static store: RequestHandler = async (req, res) => {
-		// TODO: Better validation is possible.
 		const reqBody = storeBodySchema.parse(req.body);
 		const uploadedFiles = storeFilesSchema.parse(req.files);
 		const uploadedFile = uploadedFiles.photo[0];
