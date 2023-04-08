@@ -66,7 +66,7 @@ export async function indexCaller(args: IndexArgs): Promise<ServiceCallResult<In
 export async function showCaller(args: ShowArgs, urlSearchParams: URLSearchParams): Promise<ServiceCallResult<ShowResponseBody>> {
 	let fireResult: Response;
 	try {
-		fireResult = await showCircuitBreaker.fire({ id: args.id });
+		fireResult = await showCircuitBreaker.fire({ id: args.id }, urlSearchParams);
 	} catch (e) {
 		console.log("Service breaker rejected: ", e);
 		throw e;

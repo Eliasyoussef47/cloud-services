@@ -1,5 +1,5 @@
 import { Submission } from "@/submissionsService/models/Submission.js";
-import { defaultServiceCall, getServicesAuthHeaders } from "@/shared/utils/fetch.js";
+import { defaultServiceCall, getServicesAuthHeaders, setUrlSearchParams } from "@/shared/utils/fetch.js";
 import { Environment } from "@/shared/operation/Environment.js";
 import { getTargetsSubmissionsRoute } from "@/submissionsService/routes/submissions.js";
 import { StoreBody } from "@/shared/types/submissionsService/index.js";
@@ -52,7 +52,7 @@ export default class Submissions {
 		return await defaultServiceCall(url, fetchInit);
 	}
 
-	public async show(args: ShowArgs): Promise<Response> {
+	public async show(args: ShowArgs, searchParams: URLSearchParams): Promise<Response> {
 		const fetchInit: RequestInit = {
 			method: "get",
 			headers: getServicesAuthHeaders()
@@ -60,6 +60,7 @@ export default class Submissions {
 
 		let url = new URL(Environment.getInstance().submissionServiceUrl);
 		url = new URL(args.id, url);
+		url = setUrlSearchParams(url, searchParams);
 
 		return await defaultServiceCall(url, fetchInit);
 	}

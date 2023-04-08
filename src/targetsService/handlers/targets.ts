@@ -9,7 +9,7 @@ import { toZod } from "tozod";
 import crypto from "crypto";
 import { promises as fs } from "fs";
 import { StoreBody } from "@/shared/types/targetsService/index.js";
-import { isTrue, preferTrue, toDataUrl } from "@/shared/utils/general.js";
+import { preferTrue, toDataUrl } from "@/shared/utils/general.js";
 import { TargetCreatedBody, TargetDeletedBody } from "@/shared/MessageBroker/messages.js";
 import { TargetPersistent } from "@/targetsService/persistence/ITargetRepository.js";
 import { ChangeTypes, Optional } from "@/shared/types/utility.js";
@@ -107,7 +107,6 @@ export default class TargetHandler {
 			createdAt: preferTrue(req.query.createdAt),
 			updatedAt: preferTrue(req.query.updatedAt),
 		} satisfies ResourceFilter<PartialTarget>;
-		console.log("resourceFilter", resourceFilter);
 
 		const resourceSchema = createTargetResourceSchema(resourceFilter);
 		const parseResult = resourceSchema.safeParse(target);

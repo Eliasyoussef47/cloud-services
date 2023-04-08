@@ -11,7 +11,6 @@ import { Submission } from "@/submissionsService/models/Submission.js";
 import { SubmissionPersistent } from "@/submissionsService/persistence/ISubmissionRepository.js";
 import { GatewayJwtUser } from "@/auth/AuthServiceAlpha.js";
 import { Target } from "@/submissionsService/models/Target.js";
-import { ChangeTypes } from "@/shared/types/utility.js";
 import { createSubmissionResourceSchema, PartialSubmission } from "@/submissionsService/resources/Submission.js";
 import createHttpError from "http-errors";
 import { ShowQueries } from "@/apiGateway/handlers/submissions.js";
@@ -116,7 +115,6 @@ export default class SubmissionHandler {
 			createdAt: preferTrue(req.query.createdAt),
 			updatedAt: preferTrue(req.query.updatedAt),
 		} satisfies ResourceFilter<PartialSubmission>;
-		console.log("resourceFilter", resourceFilter);
 
 		const resourceSchema = createSubmissionResourceSchema(resourceFilter);
 		const parseResult = resourceSchema.safeParse(submission);
