@@ -8,7 +8,6 @@ import { Target } from "@/submissionsService/models/Target.js";
 import ServicesRegistry from "@/submissionsService/ServiceRegistry.js";
 import createHttpError from "http-errors";
 
-
 export const ownsSubmission: RequestHandler = async (req, res, next) => {
 	if (res.locals.authorizationState === AuthorizationState.GRANTED) {
 		next();
@@ -31,7 +30,7 @@ export const ownsSubmission: RequestHandler = async (req, res, next) => {
 	}
 
 	// If the user doesn't own the submission and doesn't own the target.
-	if (submission.userId != user.customId && submission.targetId != belongsToTarget.customId) {
+	if (submission.userId != user.customId && user.customId != belongsToTarget.userId) {
 		// res.locals.authorizationState = AuthorizationState.DENIED;
 		next(getDefaultAuthorizationError());
 		return;

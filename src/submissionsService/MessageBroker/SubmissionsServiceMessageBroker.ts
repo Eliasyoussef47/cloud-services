@@ -161,8 +161,6 @@ export class SubmissionsServiceMessageBroker {
 	}
 
 	private submissionServiceCallbackQueueListener(msg: ConsumeMessage) {
-		// TODO: Send message so that it goes to the images service.
-
 		const channel = this._messageBroker.channel;
 		if (!channel) {
 			return;
@@ -198,6 +196,8 @@ export class SubmissionsServiceMessageBroker {
 			void this.consumeRpcTargetResponse(correlationId, messageParsed.data);
 			return;
 		}
+
+		channel.reject(msg, false);
 	}
 
 	private async consumeScoreCalculationResponse(message: ScoreCalculationResponseMessage) {
