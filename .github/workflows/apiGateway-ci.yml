@@ -27,21 +27,21 @@ jobs:
       - name: Build
         run: npx rollup --config ./rollup.config.ts --configPlugin typescript
       - name: Run API gateway Service
+        env:
+          MONGO_URL: "mongodb://mongo:27017"
+          DB_NAME: "cloud-services"
+          API_GATEWAY_URL: "http://127.0.0.1:4242"
+          TARGETS_SERVICE_URL: "http://targets:3001"
+          SUBMISSIONS_SERVICE_URL: "http://submissions:3003"
+          IMAGE_RECOGNITION_SERVICE_URL: "http://image-recognition:3004"
+          AUTH_DATABASE_PATH: "mongodb://mongo:27017/auth_service"
+          TARGETS_DATABASE_PATH: "mongodb://mongo:27017/targets_service"
+          SUBMISSIONS_DATABASE_PATH: "mongodb://mongo:27017/submissions_service"
+          MESSAGE_BROKER_URL: "amqp://rabbitmq:5672"
+          JWT_USERS_SECRET: 789
+          JWT_GATEWAY_SECRET: 456
+          SERVICES_API_KEY: 123
+          JWT_EXPIRES_IN: 10800
+          IMAGGA_API_KEY: "acc_2f45991556a390d"
+          IMAGGA_API_SECRET: "d105f83d5729bdca1087f4e2b8875403"
         run: npm run apiGateway
-        environment:
-          - MONGO_URL=mongodb://mongo:27017
-          - DB_NAME=cloud-services
-          - API_GATEWAY_URL=http://127.0.0.1:4242
-          - TARGETS_SERVICE_URL=http://targets:3001
-          - SUBMISSIONS_SERVICE_URL=http://submissions:3003
-          - IMAGE_RECOGNITION_SERVICE_URL=http://image-recognition:3004
-          - AUTH_DATABASE_PATH=mongodb://mongo:27017/auth_service
-          - TARGETS_DATABASE_PATH=mongodb://mongo:27017/targets_service
-          - SUBMISSIONS_DATABASE_PATH=mongodb://mongo:27017/submissions_service
-          - MESSAGE_BROKER_URL=amqp://rabbitmq:5672
-          - JWT_USERS_SECRET=789
-          - JWT_GATEWAY_SECRET=456
-          - SERVICES_API_KEY=123
-          - JWT_EXPIRES_IN=10800
-          - IMAGGA_API_KEY=acc_2f45991556a390d
-          - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
