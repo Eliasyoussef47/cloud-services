@@ -57,4 +57,13 @@ export default class SubmissionRepository implements ISubmissionRepository {
 		};
 		return await model.find(filter).exec() as MyHydratedDocument<Submission>[];
 	}
+
+	public async getByFiltered(filter: Partial<Submission>): Promise<SubmissionPersistent[]> {
+		const model = this._model;
+		if (!model) {
+			throw new DatabaseError("No database connection");
+		}
+
+		return await model.find(filter).exec() as MyHydratedDocument<Submission>[];
+	}
 }

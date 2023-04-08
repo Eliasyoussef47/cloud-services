@@ -1,4 +1,3 @@
-// TODO: Use database.
 import { toZod } from "tozod";
 import z from "zod";
 

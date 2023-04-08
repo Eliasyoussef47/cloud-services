@@ -46,7 +46,8 @@ export default class AuthenticationHandler {
 		const responseBody = {
 			status: "success",
 			data: {
-				token: loginJwt,
+				token: loginJwt.jwt,
+				// user: loginJwt.user
 			},
 		} satisfies ResponseBody;
 

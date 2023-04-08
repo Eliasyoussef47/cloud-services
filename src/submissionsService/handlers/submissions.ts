@@ -8,6 +8,9 @@ import { Environment } from "@/shared/operation/Environment.js";
 import crypto from "crypto";
 import { z } from "zod";
 import { Submission } from "@/submissionsService/models/Submission.js";
+import { SubmissionPersistent } from "@/submissionsService/persistence/ISubmissionRepository.js";
+import { GatewayJwtUser } from "@/auth/AuthServiceAlpha.js";
+import { Target } from "@/submissionsService/models/Target.js";
 
 export type RouteParams = Pick<Submission, "targetId">;
 
@@ -18,7 +21,21 @@ const storeBodySchema = z.object({
 export default class SubmissionHandler {
 	public static index: RequestHandler = async (req, res) => {
 		// TODO: User based authorization?
-		const submissions = await ServicesRegistry.getInstance().submissionRepository.getByTargetId(res.locals.target.customId);
+		const user = req.user as GatewayJwtUser;
+		const target = res.locals.target as Target;
+
+		let submissions: SubmissionPersistent[];
+
+		// TODO: This can be replaced with a mongoose model method. Or simply a method in a plain old Javascript object.
+		if (user.role == "admin") {
+			submissions = await ServicesRegistry.getInstance().submissionRepository.getByTargetId(target.customId);
+		} else {
+			const filter: Partial<Submission> = {
+				userId: user.customId,
+				targetId: target.customId
+			};
+			submissions = await ServicesRegistry.getInstance().submissionRepository.getByFiltered(filter);
+		}
 
 		const responseBody = {
 			status: "success",

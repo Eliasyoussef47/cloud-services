@@ -1,10 +1,9 @@
 import { DefaultSchemaOptions, type Model, Schema, SchemaTypes } from "mongoose";
 import { MongooseBase } from "@/shared/types/database/mongoose/mongoose.js";
 import { User } from "@/shared/models/User.js";
-import { IUserMethods } from "@/auth/persistence/mongoose/models/User.js";
 
 type MongooseUser = MongooseBase & User;
-export type UserModelType = Model<MongooseUser, {}, IUserMethods>;
+export type UserModelType = Model<MongooseUser>;
 
 export const userSchema = new Schema<MongooseUser, UserModelType, User, UserModelType, User, UserModelType, DefaultSchemaOptions, User, User>({
 	// TODO: Set index on customId.
