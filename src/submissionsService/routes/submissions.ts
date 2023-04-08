@@ -30,6 +30,7 @@ export function getTargetsSubmissionsRoute<T extends string>(param: T): TargetSu
 submissionRouter.route(getSubmissionsRoute(":id"))
 	.all(getSubmission, ownsSubmission)
 	.get(SubmissionHandler.show)
+	.delete(SubmissionHandler.delete)
 
 const upload = multer({ storage });
 submissionRouter.route(getTargetsSubmissionsRoute(":targetId"))

@@ -12,6 +12,7 @@ const getRouter = () => {
 
 	submissionsRouter.route("/submissions/:id")
 		.get(handler.show)
+		.delete(handler.delete)
 
 	submissionsRouter.route(getTargetsSubmissionsRoute(":targetId"))
 		.get(handler.index)

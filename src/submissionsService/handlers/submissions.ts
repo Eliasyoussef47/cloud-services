@@ -89,5 +89,18 @@ export default class SubmissionHandler {
 		} satisfies ResponseBody;
 
 		res.json(responseBody);
-	}
+	};
+
+	public static delete: RequestHandler<RouteParameters<"/submissions/:id">> = async (req, res) => {
+		const deletionSuccess = await ServicesRegistry.getInstance().submissionRepository.deleteById(req.params.id);
+
+		const responseBody = {
+			status: "success",
+			data: {
+				success: deletionSuccess
+			}
+		} satisfies ResponseBody;
+
+		res.json(responseBody);
+	};
 }

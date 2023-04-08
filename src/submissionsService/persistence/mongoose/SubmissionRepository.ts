@@ -66,4 +66,27 @@ export default class SubmissionRepository implements ISubmissionRepository {
 
 		return await model.find(filter).exec() as MyHydratedDocument<Submission>[];
 	}
+
+	public async deleteOne(filter: Partial<Submission>): Promise<boolean> {
+		const model = this._model;
+		if (!model) {
+			throw new DatabaseError("No database connection");
+		}
+
+		const result = await model.deleteOne(filter).exec();
+		return result.deletedCount > 0;
+	}
+
+	public async deleteById(id: Submission["customId"]): Promise<boolean> {
+		const model = this._model;
+		if (!model) {
+			throw new DatabaseError("No database connection");
+		}
+
+		const filter: Pick<Submission, "customId"> = {
+			customId: id
+		};
+		const result = await model.deleteOne(filter).exec();
+		return result.deletedCount > 0;
+	}
 }
