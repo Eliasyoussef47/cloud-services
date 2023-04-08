@@ -29,7 +29,7 @@ export default class UserRepository implements IUserRepository {
 			throw new DatabaseError("No database connection");
 		}
 
-		return await model.findOne(<Pick<User, "customId">> { customId: customId }).exec() as MyHydratedDocument<User>;
+		return await model.findOne(<Pick<User, "customId">> { customId: customId }).exec() as MyHydratedDocument<UserPersistent>;
 	}
 
 	// TODO: What happens if this method fails?

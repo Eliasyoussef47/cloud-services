@@ -20,7 +20,7 @@ const storeCircuitBreaker = new CircuitBreaker(Targets.store, circuitBreakerOpti
 attachStandardCircuitBreakerCallbacks(storeCircuitBreaker);
 
 const showCircuitBreaker = new CircuitBreaker(Targets.show, circuitBreakerOptions);
-attachStandardCircuitBreakerCallbacks(storeCircuitBreaker);
+attachStandardCircuitBreakerCallbacks(showCircuitBreaker);
 
 const indexQuerySchema: toZod<IndexArgs> = z.object({
 	locationName: z.string().optional()

@@ -10,6 +10,8 @@ import { attachErrorHandlers } from "@/shared/operation/errorHandling.js";
 import { authenticatedRouter } from "@/targetsService/routes/router.js";
 import { uploadedTargetsPath } from "@/shared/constants.js";
 import { setupDependencies } from "@/targetsService/setup.js";
+import { authorizationSetup } from "@/shared/authorization/AuthorizationHandler.js";
+import { isAdmin } from "@/shared/authorization/index.js";
 
 dotenv.config();
 Environment.setup();
@@ -30,10 +32,13 @@ app.use(uploadedTargetsPath, express.static("uploads/targetsService"));
 
 setupGatewayAuthenticationMiddlewares(app, AuthServiceAlpha.getInstance());
 
+app.use(authorizationSetup);
+app.use(isAdmin);
+
 app.use(authenticatedRouter);
 
 attachErrorHandlers(app);
 
 app.listen(port, () => {
-	console.log('Server is up on port ' + port)
+	console.log('Server is up on port ' + port);
 });

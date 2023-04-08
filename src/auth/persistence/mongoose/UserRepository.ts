@@ -1,6 +1,6 @@
 import IUserRepository, { CreateParams, UserPersistent } from "@/auth/persistence/IUserRepository.js";
 import { User } from "@/auth/models/User.js";
-import { UserModelType, userSchema } from "@/auth/persistence/mongoose/models/User.js";
+import { IUserMethods, UserModelType, userSchema } from "@/auth/persistence/mongoose/models/User.js";
 import { Connection } from "mongoose";
 import { MyHydratedDocument } from "@/shared/types/database/mongoose/mongoose.js";
 import { DatabaseError } from "@/shared/types/errors/ServiceError.js";
@@ -46,7 +46,7 @@ export default class UserRepository implements IUserRepository {
 			throw new DatabaseError("No database connection");
 		}
 
-		return await model.findOne(<Pick<User, "customId">> { customId: customId }).exec() as MyHydratedDocument<User>;
+		return await model.findOne(<Pick<User, "customId">> { customId: customId }).exec() as MyHydratedDocument<UserPersistent>;
 	}
 
 	public async getByOpaqueId(opaqueId: string): Promise<UserPersistent | null> {
@@ -55,7 +55,7 @@ export default class UserRepository implements IUserRepository {
 			throw new DatabaseError("No database connection");
 		}
 
-		return await model.findOne(<Pick<User, "opaqueId">> { opaqueId: opaqueId }).exec() as MyHydratedDocument<User>;
+		return await model.findOne(<Pick<User, "opaqueId">> { opaqueId: opaqueId }).exec() as MyHydratedDocument<UserPersistent>;
 	}
 
 	public async getByUsername(username: string): Promise<UserPersistent | null> {
@@ -65,6 +65,6 @@ export default class UserRepository implements IUserRepository {
 		}
 
 		// TODO: Check the content of toObject.
-		return await model.findOne(<Pick<User, "username">> { username: username }).exec() as MyHydratedDocument<User>;
+		return await model.findOne(<Pick<User, "username">> { username: username }).exec() as MyHydratedDocument<UserPersistent>;
 	}
 }
