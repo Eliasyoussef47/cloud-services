@@ -1,4 +1,3 @@
-// TODO: Use database.
 import { toZod } from "tozod";
 import z from "zod";
 
@@ -17,7 +16,8 @@ export interface User {
 	role: string;
 }
 
-export const userResourceSchema: toZod<Pick<User, "opaqueId" | "username">> = z.object({
+export const userResourceSchema: toZod<Pick<User, "customId" | "opaqueId" | "username">> = z.object({
+	customId: z.string(),
 	opaqueId: z.string(),
 	username: z.string()
 });

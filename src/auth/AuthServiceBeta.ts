@@ -8,6 +8,7 @@ import createHttpError from "http-errors";
 import { AuthServiceBase } from "@/auth/AuthServiceBase.js";
 import { User } from "@/auth/models/User.js";
 import ServicesRegistry from "@/auth/ServicesRegistry.js";
+import { UserPersistent } from "@/auth/persistence/IUserRepository.js";
 
 /**
  * Responsible for authentication in the API gateway.
@@ -122,7 +123,7 @@ export class AuthServiceBeta extends AuthServiceBase {
 		return await ServicesRegistry.getInstance().userRepository.create({ customId, opaqueId, username: loginForm.username, password });
 	}
 
-	public async login(loginForm: LoginForm): Promise<string | undefined> {
+	public async login(loginForm: LoginForm): Promise<{ jwt: string; user: UserPersistent } | undefined> {
 		const foundUser = await ServicesRegistry.getInstance().userRepository.getByUsername(loginForm.username);
 
 		if (!foundUser) {
@@ -136,10 +137,15 @@ export class AuthServiceBeta extends AuthServiceBase {
 		foundUser.opaqueId = crypto.randomUUID();
 		await foundUser.save();
 
-		return jwt.sign({}, <string> this.userJwtOptions.secretOrKey,
+		const newJwt = jwt.sign({}, <string> this.userJwtOptions.secretOrKey,
 			{
 				expiresIn: this.jwtExpiresIn,
 				subject: foundUser.opaqueId
 			});
+
+		return {
+			user: foundUser,
+			jwt: newJwt
+		};
 	}
 }

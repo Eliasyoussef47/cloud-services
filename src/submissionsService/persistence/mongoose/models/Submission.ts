@@ -14,6 +14,6 @@ export const submissionSchema = new Schema<MongooseSubmission, SubmissionModelTy
 	targetId: { type: SchemaTypes.String, required: true, ref: TargetRepository.modelName },
 	source: { type: SchemaTypes.String, required: true },
 	base64Encoded: { type: SchemaTypes.String, required: true },
-	score: { type: SchemaTypes.Number, default: null }
+	score: { type: SchemaTypes.Number, default: null, min: 0.0 }
 }, { timestamps: true });
 submissionSchema.set("toObject", { versionKey: false, useProjection: true });

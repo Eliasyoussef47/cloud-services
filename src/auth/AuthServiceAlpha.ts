@@ -43,7 +43,7 @@ export class AuthServiceAlpha extends AuthServiceBase {
 
 			const jwtUser: GatewayJwtUser = {
 				customId: typedPayload.sub,
-				role: payload.role
+				role: typedPayload.role
 			}
 
 			done(null, jwtUser);

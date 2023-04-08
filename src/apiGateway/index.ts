@@ -44,8 +44,6 @@ app.use(removeUser);
 app.use(nonAuthenticatedRouter);
 
 setupUserAuthenticationMiddlewares(app, AuthServiceBeta.getInstance());
-// TODO: Roles and such.
-// app.use(roles.middleware());
 
 app.use(getAuthenticatedRouter());
 

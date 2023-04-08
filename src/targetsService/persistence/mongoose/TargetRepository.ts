@@ -31,7 +31,7 @@ export default class TargetRepository implements ITargetRepository {
 	public async create(createArgs: CreateArgs): Promise<TargetPersistent> {
 		const model = this._model;
 		if (!model) {
-			throw new DatabaseError("No database connection");
+			throw new DatabaseError("No database connection.");
 		}
 
 		const data: CreateArgs = {
@@ -49,9 +49,46 @@ export default class TargetRepository implements ITargetRepository {
 	public async get(customId: string): Promise<TargetPersistent | null> {
 		const model = this._model;
 		if (!model) {
-			throw new DatabaseError("No database connection");
+			throw new DatabaseError("No database connection.");
 		}
 
-		return await model.findOne(<Pick<Target, "customId">> { customId: customId }).exec() as MyHydratedDocument<Target>;
+		const filter: Pick<Target, "customId"> = {
+			customId: customId
+		};
+		return await model.findOne(filter).exec() as MyHydratedDocument<Target>;
+	}
+
+	public async getByUserId(userId: string): Promise<TargetPersistent[]> {
+		const model = this._model;
+		if (!model) {
+			throw new DatabaseError("No database connection.");
+		}
+
+		const filter: Pick<Target, "userId"> = {
+			userId: userId
+		};
+		return await model.find(filter).exec() as MyHydratedDocument<Target>[];
+	}
+
+	public async getAll(): Promise<TargetPersistent[]> {
+		const model = this._model;
+		if (!model) {
+			throw new DatabaseError("No database connection.");
+		}
+
+		return await model.find({}).exec() as MyHydratedDocument<Target>[];
+	}
+
+	public async deleteById(id: Target["customId"]): Promise<boolean> {
+		const model = this._model;
+		if (!model) {
+			throw new DatabaseError("No database connection.");
+		}
+
+		const filter: Pick<Target, "customId"> = {
+			customId: id
+		};
+		const result = await model.deleteOne(filter).exec();
+		return result.deletedCount > 0;
 	}
 }

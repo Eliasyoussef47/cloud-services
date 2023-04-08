@@ -1,7 +1,7 @@
 import { Submission } from "@/submissionsService/models/Submission.js";
 import { defaultServiceCall, getServicesAuthHeaders } from "@/shared/utils/fetch.js";
 import { Environment } from "@/shared/operation/Environment.js";
-import { getSubmissionsRoute } from "@/submissionsService/routes/submissions.js";
+import { getTargetsSubmissionsRoute } from "@/submissionsService/routes/submissions.js";
 import { StoreBody } from "@/shared/types/submissionsService/index.js";
 import { makeTypedFormData } from "@/types/Http.js";
 
@@ -10,6 +10,14 @@ export type StoreBodyComplete = StoreBody & {
 	photo: Blob;
 };
 export type StoreArgs = StoreBodyComplete & Pick<Submission, "targetId">;
+
+export type ShowArgs = {
+	id: Submission["customId"];
+};
+
+export type DeleteArgs = {
+	id: Submission["customId"];
+};
 
 export default class Submissions {
 	// TODO: User based authorization.
@@ -20,7 +28,7 @@ export default class Submissions {
 		};
 
 		let url = new URL(Environment.getInstance().submissionServiceUrl);
-		const submissionsRoute = getSubmissionsRoute(args.targetId);
+		const submissionsRoute = getTargetsSubmissionsRoute(args.targetId);
 		url = new URL(submissionsRoute, url);
 
 		return await defaultServiceCall(url, fetchInit);
@@ -38,8 +46,32 @@ export default class Submissions {
 		};
 
 		let url = new URL(Environment.getInstance().submissionServiceUrl);
-		const submissionsRoute = getSubmissionsRoute(args.targetId);
+		const submissionsRoute = getTargetsSubmissionsRoute(args.targetId);
 		url = new URL(submissionsRoute, url);
+
+		return await defaultServiceCall(url, fetchInit);
+	}
+
+	public async show(args: ShowArgs): Promise<Response> {
+		const fetchInit: RequestInit = {
+			method: "get",
+			headers: getServicesAuthHeaders()
+		};
+
+		let url = new URL(Environment.getInstance().submissionServiceUrl);
+		url = new URL(args.id, url);
+
+		return await defaultServiceCall(url, fetchInit);
+	}
+
+	public async destroy(args: DeleteArgs): Promise<Response> {
+		const fetchInit: RequestInit = {
+			method: "delete",
+			headers: getServicesAuthHeaders()
+		};
+
+		let url = new URL(Environment.getInstance().submissionServiceUrl);
+		url = new URL(args.id, url);
 
 		return await defaultServiceCall(url, fetchInit);
 	}

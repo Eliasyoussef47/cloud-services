@@ -13,7 +13,13 @@ export type CreateArgs = Pick<Submission,
 
 export default interface ISubmissionRepository {
 	get(customId: string): Promise<SubmissionPersistent | null>;
+
+	getByFiltered(filter: Partial<Submission>): Promise<SubmissionPersistent[]>;
+
 	getByTargetId(targetId: string): Promise<SubmissionPersistent[]>;
 
-	create(createArgs: CreateArgs): Promise<SubmissionPersistent>
+	create(createArgs: CreateArgs): Promise<SubmissionPersistent>;
+
+	deleteById(id: Submission["customId"]): Promise<boolean>;
+	deleteOne(filter: Partial<Submission>): Promise<boolean>;
 }
