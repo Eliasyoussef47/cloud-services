@@ -6,6 +6,14 @@ import { toZod } from "tozod";
 import { z } from "zod";
 import { storeBodySchema, storeFilesSchema } from "@/shared/validation/targets.js";
 import { User } from "@/auth/models/User.js";
+import { indexCaller as submissionsIndexCaller } from "@/apiGateway/handlers/submissions.js"
+import { IndexResponseBody } from "@/submissionsService/handlers/submissions.js";
+import { ShowResponseBody as TargetsShowResponseBody } from "@/targetsService/handlers/targets.js";
+import { Target } from "@/targetsService/models/Target.js";
+import { Submission } from "@/submissionsService/models/Submission.js";
+import { ResponseBody } from "@/shared/types/Response.js";
+import { isTrue, noError } from "@/shared/utils/general.js";
+import { ServiceCallResult } from "@/apiGateway/types.js";
 
 const circuitBreakerOptions: CircuitBreakerOptions = {
 	timeout: 3000, // If our function takes longer than 3 seconds, trigger a failure
@@ -29,7 +37,35 @@ const indexQuerySchema: toZod<IndexArgs> = z.object({
 	locationName: z.string().optional()
 });
 
-// TODO: Validation.
+export type Target_Submissions = Target & {
+	submissions?: Submission[]
+}
+
+export type ShowResponseBody = ResponseBody<{ target: Target_Submissions }>;
+
+async function showCaller(targetId: string): Promise<ServiceCallResult<TargetsShowResponseBody>> {
+	let fireResult: Response;
+	try {
+		fireResult = await showCircuitBreaker.fire({ id: targetId });
+	} catch (e) {
+		console.log("Service breaker rejected: ", e);
+		throw e;
+	}
+
+	let targetsResponseJson: TargetsShowResponseBody;
+	try {
+		targetsResponseJson = await fireResult.json();
+	} catch (e) {
+		console.log("Response from service wasn't json: ", e);
+		throw e;
+	}
+
+	return {
+		statusCode: fireResult.status,
+		body: targetsResponseJson
+	}
+}
+
 export default class TargetHandler {
 	// TODO: Validation.
 	public static index: RequestHandler<IndexArgs> = async (req, res, next) => {
@@ -88,27 +124,54 @@ export default class TargetHandler {
 		}
 	};
 
-	public static show: RequestHandler<RouteParameters<"/targets/:id">> = async (req, res, next) => {
+	public static show: RequestHandler<RouteParameters<"/targets/:id">, {}, {}, { submissions: string, base64Encoded: string }> = async (req, res, next) => {
 		// TODO: Validate route params.
+		const targetId: string = req.params.id;
 
-		let fireResult: Response;
+		let targetsResponse: ServiceCallResult<TargetsShowResponseBody>;
 		try {
-			fireResult = await showCircuitBreaker.fire({ id: req.params.id });
+			targetsResponse = await showCaller(targetId);
+			if (targetsResponse.statusCode >= 400) {
+				res.status(targetsResponse.statusCode).json(targetsResponse.body);
+				return;
+			}
 		} catch (e) {
-			console.log("Service breaker rejected: ", e);
 			next(e);
 			return;
 		}
 
-		try {
-			const responseJson = await fireResult.json();
+		const targetFromService = targetsResponse.body.data.target;
+		let submissionsFromService: Submission[] | undefined = undefined;
 
-			res.status(fireResult.status).json(responseJson);
-		} catch (e) {
-			console.log("Response from service wasn't json: ", e);
-			next(e);
-			return;
+		if (isTrue(req.query.submissions)) {
+			let submissionsResponse: ServiceCallResult<IndexResponseBody>;
+			try {
+				submissionsResponse = await submissionsIndexCaller({ targetId: targetId });
+				if (noError(submissionsResponse.statusCode)) {
+					submissionsFromService = submissionsResponse.body.data.submissions;
+				}
+			} catch (e) {
+				console.log("Error while calling submissions service: ", e);
+			}
 		}
+
+		const targetWithSubmissions: Target_Submissions = {
+			...targetFromService
+		};
+
+		// Aggregate the response.
+		if (submissionsFromService) {
+			targetWithSubmissions.submissions = submissionsFromService
+		}
+
+		const response = {
+			status: "success",
+			data: {
+				target: targetWithSubmissions
+			}
+		} satisfies ShowResponseBody
+
+		res.status(targetsResponse.statusCode).json(response);
 	};
 
 	public static update: RequestHandler = async (req, res) => {

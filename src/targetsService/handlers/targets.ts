@@ -18,6 +18,7 @@ const storeBodySchema: toZod<StoreBody> = baseStoreBodySchema.extend({
 });
 
 export type StoreResponseBody = Pick<Target, "customId" | "source" | "locationName" | "createdAt">;
+export type ShowResponseBody = ResponseBody<{ target: Target }>;
 
 // TODO: Validation.
 export default class TargetHandler {
@@ -93,7 +94,7 @@ export default class TargetHandler {
 			data: {
 				target: res.locals.target
 			}
-		} satisfies ResponseBody;
+		} satisfies ShowResponseBody;
 
 		res.json(responseBody);
 	};

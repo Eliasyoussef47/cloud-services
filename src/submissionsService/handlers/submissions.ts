@@ -18,6 +18,8 @@ const storeBodySchema = z.object({
 	userId: z.string()
 });
 
+export type IndexResponseBody = ResponseBody<{ submissions: Submission[] }>;
+
 export default class SubmissionHandler {
 	public static index: RequestHandler = async (req, res) => {
 		const user = req.user as GatewayJwtUser;
@@ -51,7 +53,7 @@ export default class SubmissionHandler {
 			data: {
 				submissions: submissions
 			}
-		} satisfies ResponseBody;
+		} satisfies IndexResponseBody;
 
 		res.json(responseBody);
 	};
@@ -97,8 +99,6 @@ export default class SubmissionHandler {
 	};
 
 	public static show: RequestHandler<RouteParameters<"/submissions/:id">> = async (req, res) => {
-		// TODO: Validate url params.
-
 		const responseBody = {
 			status: "success",
 			data: {

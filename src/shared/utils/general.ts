@@ -9,3 +9,11 @@ export const toDataUrl = (mimeType: string, buffer: Buffer) => {
 export function basicAuth(username: string, password: string) {
 	return btoa(`${username}:${password}`);
 }
+
+export function isTrue(value: string) {
+	return /(true)|(1)/gi.test(value);
+}
+
+export function noError(statusCode: number): boolean {
+	return statusCode >= 200 && statusCode < 300;
+}
