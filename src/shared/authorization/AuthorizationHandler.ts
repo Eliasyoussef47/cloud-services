@@ -19,3 +19,14 @@ declare global {
 		}
 	}
 }
+
+export function authWrapper(requestHandler: RequestHandler): RequestHandler {
+	return async (req, res, next) => {
+		if (res.locals.authorizationState === AuthorizationState.GRANTED) {
+			next();
+			return;
+		}
+
+		return requestHandler(req, res, next);
+	};
+}

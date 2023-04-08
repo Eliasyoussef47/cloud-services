@@ -13,6 +13,6 @@ export function attachErrorHandlers(expressApp: Express) {
 	expressApp.use(errorHandler);
 }
 
-export function getDefaultAuthorizationError() {
-	return createHttpError<403>(403, "User doesn't satisfy the authorization rules.");
+export function getDefaultAuthorizationError(message?: string) {
+	return createHttpError<403>(403, message ?? "User doesn't satisfy the authorization rules.");
 }
