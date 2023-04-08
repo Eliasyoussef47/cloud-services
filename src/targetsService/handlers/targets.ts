@@ -24,7 +24,12 @@ export type StoreResponseBody = Pick<Target, "customId" | "source" | "locationNa
 export type ShowResponseBody = ResponseBody<{ target: PartialTarget }>;
 export type IndexResponseBody = ResponseBody<{ targets: PartialTarget[] }>;
 
+// TODO: Expand to accept searching based on location.
 export type ShowQueries = ChangeTypes<Partial<Target>, string>;
+export type IndexQueries = ShowQueries & {
+	locationNameQ?: string;
+}
+
 
 // TODO: Validation.
 export default class TargetHandler {

@@ -1,14 +1,12 @@
 import { RequestHandler, RouteParameters } from "express-serve-static-core";
 import CircuitBreaker, { Options as CircuitBreakerOptions } from "opossum";
-import Targets, { IndexArgs, StoreArgs } from "@/apiGateway/businessLogic/targets.js";
+import Targets, { StoreArgs } from "@/apiGateway/businessLogic/targets.js";
 import { attachStandardCircuitBreakerCallbacks } from "@/shared/utils/CircuitBreaker.js";
-import { toZod } from "tozod";
-import { z } from "zod";
 import { storeBodySchema, storeFilesSchema } from "@/shared/validation/targets.js";
 import { User } from "@/auth/models/User.js";
 import { indexCaller as submissionsIndexCaller } from "@/apiGateway/handlers/submissions.js"
-import { IndexResponseBody } from "@/submissionsService/handlers/submissions.js";
-import { ShowQueries as TargetShowQueries, ShowResponseBody as TargetsShowResponseBody } from "@/targetsService/handlers/targets.js";
+import { IndexResponseBody as SubmissionsIndexResponseBody } from "@/submissionsService/handlers/submissions.js";
+import { IndexQueries, IndexResponseBody as TargetsIndexResponseBody, ShowQueries as TargetShowQueries, ShowResponseBody as TargetsShowResponseBody } from "@/targetsService/handlers/targets.js";
 import { Submission } from "@/submissionsService/models/Submission.js";
 import { ResponseBody, ServiceStatus } from "@/shared/types/Response.js";
 import { isTrue, noError } from "@/shared/utils/general.js";
@@ -33,9 +31,9 @@ attachStandardCircuitBreakerCallbacks(showCircuitBreaker);
 const deleteCircuitBreaker = new CircuitBreaker(Targets.destroy, circuitBreakerOptions);
 attachStandardCircuitBreakerCallbacks(deleteCircuitBreaker);
 
-const indexQuerySchema: toZod<IndexArgs> = z.object({
-	locationNameQ: z.string().optional()
-});
+// const indexQuerySchema: toZod<IndexArgs> = z.object({
+// 	locationNameQ: z.string().optional()
+// });
 
 export type Target_Submissions = PartialTarget & {
 	submissions?: Submission[];
@@ -45,6 +43,29 @@ export type ShowResponseBody = ResponseBody<{ target: Target_Submissions }>;
 
 export type ShowQueries = TargetShowQueries & {
 	submissions?: string;
+}
+
+async function indexCaller(urlSearchParams: URLSearchParams): Promise<ServiceCallResult<TargetsIndexResponseBody>> {
+	let fireResult: Response;
+	try {
+		fireResult = await indexCircuitBreaker.fire(urlSearchParams);
+	} catch (e) {
+		console.log("Service breaker rejected: ", e);
+		throw e;
+	}
+
+	let responseJson: TargetsIndexResponseBody;
+	try {
+		responseJson = await fireResult.json();
+	} catch (e) {
+		console.log("Response from service wasn't json: ", e);
+		throw e;
+	}
+
+	return {
+		statusCode: fireResult.status,
+		body: responseJson
+	};
 }
 
 /**
@@ -78,27 +99,29 @@ async function showCaller(targetId: string, urlSearchParams: URLSearchParams): P
 
 export default class TargetHandler {
 	// TODO: Validation.
-	public static index: RequestHandler<IndexArgs> = async (req, res, next) => {
-		const parsedQueries = indexQuerySchema.parse(req.query);
-
-		let fireResult: Response;
+	public static index: RequestHandler<{}, {}, {}, IndexQueries> = async (req, res, next) => {
+		// Validate query params.
+		// const parsedQueries = indexQuerySchema.parse(req.query);
+		let targetsResponse: ServiceCallResult<TargetsIndexResponseBody>;
 		try {
-			fireResult = await indexCircuitBreaker.fire(parsedQueries);
+			targetsResponse = await indexCaller(new URLSearchParams(req.query));
+			if (targetsResponse.statusCode >= 400) {
+				res.status(targetsResponse.statusCode).json(targetsResponse.body);
+				return;
+			}
 		} catch (e) {
-			console.log("Service breaker rejected: ", e);
 			next(e);
 			return;
 		}
 
-		try {
-			const responseJson = await fireResult.json();
+		const responseBody = {
+			status: "success",
+			data: {
+				targets: targetsResponse.body.data.targets
+			}
+		} satisfies TargetsIndexResponseBody;
 
-			res.status(fireResult.status).json(responseJson);
-		} catch (e) {
-			console.log("Response from service wasn't json: ", e);
-			next(e);
-			return;
-		}
+		res.status(targetsResponse.statusCode).json(responseBody);
 	};
 
 	public static store: RequestHandler = async (req, res, next) => {
@@ -155,7 +178,7 @@ export default class TargetHandler {
 		let submissionsFromService: Submission[] | undefined = undefined;
 
 		if (isTrue(req.query.submissions)) {
-			let submissionsResponse: ServiceCallResult<IndexResponseBody>;
+			let submissionsResponse: ServiceCallResult<SubmissionsIndexResponseBody>;
 			try {
 				submissionsResponse = await submissionsIndexCaller({ targetId: targetId });
 				if (noError(submissionsResponse.statusCode)) {

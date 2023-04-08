@@ -30,21 +30,17 @@ export type DeleteArgs = {
 export default class Targets {
 	/**
 	 *
-	 * @param args
 	 * @throws {Error} When the fetch function fails or if the server responds with >= 500 status code.
+	 * @param searchParams
 	 */
-	public static async index(args?: IndexArgs): Promise<Response> {
+	public static async index(searchParams: URLSearchParams): Promise<Response> {
 		const fetchInit: RequestInit = {
 			method: "get",
 			headers: getServicesAuthHeaders()
 		};
 
-		const url = new URL(Environment.getInstance().targetServiceUrl);
-
-		if (args && args.locationNameQ) {
-			const searchParams = url.searchParams;
-			makeTypedSearchParams<IndexArgs>(searchParams, args);
-		}
+		let url = new URL(Environment.getInstance().targetServiceUrl);
+		url = setUrlSearchParams(url, searchParams);
 
 		return await defaultServiceCall(url, fetchInit);
 	}
