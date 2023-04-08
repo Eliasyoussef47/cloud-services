@@ -21,6 +21,9 @@ attachStandardCircuitBreakerCallbacks(indexCircuitBreaker);
 const storeCircuitBreaker = new CircuitBreaker(submissionsService.store, circuitBreakerOptions);
 attachStandardCircuitBreakerCallbacks(storeCircuitBreaker);
 
+const showCircuitBreaker = new CircuitBreaker(submissionsService.show, circuitBreakerOptions);
+attachStandardCircuitBreakerCallbacks(storeCircuitBreaker);
+
 const indexParamsSchema: toZod<IndexArgs> = z.object({
 	targetId: z.string()
 });
@@ -65,6 +68,29 @@ export default class SubmissionHandler {
 		let fireResult: Response;
 		try {
 			fireResult = await storeCircuitBreaker.fire(args);
+		} catch (e) {
+			console.log("Service breaker rejected: ", e);
+			next(e);
+			return;
+		}
+
+		try {
+			const responseJson = await fireResult.json();
+
+			res.status(fireResult.status).json(responseJson);
+		} catch (e) {
+			console.log("Response from service wasn't json: ", e);
+			next(e);
+			return;
+		}
+	}
+
+	public show: RequestHandler = async (req, res, next) => {
+		// TODO: Validate route params.
+
+		let fireResult: Response;
+		try {
+			fireResult = await showCircuitBreaker.fire({ id: req.params.id });
 		} catch (e) {
 			console.log("Service breaker rejected: ", e);
 			next(e);

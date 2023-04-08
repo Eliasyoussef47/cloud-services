@@ -87,7 +87,6 @@ export default class TargetHandler {
 
 	public static show: RequestHandler<RouteParameters<"/targets/:id">> = async (req, res, next) => {
 		// TODO: Validate route params.
-		const parsedQueries = indexQuerySchema.parse(req.query);
 
 		let fireResult: Response;
 		try {

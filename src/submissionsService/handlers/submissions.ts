@@ -1,4 +1,4 @@
-import { RequestHandler } from "express-serve-static-core";
+import { RequestHandler, RouteParameters } from "express-serve-static-core";
 import { ResponseBody } from "@/shared/types/Response.js";
 import ServicesRegistry from "@/submissionsService/ServiceRegistry.js";
 import { storeFilesSchema } from "@/shared/validation/targets.js";
@@ -61,4 +61,18 @@ export default class SubmissionHandler {
 
 		ServicesRegistry.getInstance().submissionsServiceMessageBroker.publishSubmissionTargetRequest(newSubmission.toObject());
 	};
+
+	public static show: RequestHandler<RouteParameters<"/submissions/:id">> = async (req, res) => {
+		// TODO: User based authorization?
+		// TODO: Validate url params.
+
+		const responseBody = {
+			status: "success",
+			data: {
+				submission: res.locals.submission
+			}
+		} satisfies ResponseBody;
+
+		res.json(responseBody);
+	}
 }

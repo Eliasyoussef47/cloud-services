@@ -15,7 +15,6 @@ export const getTarget: RequestHandler<RouteParameters<"/targets/:id">> = async 
 	const targetId = stringWithValueSchema.parse(targetIdParam);
 
 	const targetInDb = await ServicesRegistry.getInstance().targetRepository.get(targetId);
-	console.log(targetInDb);
 
 	if (!targetInDb) {
 		throw createHttpError(404);
