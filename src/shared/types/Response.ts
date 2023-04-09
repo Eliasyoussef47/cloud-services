@@ -11,7 +11,12 @@ export type ServiceStatus = typeof serviceStatus[number];
 
 export interface ResponseBody<DataT extends (object | null) = object | null, TStatus extends ServiceStatus = ServiceStatus> {
 	status: TStatus;
-	data: DataT
+	data: DataT;
+}
+
+export interface PaginatedResponseBody<DataT extends (object | null) = object | null, TStatus extends ServiceStatus = ServiceStatus>
+	extends ResponseBody<DataT, TStatus> {
+	meta: Meta;
 }
 
 export const statusCodeStatusMessage: Map<number, ServiceStatus> = new Map([
@@ -33,3 +38,12 @@ export const toStatusMessage = (statusCode: number): ServiceStatus => {
 }
 
 export type ResourceFilter<T> = Partial<ChangeTypes<T, boolean | undefined>>;
+
+export interface Meta {
+	currentPage: number;
+	perPage: number;
+	total: number;
+	from: number;
+	to: number;
+	lastPage: number;
+}

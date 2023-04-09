@@ -1,9 +1,10 @@
-import ITargetRepository, { CreateArgs, TargetPersistent } from "@/targetsService/persistence/ITargetRepository.js";
+import ITargetRepository, { CreateArgs, PaginatedList, TargetPersistent } from "@/targetsService/persistence/ITargetRepository.js";
 import { Connection } from "mongoose";
 import { TargetModelType, targetSchema } from "@/targetsService/persistence/mongoose/models/Target.js";
 import { Target } from "@/targetsService/models/Target.js";
 import { DatabaseError } from "@/shared/types/errors/ServiceError.js";
 import { MyHydratedDocument } from "@/shared/types/database/mongoose/mongoose.js";
+import { PaginationOptions } from "@/shared/types/database/index.js";
 
 export default class TargetRepository implements ITargetRepository {
 	public static readonly modelName = "Target";
@@ -77,6 +78,32 @@ export default class TargetRepository implements ITargetRepository {
 		}
 
 		return await model.find(filter ?? {}).exec() as MyHydratedDocument<Target>[];
+	}
+
+	public async getAllPaginated(pagination: PaginationOptions, filter?: Partial<Target>): Promise<PaginatedList> {
+		const model = this._model;
+		if (!model) {
+			throw new DatabaseError("No database connection.");
+		}
+
+		let query = model.find(filter ?? {});
+		const filteredTotal = await query.clone().count().exec();
+
+		if (pagination) {
+			query.skip(pagination.currentPage * pagination.perPage)
+				.limit(pagination.perPage)
+		}
+
+		const targetsResult = await query.exec();
+
+		return {
+			targets: targetsResult,
+			paginationInfo: {
+				currentPage: pagination.currentPage,
+				perPage: pagination.perPage,
+				total: filteredTotal
+			}
+		};
 	}
 
 	public async deleteById(id: Target["customId"]): Promise<boolean> {

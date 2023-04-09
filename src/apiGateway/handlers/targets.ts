@@ -116,9 +116,8 @@ export default class TargetHandler {
 
 		const responseBody = {
 			status: "success",
-			data: {
-				targets: targetsResponse.body.data.targets
-			}
+			data: targetsResponse.body.data,
+			meta: targetsResponse.body.meta
 		} satisfies TargetsIndexResponseBody;
 
 		res.status(targetsResponse.statusCode).json(responseBody);

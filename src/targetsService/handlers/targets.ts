@@ -1,5 +1,5 @@
 import { RequestHandler } from "express-serve-static-core";
-import { ResourceFilter, ResponseBody } from "@/shared/types/Response.js";
+import { Meta, PaginatedResponseBody, ResourceFilter, ResponseBody } from "@/shared/types/Response.js";
 import { storeBodySchema as baseStoreBodySchema, storeFilesSchema } from "@/shared/validation/targets.js";
 import { Environment } from "@/shared/operation/Environment.js";
 import { Target } from "@/targetsService/models/Target.js";
@@ -11,10 +11,11 @@ import { promises as fs } from "fs";
 import { StoreBody } from "@/shared/types/targetsService/index.js";
 import { lowerCase, preferTrue, toDataUrl } from "@/shared/utils/general.js";
 import { TargetCreatedBody, TargetDeletedBody } from "@/shared/MessageBroker/messages.js";
-import { TargetPersistent } from "@/targetsService/persistence/ITargetRepository.js";
+import { PaginationInfo, TargetPersistent } from "@/targetsService/persistence/ITargetRepository.js";
 import { ChangeTypes } from "@/shared/types/utility.js";
 import { createTargetResourceSchema, PartialTarget } from "@/targetsService/resources/Target.js";
 import createHttpError from "http-errors";
+import { PaginationOptions } from "@/shared/types/database/index.js";
 
 const storeBodySchema: toZod<StoreBody> = baseStoreBodySchema.extend({
 	userId: z.string()
@@ -22,28 +23,49 @@ const storeBodySchema: toZod<StoreBody> = baseStoreBodySchema.extend({
 
 export type StoreResponseBody = Pick<Target, "customId" | "source" | "locationName" | "createdAt">;
 export type ShowResponseBody = ResponseBody<{ target: PartialTarget }>;
-export type IndexResponseBody = ResponseBody<{ targets: PartialTarget[] }>;
+export type IndexResponseBody = PaginatedResponseBody<{ targets: PartialTarget[] }>;
 
 // TODO: Expand to accept searching based on location.
 export type ShowQueries = ChangeTypes<Partial<Target>, string>;
+export type PaginationOptionsQueries = Partial<ChangeTypes<PaginationOptions, string>>;
 export type IndexQueries = ShowQueries & {
 	locationNameQ?: string;
 	userIdQ?: string;
-}
+} & PaginationOptionsQueries;
+
+export const defaultPaginationOptions: PaginationOptions = {
+	currentPage: 0,
+	perPage: 5
+};
+
+export const paginationOptionsSchemaWithDefaults = z.object({
+	currentPage: z.coerce.number().optional().default(defaultPaginationOptions.currentPage),
+	perPage: z.coerce.number().min(1).optional().default(defaultPaginationOptions.perPage)
+});
 
 // TODO: Validation.
 export default class TargetHandler {
 	public static index: RequestHandler<{}, {}, {}, IndexQueries> = async (req, res) => {
 		let targets: TargetPersistent[] = [];
 
+		const locationsNameQ = lowerCase(req.query.locationNameQ);
+		const userIdQ = lowerCase(req.query.userIdQ);
+		const dbFilter = {
+			...(locationsNameQ && { locationName: locationsNameQ }),
+			...(userIdQ && { userId: userIdQ }),
+		} satisfies  PartialTarget;
+
+		const paginationOptionsQueries: PaginationOptionsQueries = {
+			currentPage: req.query.currentPage,
+			perPage: req.query.perPage,
+		};
+
+		const paginationOptions = paginationOptionsSchemaWithDefaults.parse(paginationOptionsQueries);
+
+		let paginationInfo: PaginationInfo | undefined;
+
 		try {
-			const locationsNameQ = lowerCase(req.query.locationNameQ);
-			const userIdQ = lowerCase(req.query.userIdQ);
-			const dbFilter = {
-				...(locationsNameQ && { locationName: locationsNameQ }),
-				...(userIdQ && { userId: userIdQ }),
-			} satisfies  PartialTarget;
-			targets = await ServicesRegistry.getInstance().targetRepository.getAll(dbFilter);
+			({ paginationInfo, targets: targets } = await ServicesRegistry.getInstance().targetRepository.getAllPaginated(paginationOptions, dbFilter));
 		} catch (e) {
 			console.error("Error while getting a all targets.", e);
 			throw e;
@@ -69,12 +91,23 @@ export default class TargetHandler {
 			throw createHttpError(500);
 		}
 
+		const metaFrom = paginationInfo.perPage * paginationOptions.currentPage;
+		const targetsMeta: Meta = {
+			currentPage: paginationOptions.currentPage,
+			perPage: paginationInfo.perPage,
+			total: paginationInfo.total,
+			from: metaFrom,
+			to: metaFrom + targets.length,
+			lastPage: Math.floor((paginationInfo.total - 1) / paginationInfo.perPage)
+		};
+
 		const responseBody = {
 			status: "success",
 			data: {
 				targets: parseResult.data
-			}
-		} satisfies IndexResponseBody;
+			},
+			meta: targetsMeta
+		} satisfies PaginatedResponseBody;
 
 		res.json(responseBody);
 	};
