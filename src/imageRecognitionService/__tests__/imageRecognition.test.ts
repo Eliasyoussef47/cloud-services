@@ -1,19 +1,22 @@
+import * as dotenv from "dotenv";
+import { Environment } from "@/shared/operation/Environment.js";
 import { ImageRecognition } from "../businessLogic/ImageRecognition.js";
-import ImaggaError from "@/imageRecognitionService/types/errors/ImaggaError.js";
 
+dotenv.config();
+Environment.setup();
 
 describe("ImageRecognition", () => {
 	describe("getImageSimilarity", () => {
 		it("should return the correct similarity distance between two images", async () => {
-			const imageA = "data:image/jpeg;base64,/9j/4AAQSkZJRgA...";
-			const imageB = "data:image/jpeg;base64,/9j/4AAQSkZJRgA...";
-			const expectedDistance = 0.752;
+			const imageA = "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAACXBIWXMAAC4jAAAuIwF4pT92AAAAFUlEQVQImWP8z8DwnwENMKELUEEQAM6pAggfw96NAAAAAElFTkSuQmCC";
+			const imageB = "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAACXBIWXMAAC4jAAAuIwF4pT92AAAAHUlEQVQImWNkYPj/n4GBgeE/AyMDDDAxYAEUCgIALLgDCH/EWEUAAAAASUVORK5CYII=";
+			const expectedDistance = 0.801701545715332;
 			const imageRecognition = new ImageRecognition();
 
 			const result = await imageRecognition.getImageSimilarity(imageA, imageB);
 
 			expect(result).not.toBeNull();
-			expect(result).toBeCloseTo(expectedDistance, 3);
+			expect(result).toBe(expectedDistance);
 		});
 
 		// it("should throw an error when the response has a non-200 status code", async () => {
