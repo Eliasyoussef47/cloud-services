@@ -25,4 +25,4 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
-        run: npx rollup --config ./rollup.config.ts --configPlugin typescript
+        run: npm run build:apiGateway
