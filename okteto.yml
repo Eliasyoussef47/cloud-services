@@ -1,9 +1,8 @@
-# docker-compose.yml
-version: '3.9'
-
+name: cloud-services-nielsverheggen
+namespace: cloud-services-nielsverheggen
 services:
   mongo:
-    image: mongo:latest
+#    image: docker.io/bitnami/mongodb:latest
     restart: always
     ports:
       - "27017"
@@ -23,8 +22,6 @@ services:
       context: .
       dockerfile: apiGateway.dockerfile
     command: sh -c "npm install && npm run apiGateway"
-    ports:
-      - 4242:4242
     volumes:
       - ./:/cloud-services
     environment:
@@ -44,52 +41,20 @@ services:
       - JWT_EXPIRES_IN=10800
       - IMAGGA_API_KEY=acc_2f45991556a390d
       - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
+    ports:
+      - 4242:4242
     depends_on:
       - mongo
       - rabbitmq
       - image-recognition
       - submissions
       - targets
-    restart: on-failure
-
-  image-recognition:
-    build:
-      context: .
-      dockerfile: imageRecognition.dockerfile
-    command: sh -c "npm install && npm run imageRecognition"
-    ports:
-      - 3004:3004
-    volumes:
-      - ./:/cloud-services
-    environment:
-      - MONGO_URL=mongodb://mongo:27017
-      - DB_NAME=cloud-services
-      - API_GATEWAY_URL=http://127.0.0.1:4242
-      - TARGETS_SERVICE_URL=http://targets:3001
-      - SUBMISSIONS_SERVICE_URL=http://submissions:3003
-      - IMAGE_RECOGNITION_SERVICE_URL=http://image-recognition:3004
-      - AUTH_DATABASE_PATH=mongodb://mongo:27017/auth_service
-      - TARGETS_DATABASE_PATH=mongodb://mongo:27017/targets_service
-      - SUBMISSIONS_DATABASE_PATH=mongodb://mongo:27017/submissions_service
-      - MESSAGE_BROKER_URL=amqp://rabbitmq:5672
-      - JWT_USERS_SECRET=789
-      - JWT_GATEWAY_SECRET=456
-      - SERVICES_API_KEY=123
-      - JWT_EXPIRES_IN=10800
-      - IMAGGA_API_KEY=acc_2f45991556a390d
-      - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
-    depends_on:
-      - mongo
-      - rabbitmq
-    restart: on-failure
 
   submissions:
     build:
       context: .
       dockerfile: submissions.dockerfile
     command: sh -c "npm install && npm run submissions"
-    ports:
-      - 3003:3003
     volumes:
       - ./:/cloud-services
     environment:
@@ -109,18 +74,47 @@ services:
       - JWT_EXPIRES_IN=10800
       - IMAGGA_API_KEY=acc_2f45991556a390d
       - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
+    ports:
+      - 3003:3003
     depends_on:
       - mongo
       - rabbitmq
-    restart: on-failure
+
+  image-recognition:
+    build:
+      context: .
+      dockerfile: imageRecognition.dockerfile
+    command: sh -c "npm install && npm run imageRecognition"
+    volumes:
+      - ./:/cloud-services
+    environment:
+      - MONGO_URL=mongodb://mongo:27017
+      - DB_NAME=cloud-services
+      - API_GATEWAY_URL=http://127.0.0.1:4242
+      - TARGETS_SERVICE_URL=http://targets:3001
+      - SUBMISSIONS_SERVICE_URL=http://submissions:3003
+      - IMAGE_RECOGNITION_SERVICE_URL=http://image-recognition:3004
+      - AUTH_DATABASE_PATH=mongodb://mongo:27017/auth_service
+      - TARGETS_DATABASE_PATH=mongodb://mongo:27017/targets_service
+      - SUBMISSIONS_DATABASE_PATH=mongodb://mongo:27017/submissions_service
+      - MESSAGE_BROKER_URL=amqp://rabbitmq:5672
+      - JWT_USERS_SECRET=789
+      - JWT_GATEWAY_SECRET=456
+      - SERVICES_API_KEY=123
+      - JWT_EXPIRES_IN=10800
+      - IMAGGA_API_KEY=acc_2f45991556a390d
+      - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
+    ports:
+      - 3004:3004
+    depends_on:
+      - mongo
+      - rabbitmq
 
   targets:
     build:
       context: .
       dockerfile: targets.dockerfile
     command: sh -c "npm install && npm run targets"
-    ports:
-      - 3001:3001
     volumes:
       - ./:/cloud-services
     environment:
@@ -140,22 +134,8 @@ services:
       - JWT_EXPIRES_IN=10800
       - IMAGGA_API_KEY=acc_2f45991556a390d
       - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
+    ports:
+      - 3001:3001
     depends_on:
       - mongo
       - rabbitmq
-    restart: on-failure
-
-  prometheus:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus:/etc/prometheus
-      - prometheus-data:/prometheus
-    ports:
-      - 9090:9090
-    command: --web.enable-lifecycle --config.file=/etc/prometheus/prometheus.yml
-  grafana:
-    build: ./grafana
-    ports:
-      - 3000:3000
-volumes:
-  prometheus-data:
