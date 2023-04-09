@@ -7,6 +7,8 @@
 		"build": "npx rollup --config ./rollup.config.ts --configPlugin typescript",
 		"build:prod": "npx rollup --config ./rollup.config.prod.ts --configPlugin typescript",
 		"build:apiGateway": "npx rollup --config ./.RollupConfigs/rollup.gateway.configs.ts --configPlugin typescript",
+		"build:imageRecognition": "npx rollup --config ./.RollupConfigs/rollup.imageRecognition.configs.ts --configPlugin typescript",
+		"build:submissions": "npx rollup --config ./.RollupConfigs/rollup.submissions.configs.ts --configPlugin typescript",
 		"build:targets": "npx rollup --config ./.RollupConfigs/rollup.targets.configs.ts --configPlugin typescript",
 		"watch": "npx rollup -w --config ./rollup.config.ts --configPlugin typescript",
 		"apiGateway": "node dist/apiGateway.js",

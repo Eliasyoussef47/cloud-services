@@ -28,6 +28,14 @@ export const apiGateway = () => {
 	return forInput("apiGateway", "src/apiGateway/index.ts");
 }
 
+export const imageRecognition = () => {
+	return forInput("imageRecognitionService", "src/imageRecognitionService/index.ts");
+}
+
+export const submissions = () => {
+	return forInput("submissionsService", "src/submissionsService/index.ts");
+}
+
 export const targets = () => {
 	return forInput("targetsService", "src/targetsService/index.ts");
 }
@@ -37,7 +45,7 @@ export default defineConfig([
 	// forInput("createPasswordCli", "src/auth/createPasswordCli.ts"),
 	// forInput("verifyPasswordCli", "src/auth/verifyPasswordCli.ts"),
 	apiGateway(),
-	forInput("imageRecognitionService", "src/imageRecognitionService/index.ts"),
-	forInput("submissionsService", "src/submissionsService/index.ts"),
+	imageRecognition(),
+	submissions(),
 	targets(),
 ]);
