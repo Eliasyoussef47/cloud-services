@@ -29,6 +29,7 @@ export class ImageRecognition {
 		try {
 			// TODO: Get Imagga API URL from .env file.
 			response = await fetch("https://api.imagga.com/v2/images-similarity/categories/general_v3", requestOptions);
+			// console.log("Request to Imagga sent");
 		} catch (e) {
 			console.error("Imagga request error:", e);
 			return null;
@@ -36,7 +37,7 @@ export class ImageRecognition {
 
 		if (!response.ok) {
 			console.warn("Imagga request not ok:");
-			// void printResponse(response);
+			await printResponse(response);
 			const responseText = await response.text();
 			throw new ImaggaError(responseText);
 		}

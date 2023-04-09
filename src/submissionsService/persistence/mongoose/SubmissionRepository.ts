@@ -1,6 +1,6 @@
-import ISubmissionRepository, { CreateArgs, SubmissionPersistent } from "@/submissionsService/persistence/ISubmissionRepository.js";
+import ISubmissionRepository, { CreateArgs, SubmissionPersistent, SubmissionsSort } from "@/submissionsService/persistence/ISubmissionRepository.js";
 import { SubmissionModelType, submissionSchema } from "@/submissionsService/persistence/mongoose/models/Submission.js";
-import { Connection } from "mongoose";
+import { Connection, FilterQuery } from "mongoose";
 import { Submission } from "@/submissionsService/models/Submission.js";
 import { MyHydratedDocument } from "@/shared/types/database/mongoose/mongoose.js";
 import { DatabaseError } from "@/shared/types/errors/ServiceError.js";
@@ -58,13 +58,18 @@ export default class SubmissionRepository implements ISubmissionRepository {
 		return await model.find(filter).exec() as MyHydratedDocument<Submission>[];
 	}
 
-	public async getByFiltered(filter: Partial<Submission>): Promise<SubmissionPersistent[]> {
+	public async getByFiltered(filter: FilterQuery<Submission>, sort?: SubmissionsSort | undefined): Promise<SubmissionPersistent[]> {
 		const model = this._model;
 		if (!model) {
 			throw new DatabaseError("No database connection.");
 		}
 
-		return await model.find(filter).exec() as MyHydratedDocument<Submission>[];
+		let query = model.find(filter);
+		if (sort) {
+			query.sort(sort);
+		}
+
+		return await query.exec() as MyHydratedDocument<Submission>[];
 	}
 
 	public async deleteById(id: Submission["customId"]): Promise<boolean> {

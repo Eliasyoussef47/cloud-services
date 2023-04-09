@@ -6,10 +6,8 @@ import { toZod } from "tozod";
 import { z } from "zod";
 import { storeFilesSchema } from "@/shared/validation/targets.js";
 import { User } from "@/auth/models/User.js";
-import { IndexResponseBody, ShowResponseBody } from "@/submissionsService/handlers/submissions.js";
+import { IndexResponseBody, ShowQueries, ShowResponseBody } from "@/submissionsService/handlers/submissions.js";
 import { ServiceCallResult } from "@/apiGateway/types.js";
-import { ChangeTypes } from "@/shared/types/utility.js";
-import { Submission } from "@/submissionsService/models/Submission.js";
 
 const circuitBreakerOptions: CircuitBreakerOptions = {
 	timeout: 3000, // If our function takes longer than 3 seconds, trigger a failure
@@ -34,8 +32,6 @@ attachStandardCircuitBreakerCallbacks(deleteCircuitBreaker);
 const indexParamsSchema: toZod<IndexArgs> = z.object({
 	targetId: z.string()
 });
-
-export type ShowQueries = ChangeTypes<Partial<Submission>, string>;
 
 /**
  *

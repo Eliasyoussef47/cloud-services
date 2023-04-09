@@ -1,5 +1,8 @@
 import { Submission } from "@/submissionsService/models/Submission.js";
 import { IPersistent } from "@/shared/types/database/database.js";
+import { ChangeTypes } from "@/shared/types/utility.js";
+import { PartialSubmission } from "@/submissionsService/resources/Submission.js";
+import { FilterQuery, SortOrder } from "mongoose";
 
 export interface SubmissionPersistent extends Submission, IPersistent<Submission> {
 }
@@ -11,10 +14,12 @@ export type CreateArgs = Pick<Submission,
 	| "source"
 	| "base64Encoded">;
 
+export type SubmissionsSort = ChangeTypes<PartialSubmission, SortOrder>;
+
 export default interface ISubmissionRepository {
 	get(customId: string): Promise<SubmissionPersistent | null>;
 
-	getByFiltered(filter: Partial<Submission>): Promise<SubmissionPersistent[]>;
+	getByFiltered(filter: FilterQuery<Submission>, sort?: SubmissionsSort | undefined): Promise<SubmissionPersistent[]>;
 
 	getByTargetId(targetId: string): Promise<SubmissionPersistent[]>;
 

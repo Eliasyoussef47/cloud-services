@@ -10,11 +10,11 @@ import { imagesToProcessQueueName } from "@/shared/MessageBroker/constants.js";
 
 const circuitBreakerOptions: CircuitBreakerOptions = {
 	timeout: 10000, // If our function takes longer than 10 seconds, trigger a failure
-	errorThresholdPercentage: 10, // When 50% of requests fail, trip the circuit
+	errorThresholdPercentage: 10, // When 10% of requests fail, trip the circuit
 	resetTimeout: 10000, // After 3 seconds, try again.
 	rollingCountTimeout: 1000,
 	rollingCountBuckets: 1,
-	capacity: 2
+	capacity: 1
 };
 
 const imageRecognition = new ImageRecognition();
@@ -65,11 +65,11 @@ export class ImageRecognitionServiceMessageBroker {
 				return;
 			}
 
-			channel.consume(imagesToProcessQueue.queue, (msg) => {
+			channel.consume(imagesToProcessQueue.queue, async (msg) => {
 				if (!msg) {
 					return;
 				}
-				this.scoreCalculationRequestListener(msg);
+				await this.scoreCalculationRequestListener(msg);
 			}).then();
 
 		} catch (error) {
@@ -119,15 +119,17 @@ export class ImageRecognitionServiceMessageBroker {
 		let similarityDistance: number | null = null;
 
 		try {
+			console.log("Requesting similarity check.");
 			similarityDistance = await imageSimilarityCircuitBreaker.fire(parsedMessage.data.target.base64Encoded, parsedMessage.data.submission.base64Encoded);
 		} catch (e) {
 			const queueStats = await channel.checkQueue(imagesToProcessQueueName);
-			console.log("Messages in queue: ", queueStats.messageCount);
+			console.log("Messages left in queue: ", queueStats.messageCount);
 			// console.error("imageSimilarity", e);
 		}
 
-		if (similarityDistance) {
+		if (similarityDistance != null) {
 			channel.ack(msg);
+			console.log("Similarity check done: ", similarityDistance);
 
 			this.publishScoreCalculationResponse(parsedMessage.data.submission.customId, parsedMessage.data.target.customId, similarityDistance);
 		} else {
