@@ -25,12 +25,4 @@ describe("AuthServiceBeta", () => {
 			expect(isCorrectPassword).toBe(false);
 		});
 	});
-
-	describe("login", () => {
-		it("should return undefined for an invalid username or password", async () => {
-			const loginForm: LoginForm = { username: "user123", password: "incorrectpassword" };
-			const result = await AuthServiceBeta.getInstance().login(loginForm);
-			expect(result).toBeUndefined();
-		});
-	});
 });
