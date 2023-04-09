@@ -9,7 +9,7 @@ import { toZod } from "tozod";
 import crypto from "crypto";
 import { promises as fs } from "fs";
 import { StoreBody } from "@/shared/types/targetsService/index.js";
-import { lowerCase, preferTrue, toDataUrl } from "@/shared/utils/general.js";
+import { lowerCase, minZero, preferTrue, toDataUrl } from "@/shared/utils/general.js";
 import { TargetCreatedBody, TargetDeletedBody } from "@/shared/MessageBroker/messages.js";
 import { PaginationInfo, TargetPersistent } from "@/targetsService/persistence/ITargetRepository.js";
 import { ChangeTypes } from "@/shared/types/utility.js";
@@ -98,7 +98,7 @@ export default class TargetHandler {
 			total: paginationInfo.total,
 			from: metaFrom,
 			to: metaFrom + targets.length,
-			lastPage: Math.floor((paginationInfo.total - 1) / paginationInfo.perPage)
+			lastPage: Math.floor(minZero(paginationInfo.total - 1) / paginationInfo.perPage)
 		};
 
 		const responseBody = {

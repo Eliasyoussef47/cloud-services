@@ -58,3 +58,11 @@ export const getParamsWithKeyStripped = (urlParams: URLSearchParams, keyToRemove
 
 	return submissionUrlParams;
 };
+
+export const clamp = (value: number, min: number, max: number) => {
+	return Math.min(Math.max(value, min), max);
+};
+
+export const minZero = (value: number) => {
+	return Math.max(value, 0);
+}
