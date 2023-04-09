@@ -35,7 +35,7 @@ export function noError(statusCode: number): boolean {
 	return statusCode >= 200 && statusCode < 300;
 }
 
-const getParamsWithKeyStripped = (urlParams: URLSearchParams, keyToRemove: string) => {
+export const getParamsWithKeyStripped = (urlParams: URLSearchParams, keyToRemove: string) => {
 	const submissionUrlParams = new URLSearchParams();
 
 	for (const [key, value] of urlParams.entries()) {

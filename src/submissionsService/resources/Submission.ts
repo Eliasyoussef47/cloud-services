@@ -3,7 +3,6 @@ import { toZod } from "tozod";
 import { z } from "zod";
 import { ChangeTypes, Mask } from "@/shared/types/utility.js";
 import { ResourceFilter } from "@/shared/types/Response.js";
-import { Target } from "@/targetsService/models/Target.js";
 
 export type PartialSubmission = Partial<Submission>;
 

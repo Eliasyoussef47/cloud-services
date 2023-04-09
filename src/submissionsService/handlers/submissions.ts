@@ -25,7 +25,7 @@ export type IndexResponseBody = ResponseBody<{ submissions: Submission[] }>;
 export type ShowResponseBody = ResponseBody<{ submission: Submission }>;
 
 export default class SubmissionHandler {
-	public static index: RequestHandler<RouteParams> = async (req, res) => {
+	public static index: RequestHandler<RouteParams, {}, {}, ShowQueries> = async (req, res) => {
 		const user = req.user as GatewayJwtUser;
 		const target = res.locals.target as Target;
 
@@ -52,10 +52,30 @@ export default class SubmissionHandler {
 			}
 		}
 
+		const resourceFilter = {
+			customId: preferTrue(req.query.customId),
+			userId: preferTrue(req.query.userId),
+			targetId: preferTrue(req.query.targetId),
+			source: preferTrue(req.query.source),
+			base64Encoded: preferTrue(req.query.base64Encoded),
+			score: preferTrue(req.query.score),
+			createdAt: preferTrue(req.query.createdAt),
+			updatedAt: preferTrue(req.query.updatedAt),
+		} satisfies ResourceFilter<PartialSubmission>;
+
+		const resourceSchema = createSubmissionResourceSchema(resourceFilter);
+		const resourceArray = z.array(resourceSchema);
+		const parseResult = resourceArray.safeParse(submissions);
+
+		if (!parseResult.success) {
+			console.error("Parsing submissions failed.", parseResult.error);
+			throw createHttpError(500);
+		}
+
 		const responseBody = {
 			status: "success",
 			data: {
-				submissions: submissions
+				submissions: parseResult.data
 			}
 		} satisfies IndexResponseBody;
 

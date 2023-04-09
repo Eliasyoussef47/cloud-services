@@ -30,7 +30,6 @@ export type IndexQueries = ShowQueries & {
 	locationNameQ?: string;
 }
 
-
 // TODO: Validation.
 export default class TargetHandler {
 	public static index: RequestHandler<{}, {}, {}, ShowQueries> = async (req, res) => {
@@ -59,7 +58,7 @@ export default class TargetHandler {
 		const parseResult = resourceArray.safeParse(targets);
 
 		if (!parseResult.success) {
-			console.error("Parsing target failed.", parseResult.error);
+			console.error("Parsing targets failed.", parseResult.error);
 			throw createHttpError(500);
 		}
 

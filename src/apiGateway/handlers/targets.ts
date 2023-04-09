@@ -9,7 +9,7 @@ import { IndexResponseBody as SubmissionsIndexResponseBody } from "@/submissions
 import { IndexQueries, IndexResponseBody as TargetsIndexResponseBody, ShowQueries as TargetShowQueries, ShowResponseBody as TargetsShowResponseBody } from "@/targetsService/handlers/targets.js";
 import { Submission } from "@/submissionsService/models/Submission.js";
 import { ResponseBody, ServiceStatus } from "@/shared/types/Response.js";
-import { isTrue, noError } from "@/shared/utils/general.js";
+import { getParamsWithKeyStripped, isTrue, noError } from "@/shared/utils/general.js";
 import { ServiceCallResult } from "@/apiGateway/types.js";
 import { PartialTarget } from "@/targetsService/resources/Target.js";
 
@@ -161,9 +161,10 @@ export default class TargetHandler {
 		// TODO: Validate route params.
 		const targetId: string = req.params.id;
 
+		const urlParams = new URLSearchParams(req.query);
 		let targetResponse: ServiceCallResult<TargetsShowResponseBody>;
 		try {
-			targetResponse = await showCaller(targetId, new URLSearchParams(req.query));
+			targetResponse = await showCaller(targetId, urlParams);
 			if (targetResponse.statusCode >= 400) {
 				res.status(targetResponse.statusCode).json(targetResponse.body);
 				return;
@@ -180,7 +181,8 @@ export default class TargetHandler {
 		if (isTrue(req.query.submissions)) {
 			let submissionsResponse: ServiceCallResult<SubmissionsIndexResponseBody>;
 			try {
-				submissionsResponse = await submissionsIndexCaller({ targetId: targetId });
+				const submissionQueries = getParamsWithKeyStripped(urlParams, "submissions");
+				submissionsResponse = await submissionsIndexCaller({ targetId: targetId }, submissionQueries);
 				if (noError(submissionsResponse.statusCode)) {
 					submissionsFromService = submissionsResponse.body.data.submissions;
 				} else {

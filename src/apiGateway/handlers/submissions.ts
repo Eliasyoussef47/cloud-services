@@ -40,12 +40,13 @@ export type ShowQueries = ChangeTypes<Partial<Submission>, string>;
 /**
  *
  * @param args
+ * @param urlSearchParams
  * @throws Whatever indexCircuitBreaker or Request.json throw.
  */
-export async function indexCaller(args: IndexArgs): Promise<ServiceCallResult<IndexResponseBody>> {
+export async function indexCaller(args: IndexArgs, urlSearchParams: URLSearchParams): Promise<ServiceCallResult<IndexResponseBody>> {
 	let fireResult: Response;
 	try {
-		fireResult = await indexCircuitBreaker.fire(args);
+		fireResult = await indexCircuitBreaker.fire(args, urlSearchParams);
 	} catch (e) {
 		console.log("Service breaker rejected: ", e);
 		throw e;
@@ -87,10 +88,10 @@ export async function showCaller(args: ShowArgs, urlSearchParams: URLSearchParam
 }
 
 export default class SubmissionHandler {
-	public index: RequestHandler<IndexArgs> = async (req, res, next) => {
+	public index: RequestHandler<IndexArgs, {}, {}, ShowQueries> = async (req, res, next) => {
 		const parsedParams = indexParamsSchema.parse(req.params);
 		try {
-			const result = await indexCaller(parsedParams);
+			const result = await indexCaller(parsedParams, new URLSearchParams(req.query));
 			res.status(result.statusCode).json(result.body);
 		} catch (e) {
 			next(e);
@@ -136,7 +137,7 @@ export default class SubmissionHandler {
 
 		let submissionResponse: ServiceCallResult<ShowResponseBody>;
 		try {
-			submissionResponse = await showCaller({id: submissionId}, new URLSearchParams(req.query));
+			submissionResponse = await showCaller({ id: submissionId }, new URLSearchParams(req.query));
 			if (submissionResponse.statusCode >= 400) {
 				res.status(submissionResponse.statusCode).json(submissionResponse.body);
 				return;

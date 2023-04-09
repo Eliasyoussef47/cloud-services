@@ -21,7 +21,7 @@ export type DeleteArgs = {
 
 export default class Submissions {
 	// TODO: User based authorization.
-	public async index(args: IndexArgs): Promise<Response> {
+	public async index(args: IndexArgs, searchParams: URLSearchParams): Promise<Response> {
 		const fetchInit: RequestInit = {
 			method: "get",
 			headers: getServicesAuthHeaders()
@@ -30,6 +30,7 @@ export default class Submissions {
 		let url = new URL(Environment.getInstance().submissionServiceUrl);
 		const submissionsRoute = getTargetsSubmissionsRoute(args.targetId);
 		url = new URL(submissionsRoute, url);
+		url = setUrlSearchParams(url, searchParams);
 
 		return await defaultServiceCall(url, fetchInit);
 	}
