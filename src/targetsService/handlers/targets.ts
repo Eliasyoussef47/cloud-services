@@ -9,7 +9,7 @@ import { toZod } from "tozod";
 import crypto from "crypto";
 import { promises as fs } from "fs";
 import { StoreBody } from "@/shared/types/targetsService/index.js";
-import { preferTrue, toDataUrl } from "@/shared/utils/general.js";
+import { lowerCase, preferTrue, toDataUrl } from "@/shared/utils/general.js";
 import { TargetCreatedBody, TargetDeletedBody } from "@/shared/MessageBroker/messages.js";
 import { TargetPersistent } from "@/targetsService/persistence/ITargetRepository.js";
 import { ChangeTypes } from "@/shared/types/utility.js";
@@ -28,15 +28,22 @@ export type IndexResponseBody = ResponseBody<{ targets: PartialTarget[] }>;
 export type ShowQueries = ChangeTypes<Partial<Target>, string>;
 export type IndexQueries = ShowQueries & {
 	locationNameQ?: string;
+	userIdQ?: string;
 }
 
 // TODO: Validation.
 export default class TargetHandler {
-	public static index: RequestHandler<{}, {}, {}, ShowQueries> = async (req, res) => {
+	public static index: RequestHandler<{}, {}, {}, IndexQueries> = async (req, res) => {
 		let targets: TargetPersistent[] = [];
 
 		try {
-			targets = await ServicesRegistry.getInstance().targetRepository.getAll();
+			const locationsNameQ = lowerCase(req.query.locationNameQ);
+			const userIdQ = lowerCase(req.query.userIdQ);
+			const dbFilter = {
+				...(locationsNameQ && { locationName: locationsNameQ }),
+				...(userIdQ && { userId: userIdQ }),
+			} satisfies  PartialTarget;
+			targets = await ServicesRegistry.getInstance().targetRepository.getAll(dbFilter);
 		} catch (e) {
 			console.error("Error while getting a all targets.", e);
 			throw e;

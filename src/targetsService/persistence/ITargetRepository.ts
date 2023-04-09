@@ -14,7 +14,7 @@ export type CreateArgs = Pick<Target,
 export default interface ITargetRepository {
 	get(customId: string): Promise<TargetPersistent | null>;
 	getByUserId(userId: string): Promise<TargetPersistent[]>;
-	getAll(): Promise<TargetPersistent[]>;
+	getAll(filter?: Partial<Target>): Promise<TargetPersistent[]>;
 	create(createArgs: CreateArgs): Promise<TargetPersistent>
 	deleteById(id: Target["customId"]): Promise<boolean>;
 }

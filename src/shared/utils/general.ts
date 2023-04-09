@@ -35,6 +35,14 @@ export function noError(statusCode: number): boolean {
 	return statusCode >= 200 && statusCode < 300;
 }
 
+export function lowerCase(value: unknown) {
+	if (!(typeof value === "string" || value instanceof String)) {
+		return undefined;
+	}
+
+	return value.toLowerCase();
+}
+
 export const getParamsWithKeyStripped = (urlParams: URLSearchParams, keyToRemove: string) => {
 	const submissionUrlParams = new URLSearchParams();
 

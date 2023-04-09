@@ -70,13 +70,13 @@ export default class TargetRepository implements ITargetRepository {
 		return await model.find(filter).exec() as MyHydratedDocument<Target>[];
 	}
 
-	public async getAll(): Promise<TargetPersistent[]> {
+	public async getAll(filter?: Partial<Target>): Promise<TargetPersistent[]> {
 		const model = this._model;
 		if (!model) {
 			throw new DatabaseError("No database connection.");
 		}
 
-		return await model.find({}).exec() as MyHydratedDocument<Target>[];
+		return await model.find(filter ?? {}).exec() as MyHydratedDocument<Target>[];
 	}
 
 	public async deleteById(id: Target["customId"]): Promise<boolean> {
