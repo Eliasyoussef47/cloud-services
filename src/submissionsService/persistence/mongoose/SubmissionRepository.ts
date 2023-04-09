@@ -77,7 +77,6 @@ export default class SubmissionRepository implements ISubmissionRepository {
 		if (!model) {
 			throw new DatabaseError("No database connection.");
 		}
-		console.log("id", id);
 
 		const filter: Pick<Submission, "customId"> = {
 			customId: id
