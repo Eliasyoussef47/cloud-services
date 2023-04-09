@@ -11,7 +11,13 @@ export const targetSchema = new Schema<MongooseTarget, TargetModelType, Target, 
 	customId: { type: SchemaTypes.String, required: true },
 	userId: { type: SchemaTypes.String, required: true, ref: UserRepository.modelName },
 	source: { type: SchemaTypes.String, required: true },
-	base64Encoded: { type: SchemaTypes.String, required: true },
+	base64Encoded: {
+		type: SchemaTypes.String,
+		required: function() {
+			// @ts-ignore
+			return this.externalUploadId == null;
+		}
+	},
 	locationName: { type: SchemaTypes.String, required: true },
 	externalUploadId: { type: SchemaTypes.String, default: null },
 }, { timestamps: true });

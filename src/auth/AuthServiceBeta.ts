@@ -74,14 +74,14 @@ export class AuthServiceBeta extends AuthServiceBase {
 		this.setInstance(new AuthServiceBeta(gatewayJwtOptions, userJwtOptions));
 	}
 
-	public static createPassword(suppliedPassword: string) {
+	public static createPassword(suppliedPassword: string): string {
 		const salt = crypto.randomBytes(this._saltSize).toString(this._encoding);
 		const hash = crypto.pbkdf2Sync(suppliedPassword, salt,
 			this._iterations, this._keyLength, this._digest).toString(this._encoding);
 		return `${hash}.${salt}`;
 	}
 
-	public static verifyPassword(storedPassword: string, suppliedPassword: string) {
+	public static verifyPassword(storedPassword: string, suppliedPassword: string): boolean {
 		const [hashedPassword, salt] = storedPassword.split(".");
 		const hashedPasswordBuf = Buffer.from(hashedPassword, this._encoding);
 		const suppliedPasswordBuf = crypto.pbkdf2Sync(suppliedPassword,
