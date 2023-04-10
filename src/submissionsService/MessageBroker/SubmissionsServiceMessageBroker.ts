@@ -107,7 +107,7 @@ export class SubmissionsServiceMessageBroker {
 			return;
 		}
 
-		// Test if the message is the result of the score calculation.
+		// Test if the message is about the deletion of a target.
 		const parsedMessageTargetDeleted = targetDeletedMessageSchema.safeParse(messageParsed.data);
 		if (parsedMessageTargetDeleted.success) {
 			await this.consumeTargetDeleted(parsedMessageTargetDeleted.data);
