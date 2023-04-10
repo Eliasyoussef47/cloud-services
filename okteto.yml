@@ -2,7 +2,7 @@ name: cloud-services-nielsverheggen
 namespace: cloud-services-nielsverheggen
 services:
   mongo:
-#    image: docker.io/bitnami/mongodb:latest
+    image: docker.io/bitnami/mongodb:latest
     restart: always
     ports:
       - "27017"
@@ -39,8 +39,8 @@ services:
       - JWT_GATEWAY_SECRET=456
       - SERVICES_API_KEY=123
       - JWT_EXPIRES_IN=10800
-      - IMAGGA_API_KEY=acc_2f45991556a390d
-      - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
+      - IMAGGA_API_KEY=acc_131509f9dd4b1be
+      - IMAGGA_API_SECRET=e617c2a290749739dfbc3f4a824289b6
     ports:
       - 4242:4242
     depends_on:
@@ -72,8 +72,8 @@ services:
       - JWT_GATEWAY_SECRET=456
       - SERVICES_API_KEY=123
       - JWT_EXPIRES_IN=10800
-      - IMAGGA_API_KEY=acc_2f45991556a390d
-      - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
+      - IMAGGA_API_KEY=acc_131509f9dd4b1be
+      - IMAGGA_API_SECRET=e617c2a290749739dfbc3f4a824289b6
     ports:
       - 3003:3003
     depends_on:
@@ -102,8 +102,8 @@ services:
       - JWT_GATEWAY_SECRET=456
       - SERVICES_API_KEY=123
       - JWT_EXPIRES_IN=10800
-      - IMAGGA_API_KEY=acc_2f45991556a390d
-      - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
+      - IMAGGA_API_KEY=acc_131509f9dd4b1be
+      - IMAGGA_API_SECRET=e617c2a290749739dfbc3f4a824289b6
     ports:
       - 3004:3004
     depends_on:
@@ -132,8 +132,8 @@ services:
       - JWT_GATEWAY_SECRET=456
       - SERVICES_API_KEY=123
       - JWT_EXPIRES_IN=10800
-      - IMAGGA_API_KEY=acc_2f45991556a390d
-      - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
+      - IMAGGA_API_KEY=acc_131509f9dd4b1be
+      - IMAGGA_API_SECRET=e617c2a290749739dfbc3f4a824289b6
     ports:
       - 3001:3001
     depends_on:

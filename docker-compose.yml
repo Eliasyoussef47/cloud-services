@@ -42,8 +42,8 @@ services:
       - JWT_GATEWAY_SECRET=456
       - SERVICES_API_KEY=123
       - JWT_EXPIRES_IN=10800
-      - IMAGGA_API_KEY=acc_2f45991556a390d
-      - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
+      - IMAGGA_API_KEY=acc_131509f9dd4b1be
+      - IMAGGA_API_SECRET=e617c2a290749739dfbc3f4a824289b6
     depends_on:
       - mongo
       - rabbitmq
@@ -76,8 +76,8 @@ services:
       - JWT_GATEWAY_SECRET=456
       - SERVICES_API_KEY=123
       - JWT_EXPIRES_IN=10800
-      - IMAGGA_API_KEY=acc_2f45991556a390d
-      - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
+      - IMAGGA_API_KEY=acc_131509f9dd4b1be
+      - IMAGGA_API_SECRET=e617c2a290749739dfbc3f4a824289b6
     depends_on:
       - mongo
       - rabbitmq
@@ -107,8 +107,8 @@ services:
       - JWT_GATEWAY_SECRET=456
       - SERVICES_API_KEY=123
       - JWT_EXPIRES_IN=10800
-      - IMAGGA_API_KEY=acc_2f45991556a390d
-      - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
+      - IMAGGA_API_KEY=acc_131509f9dd4b1be
+      - IMAGGA_API_SECRET=e617c2a290749739dfbc3f4a824289b6
     depends_on:
       - mongo
       - rabbitmq
@@ -138,8 +138,8 @@ services:
       - JWT_GATEWAY_SECRET=456
       - SERVICES_API_KEY=123
       - JWT_EXPIRES_IN=10800
-      - IMAGGA_API_KEY=acc_2f45991556a390d
-      - IMAGGA_API_SECRET=d105f83d5729bdca1087f4e2b8875403
+      - IMAGGA_API_KEY=acc_131509f9dd4b1be
+      - IMAGGA_API_SECRET=e617c2a290749739dfbc3f4a824289b6
     depends_on:
       - mongo
       - rabbitmq
