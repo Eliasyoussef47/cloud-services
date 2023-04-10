@@ -1,5 +1,5 @@
 import { ErrorRequestHandler, Request, RequestHandler } from "express-serve-static-core";
-import { z } from "zod"
+import { z, ZodError } from "zod"
 import createHttpError, { HttpError } from "http-errors";
 import { ResponseBody, toStatusMessage } from "@/shared/types/Response.js";
 
@@ -7,14 +7,14 @@ export const errorSchema = z.object({
 	name: z.string(),
 	message: z.string(),
 	stack: z.string().optional()
-});
+}) satisfies z.Schema<Error>;
 
 export const httpErrorSchema = errorSchema.extend({
 	status: z.number(),
 	statusCode: z.number(),
 	expose: z.boolean(),
 	headers: z.union([z.record(z.string()), z.undefined()]).optional()
-}).passthrough();
+}).passthrough() satisfies z.Schema<HttpError>;
 
 export const zodErrorSchema = z.object({
 	name: z.literal("ZodError")

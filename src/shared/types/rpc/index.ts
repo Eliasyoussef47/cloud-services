@@ -8,7 +8,7 @@ interface RequestLine {
 	requestUri: string;
 }
 
-export interface RpcRequest<BodyT extends object | null = null> {
+export interface RpcRequest<BodyT extends object | null = null | object> {
 	request: RequestLine;
 	body: BodyT;
 }
@@ -25,15 +25,15 @@ export interface RpcResponse<BodyT extends object | null = null> {
 
 export type TargetRpcRequest = RpcRequest<{submission: Submission}>;
 
-export const requestLineSchema: toZod<RequestLine> = z.object({
+export const requestLineSchema = z.object({
 	method: z.string(),
 	requestUri: z.string()
-});
+}) satisfies z.Schema<RequestLine>;
 
 export const rpcRequestSchema = z.object({
 	request: requestLineSchema,
 	body: z.object({}).passthrough().nullable()
-});
+}) satisfies z.Schema<RpcRequest>;
 
 export const submissionBodyCustomSchema = z.custom<Submission>((val) => {
 	return z.object({}).passthrough().nullable().safeParse(val).success

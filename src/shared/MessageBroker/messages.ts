@@ -25,7 +25,7 @@ const isResourceTypeValidator = (val: unknown) => {
 
 const resourceTypeSchema = z.custom<ResourceType>(() => {
 	return z.string().refine(isResourceTypeValidator);
-});
+}) satisfies z.Schema<ResourceType>;
 
 // TODO: Status isn't enforced.
 export interface MessageBrokerMessageBase<DataT extends object | null, TStatus extends ServiceStatus, TResource extends ResourceType> extends ResponseBody<DataT> {

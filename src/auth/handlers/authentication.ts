@@ -5,25 +5,11 @@ import createHttpError from "http-errors";
 import { ResponseBody } from "@/shared/types/Response.js";
 import { AuthServiceBeta } from "@/auth/AuthServiceBeta.js";
 import { userResourceSchema } from "@/auth/models/User.js";
-import z from "zod";
 import ServicesRegistry from "@/auth/ServicesRegistry.js";
-import { UserPersistent } from "@/auth/persistence/IUserRepository.js";
-
-export const registerFormSchema = loginFormSchema.merge(z.object({
-	username: z.string().refine(async (val) => {
-		let foundUser: UserPersistent | null = null;
-		try {
-			foundUser = await ServicesRegistry.getInstance().userRepository.getByUsername(val);
-		} catch (e) {
-			console.error("Error while getting a target.", e);
-		}
-		return !foundUser;
-	}, {message: "The username must be unique."})
-}));
 
 export default class AuthenticationHandler {
-	public static register: RequestHandler = async (req, res) => {
-		const loginForm: LoginForm = await registerFormSchema.parseAsync(req.body);
+	public static register: RequestHandler<{}, {}, LoginForm> = async (req, res) => {
+		const loginForm = req.body;
 
 		const newUser = await AuthServiceBeta.getInstance().register(loginForm);
 		if (!newUser) {
@@ -43,7 +29,7 @@ export default class AuthenticationHandler {
 		ServicesRegistry.getInstance().authServiceMessageBroker.publishUserCreated({customId: newUser.customId});
 	};
 
-	public static loginPost: RequestHandler = async (req, res) => {
+	public static loginPost: RequestHandler<{}, {}, LoginForm> = async (req, res) => {
 		const loginForm: LoginForm = loginFormSchema.parse(req.body);
 
 		const loginJwt = await AuthServiceBeta.getInstance().login(loginForm);
