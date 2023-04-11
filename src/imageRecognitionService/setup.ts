@@ -12,7 +12,7 @@ async function setupMessageBroker() {
 
 	const imageRecognitionServiceMessageBroker = new ImageRecognitionServiceMessageBroker(messageBroker);
 	await messageBroker.setup();
-	void imageRecognitionServiceMessageBroker.consume();
+	await imageRecognitionServiceMessageBroker.consume();
 	return { messageBroker, imageRecognitionServiceMessageBroker };
 }
 

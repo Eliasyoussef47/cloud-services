@@ -2,6 +2,9 @@ import { User } from "@/auth/models/User.js";
 import { IPersistent } from "@/shared/types/database/database.js";
 import { IUserMethods } from "@/auth/persistence/mongoose/models/User.js";
 
+/**
+ * An abstraction above the actual implementation of a database model (Mongoose).
+ */
 export interface UserPersistent extends User, IPersistent<User>, IUserMethods {
 
 }

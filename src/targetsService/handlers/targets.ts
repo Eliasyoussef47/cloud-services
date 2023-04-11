@@ -53,7 +53,7 @@ export default class TargetHandler {
 		const dbFilter = {
 			...(locationsNameQ && { locationName: locationsNameQ }),
 			...(userIdQ && { userId: userIdQ }),
-		} satisfies  PartialTarget;
+		} satisfies PartialTarget;
 
 		const paginationOptionsQueries: PaginationOptionsQueries = {
 			currentPage: req.query.currentPage,
@@ -157,7 +157,6 @@ export default class TargetHandler {
 		ServicesRegistry.getInstance().targetsServiceMessageBroker.publishTargetCreated(messageBody);
 	};
 
-	// TODO: Validate url param.
 	public static show: RequestHandler<"/:id", {}, {}, ShowQueries> = async (req, res) => {
 		const target = res.locals.target as Target;
 

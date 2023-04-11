@@ -5,8 +5,8 @@ import ServicesRegistry from "@/submissionsService/ServiceRegistry.js";
 import { SubmissionPersistent } from "@/submissionsService/persistence/ISubmissionRepository.js";
 
 /**
- * Fetches the requested target from the database and set it in res.locals.target. This makes it possible for
- * subsequent handlers to get the target.
+ * Fetches the requested submission from the database and set it in res.locals.submission. This makes it possible for
+ * subsequent handlers to get the submission.
  * @param req
  * @param res
  * @param next

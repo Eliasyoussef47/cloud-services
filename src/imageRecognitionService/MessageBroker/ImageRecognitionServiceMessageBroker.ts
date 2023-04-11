@@ -50,7 +50,7 @@ export class ImageRecognitionServiceMessageBroker {
 	public async setup() {
 		await this.assertExchanges();
 		await this.setupQueues();
-		void this.consume();
+		await this.consume();
 	}
 
 	public async consume(): Promise<void> {
@@ -91,7 +91,7 @@ export class ImageRecognitionServiceMessageBroker {
 				}
 			}
 		};
-		const routingKey: RoutingKey = "submissions.image.scoreCalculated";
+		const routingKey: RoutingKey = "submissions.image.scoreCalculationRequested";
 
 		this._messageBroker.publish(routingKey, JSON.stringify(scoreCalculationResponse));
 	}

@@ -20,7 +20,6 @@ export type DeleteArgs = {
 };
 
 export default class Submissions {
-	// TODO: User based authorization.
 	public async index(args: IndexArgs, searchParams: URLSearchParams): Promise<Response> {
 		const fetchInit: RequestInit = {
 			method: "get",

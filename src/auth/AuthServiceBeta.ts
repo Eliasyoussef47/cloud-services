@@ -11,7 +11,7 @@ import ServicesRegistry from "@/auth/ServicesRegistry.js";
 import { UserPersistent } from "@/auth/persistence/IUserRepository.js";
 
 /**
- * Responsible for authentication in the API gateway.
+ * Responsible for authentication in the API gateway (user).
  */
 export class AuthServiceBeta extends AuthServiceBase {
 	static #instance: AuthServiceBeta | undefined;
@@ -39,6 +39,7 @@ export class AuthServiceBeta extends AuthServiceBase {
 		this._userJwtOptions = userJwtOptions;
 
 		this._authenticateUserStrategy = new JwtStrategy(this.userJwtOptions, (payload, done) => {
+			// Validate if the user exists. Otherwise, send 407 error.
 			this.getMatchingUser(payload)
 				.then((value) => {
 					ServicesRegistry.getInstance().user = value;

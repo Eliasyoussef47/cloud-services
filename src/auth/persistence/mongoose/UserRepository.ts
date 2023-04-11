@@ -64,7 +64,6 @@ export default class UserRepository implements IUserRepository {
 			throw new DatabaseError("No database connection");
 		}
 
-		// TODO: Check the content of toObject.
 		return await model.findOne(<Pick<User, "username">> { username: username }).exec() as MyHydratedDocument<UserPersistent>;
 	}
 }

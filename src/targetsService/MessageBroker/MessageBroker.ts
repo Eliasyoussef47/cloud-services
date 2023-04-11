@@ -31,7 +31,7 @@ export class TargetsServiceMessageBroker {
 	public async setup() {
 		await this.assertExchanges();
 		await this.setupQueues();
-		void this.consume();
+		await this.consume();
 	}
 
 	public publish(routingKey: RoutingKey, msg: string, exchange: ExchangeName = exchangeAlphaName): boolean {
@@ -93,6 +93,7 @@ export class TargetsServiceMessageBroker {
 			return;
 		}
 
+		// Validate whether the message is about a newly created user.
 		const parsedMessage = userCreatedMessageSchema.safeParse(messageObject);
 
 		if (!parsedMessage.success) {
