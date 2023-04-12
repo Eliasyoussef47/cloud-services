@@ -30,7 +30,7 @@ jobs:
           DB_NAME: "cloud-services"
           API_GATEWAY_URL: "http://127.0.0.1:4242"
           TARGETS_SERVICE_URL: "http://targets:3001"
-          SUBMISSIONS_SERVICE_URL: http://submissions:3003"
+          SUBMISSIONS_SERVICE_URL: "http://submissions:3003"
           IMAGE_RECOGNITION_SERVICE_URL: "http://image-recognition:3004"
           AUTH_DATABASE_PATH: "mongodb://mongo:27017/auth_service"
           TARGETS_DATABASE_PATH: "mongodb://mongo:27017/targets_service"
