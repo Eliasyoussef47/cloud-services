@@ -30,7 +30,7 @@ export function isProd(req?: Request) {
 
 export const notFoundHandler: RequestHandler = () => {
 	throw createHttpError(404);
-}
+};
 
 export const convertToHttpError: ErrorRequestHandler = (err: Error, req, res, next) => {
 	const errorParsingResult = httpErrorSchema.safeParse(err);
@@ -46,7 +46,7 @@ export const convertToHttpError: ErrorRequestHandler = (err: Error, req, res, ne
 	let createdError = createHttpError({ internalError: err });
 
 	return next(createdError);
-}
+};
 
 export const httpErrorHandler: ErrorRequestHandler = (err: HttpError, req, res, next) => {
 	const errorParsingResult = httpErrorSchema.safeParse(err);
@@ -64,7 +64,7 @@ export const httpErrorHandler: ErrorRequestHandler = (err: HttpError, req, res, 
 	} as ResponseBody;
 
 	res.status(err.statusCode).json(responseBody);
-}
+};
 
 export const errorHandler: ErrorRequestHandler = (err: Error, req, res) => {
 	if (isProd(req)) {
@@ -78,4 +78,4 @@ export const errorHandler: ErrorRequestHandler = (err: Error, req, res) => {
 	} as ResponseBody;
 
 	res.status(500).json(responseBody);
-}
+};
