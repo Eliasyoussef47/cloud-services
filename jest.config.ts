@@ -35,4 +35,4 @@ const jestConfig: JestConfigWithTsJest = {
 	},
 };
 
-export default jestConfig
+export default jestConfig;
