@@ -26,19 +26,19 @@ export function forInput(entryAlias: string, inputPath: string) {
 
 export const apiGateway = () => {
 	return forInput("apiGateway", "src/apiGateway/index.ts");
-}
+};
 
 export const imageRecognition = () => {
 	return forInput("imageRecognitionService", "src/imageRecognitionService/index.ts");
-}
+};
 
 export const submissions = () => {
 	return forInput("submissionsService", "src/submissionsService/index.ts");
-}
+};
 
 export const targets = () => {
 	return forInput("targetsService", "src/targetsService/index.ts");
-}
+};
 
 // noinspection JSUnusedGlobalSymbols
 export default defineConfig([
