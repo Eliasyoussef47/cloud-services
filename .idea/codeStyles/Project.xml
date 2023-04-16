@@ -7,12 +7,16 @@
     </option>
     <option name="RIGHT_MARGIN" value="1000" />
     <JSCodeStyleSettings version="0">
+      <option name="FORCE_SEMICOLON_STYLE" value="true" />
+      <option name="FORCE_QUOTE_STYlE" value="true" />
       <option name="USE_EXPLICIT_JS_EXTENSION" value="TRUE" />
       <option name="SPACES_WITHIN_OBJECT_LITERAL_BRACES" value="true" />
       <option name="SPACES_WITHIN_IMPORTS" value="true" />
     </JSCodeStyleSettings>
     <TypeScriptCodeStyleSettings version="0">
+      <option name="FORCE_SEMICOLON_STYLE" value="true" />
       <option name="USE_PUBLIC_MODIFIER" value="true" />
+      <option name="FORCE_QUOTE_STYlE" value="true" />
       <option name="USE_EXPLICIT_JS_EXTENSION" value="TRUE" />
       <option name="SPACES_WITHIN_OBJECT_LITERAL_BRACES" value="true" />
       <option name="SPACES_WITHIN_IMPORTS" value="true" />
@@ -20,6 +24,9 @@
     </TypeScriptCodeStyleSettings>
     <codeStyleSettings language="HTML">
       <indentOptions>
+        <option name="INDENT_SIZE" value="1" />
+        <option name="CONTINUATION_INDENT_SIZE" value="1" />
+        <option name="TAB_SIZE" value="1" />
         <option name="USE_TAB_CHARACTER" value="true" />
       </indentOptions>
     </codeStyleSettings>
@@ -30,6 +37,10 @@
       </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="JavaScript">
+      <option name="BLOCK_COMMENT_ADD_SPACE" value="true" />
+      <option name="INDENT_CASE_FROM_SWITCH" value="false" />
+      <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+      <option name="ALIGN_MULTILINE_FOR" value="false" />
       <indentOptions>
         <option name="USE_TAB_CHARACTER" value="true" />
         <option name="SMART_TABS" value="true" />
@@ -44,6 +55,10 @@
       </arrangement>
     </codeStyleSettings>
     <codeStyleSettings language="TypeScript">
+      <option name="BLOCK_COMMENT_ADD_SPACE" value="true" />
+      <option name="INDENT_CASE_FROM_SWITCH" value="false" />
+      <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+      <option name="ALIGN_MULTILINE_FOR" value="false" />
       <indentOptions>
         <option name="USE_TAB_CHARACTER" value="true" />
       </indentOptions>
