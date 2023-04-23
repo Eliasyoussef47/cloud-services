@@ -1,0 +1,462 @@
+{
+	"info": {
+		"_postman_id": "ee669716-06d6-49a4-9c37-35cb40c7f53d",
+		"name": "Targets",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_uid": "8716023-ee669716-06d6-49a4-9c37-35cb40c7f53d"
+	},
+	"item": [
+		{
+			"name": "targets",
+			"id": "281742c8-e0d7-4b5b-a4b5-f9ca51ef2069",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/targets?currentPage=0&perPage=2&locationNameQ=leerdam",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"targets"
+					],
+					"query": [
+						{
+							"key": "currentPage",
+							"value": "0",
+							"description": "The index of the page to get. Starts at 0."
+						},
+						{
+							"key": "perPage",
+							"value": "2",
+							"description": "The amount of entries to get per page. Can't be zero."
+						},
+						{
+							"key": "locationNameQ",
+							"value": "leerdam",
+							"description": "Search based on location name"
+						},
+						{
+							"key": "userIdQ",
+							"value": "768267d5-c9f4-4686-9853-abe3cb63d512",
+							"disabled": true
+						},
+						{
+							"key": "customId",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "userId",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "source",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "base64Encoded",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "locationName",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "externalUploadId",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "createdAt",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "updatedAt",
+							"value": "false",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "targets/:id",
+			"id": "6bcfbab5-abbb-4be3-ada7-1da0821551f1",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/targets/:id?customId=false&userId=false&submissions=true",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"targets",
+						":id"
+					],
+					"query": [
+						{
+							"key": "customId",
+							"value": "false"
+						},
+						{
+							"key": "userId",
+							"value": "false"
+						},
+						{
+							"key": "source",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "base64Encoded",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "locationName",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "externalUploadId",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "createdAt",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "updatedAt",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "submissions",
+							"value": "true"
+						},
+						{
+							"key": "submissions.customId",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "submissions.userId",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "submissions.targetId",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "submissions.source",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "submissions.base64Encoded",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "submissions.score",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "submissions.createdAt",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "submissions.updatedAt",
+							"value": "false",
+							"disabled": true
+						}
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "targets",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3e7758a8-6676-4618-aa91-d44f626cae80",
+						"exec": [
+							"if (pm.response.code === 200) {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.environment.set(\"lastTargetId\", jsonData.data.customId);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "405c9ef3-98a8-400f-8a10-ba5c8ec84d6c",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "locationName",
+							"value": "leerdam",
+							"type": "text"
+						},
+						{
+							"key": "photo",
+							"type": "file",
+							"src": "smol.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}/targets",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"targets"
+					]
+				}
+			},
+			"response": [
+				{
+					"id": "850f8f97-830b-4dba-abde-f86571896436",
+					"name": "No location name",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "locationName",
+									"value": "leerdam",
+									"type": "text"
+								},
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "smol.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/targets",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"targets"
+							]
+						}
+					},
+					"status": "Unprocessable Entity",
+					"code": 422,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "229"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"e5-HyLtXvK7iryh0EdAySgqeRXiM24\""
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Apr 2023 18:03:22 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"validationError\",\n    \"data\": {\n        \"message\": \"Unprocessable Entity\",\n        \"internalError\": {\n            \"issues\": [\n                {\n                    \"code\": \"invalid_type\",\n                    \"expected\": \"string\",\n                    \"received\": \"undefined\",\n                    \"path\": [\n                        \"locationName\"\n                    ],\n                    \"message\": \"Required\"\n                }\n            ],\n            \"name\": \"ZodError\"\n        }\n    }\n}"
+				},
+				{
+					"id": "81598ef9-ce19-48eb-82b0-3030ad8965d4",
+					"name": "No photo",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "locationName",
+									"value": "leerdam",
+									"type": "text"
+								},
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "smol.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/targets",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"targets"
+							]
+						}
+					},
+					"status": "Unprocessable Entity",
+					"code": 422,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "242"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"f2-+QlL6dCCaZcOYmPRCodCAl5wUgA\""
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Apr 2023 18:04:34 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"validationError\",\n    \"data\": {\n        \"message\": \"Unprocessable Entity\",\n        \"internalError\": {\n            \"issues\": [\n                {\n                    \"code\": \"invalid_type\",\n                    \"expected\": \"array\",\n                    \"received\": \"undefined\",\n                    \"path\": [\n                        \"photo\"\n                    ],\n                    \"message\": \"Request must include a photo.\"\n                }\n            ],\n            \"name\": \"ZodError\"\n        }\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "targets/:id",
+			"id": "b8129412-523d-48a3-87f5-fd5317e8628a",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/targets/:id",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"targets",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{lastTargetId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "75ab303a-95bb-463f-b096-b24dc57a0428",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "22809a20-8be2-4dc3-be42-f53a1a06a33a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

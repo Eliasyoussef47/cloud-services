@@ -1,0 +1,300 @@
+{
+	"info": {
+		"_postman_id": "5e49e126-4144-4f28-a439-74c69160035b",
+		"name": "Submissions",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_uid": "8716023-5e49e126-4144-4f28-a439-74c69160035b"
+	},
+	"item": [
+		{
+			"name": "targets/:targetId/submissions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ec9f9790-6137-4c73-8520-c158a71a8f9e",
+						"exec": [
+							"if (pm.response.code === 200) {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.environment.set(\"lastSubmissionId\", jsonData.data.customId);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"id": "9896c906-9e86-4ffc-a969-7fa89493ba70",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "photo",
+							"type": "file",
+							"src": "smol2.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}/targets/:targetId/submissions",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"targets",
+						":targetId",
+						"submissions"
+					],
+					"variable": [
+						{
+							"key": "targetId",
+							"value": "{{lastTargetId}}",
+							"description": "The id of the target to submit to."
+						}
+					]
+				},
+				"description": "Make a submission to a target."
+			},
+			"response": []
+		},
+		{
+			"name": "targets/:targetId/submissions",
+			"id": "370140c0-8402-44a9-9262-587d33ee65c6",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/targets/:targetId/submissions?sortByScore=true",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"targets",
+						":targetId",
+						"submissions"
+					],
+					"query": [
+						{
+							"key": "customId",
+							"value": "true",
+							"description": "Whether or not to include the customId property. Default is true.",
+							"disabled": true
+						},
+						{
+							"key": "userId",
+							"value": "false",
+							"description": "Whether or not to include the userId property. Default is true.",
+							"disabled": true
+						},
+						{
+							"key": "targetId",
+							"value": "false",
+							"description": "Whether or not to include the targetId property. Default is true.",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "source",
+							"value": "false",
+							"description": "Whether or not to include the source property. Default is true.",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "base64Encoded",
+							"value": "false",
+							"description": "Whether or not to include the base64Encoded  property. Default is true.",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "score",
+							"value": "false",
+							"description": "Whether or not to include the score property. Default is true.",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "createdAt",
+							"value": "false",
+							"description": "Whether or not to include the createdAt property. Default is true.",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "updatedAt",
+							"value": "false",
+							"description": "Whether or not to include the updatedAt property. Default is true.",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sortByScore",
+							"value": "true",
+							"description": "Whether or not to sort by score in ascending order. Default is false."
+						},
+						{
+							"key": "hasScore",
+							"value": "false",
+							"description": "Whether or not to only display the entries that have a score. Default is false.",
+							"disabled": true
+						},
+						{
+							"key": "userIdQ",
+							"value": "3157f999-b3ee-4640-8f36-c979cd4f4a9a",
+							"description": "Filter to only show entries with this userId. Only works when the user is an admin or is the owner of this target.",
+							"type": "text",
+							"disabled": true
+						}
+					],
+					"variable": [
+						{
+							"key": "targetId",
+							"value": "{{lastTargetId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "submissions/:id",
+			"id": "91f88983-b018-4c59-8270-1bfa6b9e0074",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/submissions/:id",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"submissions",
+						":id"
+					],
+					"query": [
+						{
+							"key": "customId",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "userId",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "targetId",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "source",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "base64Encoded",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "score",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "createdAt",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "updatedAt",
+							"value": "false",
+							"disabled": true
+						}
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{lastSubmissionId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "submissions/:id",
+			"id": "2f924175-7913-4412-b2f8-7df3bcabe8da",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/submissions/:id",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"submissions",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{lastSubmissionId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "7b42fc08-e6b2-4055-be4d-08b2b7fda426",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "3dc24373-e195-42f5-b16c-5133bd4f7e4d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
