@@ -25,7 +25,7 @@ export async function setupDependencies() {
 		messageBroker: messageBroker,
 		authServiceMessageBroker: authServiceMessageBroker,
 		user: undefined
-	}
+	};
 
 	ServicesRegistry.setupInitial(services);
 }

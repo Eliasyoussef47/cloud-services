@@ -12,11 +12,11 @@ services:
 
   rabbitmq:
     image: rabbitmq:3
-    healthcheck: # check if service bus is up and healthy. Note: The timings have been decreased from default in order to speed up startup time for dependant services
-      test: rabbitmq-diagnostics -q ping
-      interval: 5s
-      timeout: 5s
-      retries: 5
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 1s
+      timeout: 3s
+      retries: 30
 
   api-gateway:
     build:
@@ -79,8 +79,10 @@ services:
       - IMAGGA_API_KEY=acc_131509f9dd4b1be
       - IMAGGA_API_SECRET=e617c2a290749739dfbc3f4a824289b6
     depends_on:
-      - mongo
-      - rabbitmq
+      mongo:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     restart: on-failure
 
   submissions:

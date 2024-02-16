@@ -35,7 +35,7 @@ export const toStatusMessage = (statusCode: number): ServiceStatus => {
 	}
 
 	return "success";
-}
+};
 
 export type ResourceFilter<T> = Partial<ChangeTypes<T, boolean | undefined>>;
 

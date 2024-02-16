@@ -101,7 +101,7 @@ export class Environment {
 			AUTH_DATABASE_PATH: process.env.AUTH_DATABASE_PATH || "",
 			TARGETS_DATABASE_PATH: process.env.TARGETS_DATABASE_PATH || "",
 			SUBMISSIONS_DATABASE_PATH: process.env.SUBMISSIONS_DATABASE_PATH || ""
-		}
+		};
 
 		envFileSchema.parse(envFile);
 

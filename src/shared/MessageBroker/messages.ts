@@ -65,7 +65,7 @@ export const targetCreatedMessageSchema = responseBodySchema.extend({
 	data: targetCreatedBodySchema
 });
 
-export type TargetDeletedBody = Pick<Target, "customId">
+export type TargetDeletedBody = Pick<Target, "customId">;
 
 export const targetDeletedBodySchema: toZod<TargetDeletedBody> = z.object({
 	customId: z.string()
