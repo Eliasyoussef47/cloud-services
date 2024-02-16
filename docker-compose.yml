@@ -13,9 +13,9 @@ services:
   rabbitmq:
     image: rabbitmq:3
     healthcheck:
-      test: rabbitmq-diagnostics check_port_connectivity
-      interval: 1s
-      timeout: 3s
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 5s
       retries: 30
 
   api-gateway:
@@ -45,11 +45,16 @@ services:
       - IMAGGA_API_KEY=acc_131509f9dd4b1be
       - IMAGGA_API_SECRET=e617c2a290749739dfbc3f4a824289b6
     depends_on:
-      - mongo
-      - rabbitmq
-      - image-recognition
-      - submissions
-      - targets
+      mongo:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      image-recognition:
+        condition: service_started
+      submissions:
+        condition: service_started
+      targets:
+        condition: service_started
     restart: on-failure
 
   image-recognition:
@@ -112,8 +117,10 @@ services:
       - IMAGGA_API_KEY=acc_131509f9dd4b1be
       - IMAGGA_API_SECRET=e617c2a290749739dfbc3f4a824289b6
     depends_on:
-      - mongo
-      - rabbitmq
+      mongo:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     restart: on-failure
 
   targets:
@@ -143,8 +150,10 @@ services:
       - IMAGGA_API_KEY=acc_131509f9dd4b1be
       - IMAGGA_API_SECRET=e617c2a290749739dfbc3f4a824289b6
     depends_on:
-      - mongo
-      - rabbitmq
+      mongo:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     restart: on-failure
 
   prometheus:
