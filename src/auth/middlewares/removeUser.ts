@@ -2,7 +2,7 @@ import { RequestHandler } from "express-serve-static-core";
 import ServicesRegistry from "@/auth/ServicesRegistry.js";
 
 /**
- * Removes the user from ServicesRegistry after the request is sent. This is done to prevent old users staying in the
+ * Removes the user from ServicesRegistry after the response is sent. This is done to prevent old users staying in the
  * memory.
  * @param req
  * @param res

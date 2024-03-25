@@ -13,6 +13,6 @@ const getAuthenticatedRouter = () => {
 	authenticatedRouter.use(getTargetRouter());
 
 	return authenticatedRouter;
-}
+};
 
 export { getAuthenticatedRouter };
