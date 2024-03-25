@@ -18,7 +18,7 @@ export type GatewayJwtPayload = {
 	role: string;
 } & NoUndefinedField<Required<Pick<JwtPayload, "sub" | "iat">>>;
 
-export type GatewayJwtUser = Pick<User, "customId" | "role">
+export type GatewayJwtUser = Pick<User, "customId" | "role">;
 
 export type GatewayJwtPayloadManual = Optional<GatewayJwtPayload, "iat">;
 
@@ -44,7 +44,7 @@ export class AuthServiceAlpha extends AuthServiceBase {
 			const jwtUser: GatewayJwtUser = {
 				customId: typedPayload.sub,
 				role: typedPayload.role
-			}
+			};
 
 			done(null, jwtUser);
 		});

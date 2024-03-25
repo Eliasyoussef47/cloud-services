@@ -58,7 +58,7 @@ export default class SubmissionHandler {
 			filter = {
 				...filter,
 				score: hasScoreB ? { $ne: null } : { $eq: null }
-			}
+			};
 		}
 
 		// Only apply userIdQ URL query if the userId hasn't already been filtered. So userIdQ will only work for
@@ -71,7 +71,7 @@ export default class SubmissionHandler {
 				filter = {
 					...filter,
 					userId: userIdQ
-				}
+				};
 			}
 		}
 

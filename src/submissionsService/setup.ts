@@ -31,6 +31,6 @@ export async function setupDependencies() {
 		submissionRepository: new SubmissionRepository(dbConnection),
 		messageBroker: messageBroker,
 		submissionsServiceMessageBroker
-	}
+	};
 	ServicesRegistry.setupInitial(services);
 }

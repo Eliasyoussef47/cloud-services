@@ -10,12 +10,12 @@ export type MongooseBase<T = Types.ObjectId> = {
 	 * This documents __v.
 	 */
 	__v?: any;
-}
+};
 
 export type MongooseWithTimestamps = {
 	createdAt: Date;
 	updatedAt: Date;
-}
+};
 
 export type MyHydratedDocument<DocType,
 	TOverrides = {},

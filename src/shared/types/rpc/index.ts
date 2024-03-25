@@ -36,7 +36,7 @@ export const rpcRequestSchema = z.object({
 });
 
 export const submissionBodyCustomSchema = z.custom<Submission>((val) => {
-	return z.object({}).passthrough().nullable().safeParse(val).success
+	return z.object({}).passthrough().nullable().safeParse(val).success;
 });
 
 export const targetRpcRequestSchema = rpcRequestSchema.extend({
@@ -64,7 +64,7 @@ export type TargetRpcResponseBody = {
 export type TargetRpcResponse = RpcResponse<TargetRpcResponseBody>;
 
 export const targetBodyCustomSchema = z.custom<Target>((val) => {
-	return z.object({}).passthrough().nullable().safeParse(val).success
+	return z.object({}).passthrough().nullable().safeParse(val).success;
 });
 
 export const targetRpcResponseSchema = rpcResponseSchema.extend({

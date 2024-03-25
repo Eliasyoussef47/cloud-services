@@ -19,7 +19,7 @@ const getRouter = () => {
 
 	targetsRouter.route("/targets/:id")
 		.get(TargetHandler.show)
-		.delete(TargetHandler.destroy)
+		.delete(TargetHandler.destroy);
 
 	return targetsRouter;
 };

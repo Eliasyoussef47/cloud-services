@@ -35,7 +35,7 @@ app.use(metricsMiddleware);
 
 app.set("env", process.env.NODE_ENV);
 
-app.use(cors())
+app.use(cors());
 app.use(express.json());
 
 // TODO: User based authorization.

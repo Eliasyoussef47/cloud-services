@@ -91,7 +91,7 @@ export default class TargetRepository implements ITargetRepository {
 
 		if (pagination) {
 			query.skip(pagination.currentPage * pagination.perPage)
-				.limit(pagination.perPage)
+				.limit(pagination.perPage);
 		}
 
 		const targetsResult = await query.exec();
