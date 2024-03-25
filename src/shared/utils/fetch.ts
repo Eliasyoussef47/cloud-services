@@ -44,7 +44,7 @@ export function getServicesAuthHeaders() {
 	const myHeaders = new Headers();
 	myHeaders.append("Authorization", `Bearer ${AuthServiceBeta.getInstance().getGatewayJwt(currentUser)}`);
 
-	return myHeaders
+	return myHeaders;
 }
 
 export async function printResponse(response: Response) {
@@ -67,4 +67,4 @@ export async function printResponse(response: Response) {
 
 export const setUrlSearchParams = (url: URL, params: URLSearchParams) => {
 	return new URL(`${url.origin}${url.pathname}?${params.toString()}`);
-}
+};

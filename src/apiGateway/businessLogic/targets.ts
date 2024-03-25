@@ -1,5 +1,5 @@
 import { Environment } from "@/shared/operation/Environment.js";
-import { makeTypedFormData, makeTypedSearchParams } from "@/types/Http.js";
+import { makeTypedFormData } from "@/types/Http.js";
 import { StoreBody } from "@/shared/types/targetsService/index.js";
 import { Target } from "@/targetsService/models/Target.js";
 import { defaultServiceCall, getServicesAuthHeaders, setUrlSearchParams } from "@/shared/utils/fetch.js";
@@ -21,11 +21,11 @@ export type StoreArgs = StoreBody & {
 
 export type ShowArgs = {
 	id: Target["customId"]
-}
+};
 
 export type DeleteArgs = {
 	id: Target["customId"]
-}
+};
 
 export default class Targets {
 	/**

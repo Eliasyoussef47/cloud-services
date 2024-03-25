@@ -30,7 +30,7 @@ export type IndexQueries = ShowQueries & {
 	hasScore?: string;
 	sortByScore?: string;
 	userIdQ?: string;
-}
+};
 
 export default class SubmissionHandler {
 	public static index: RequestHandler<RouteParams, {}, {}, IndexQueries> = async (req, res) => {

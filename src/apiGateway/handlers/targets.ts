@@ -4,7 +4,7 @@ import Targets, { StoreArgs } from "@/apiGateway/businessLogic/targets.js";
 import { attachStandardCircuitBreakerCallbacks } from "@/shared/utils/CircuitBreaker.js";
 import { storeBodySchema, storeFilesSchema } from "@/shared/validation/targets.js";
 import { User } from "@/auth/models/User.js";
-import { indexCaller as submissionsIndexCaller } from "@/apiGateway/handlers/submissions.js"
+import { indexCaller as submissionsIndexCaller } from "@/apiGateway/handlers/submissions.js";
 import { IndexResponseBody as SubmissionsIndexResponseBody } from "@/submissionsService/handlers/submissions.js";
 import { IndexQueries, IndexResponseBody as TargetsIndexResponseBody, ShowQueries as TargetShowQueries, ShowResponseBody as TargetsShowResponseBody } from "@/targetsService/handlers/targets.js";
 import { Submission } from "@/submissionsService/models/Submission.js";
@@ -37,13 +37,13 @@ attachStandardCircuitBreakerCallbacks(deleteCircuitBreaker);
 
 export type Target_Submissions = PartialTarget & {
 	submissions?: Submission[];
-}
+};
 
 export type ShowResponseBody = ResponseBody<{ target: Target_Submissions }>;
 
 export type ShowQueries = TargetShowQueries & {
 	submissions?: string;
-}
+};
 
 async function indexCaller(urlSearchParams: URLSearchParams): Promise<ServiceCallResult<TargetsIndexResponseBody>> {
 	let fireResult: Response;
@@ -199,7 +199,7 @@ export default class TargetHandler {
 
 		// Aggregate the response.
 		if (submissionsFromService) {
-			targetWithSubmissions.submissions = submissionsFromService
+			targetWithSubmissions.submissions = submissionsFromService;
 		}
 
 		const response = {
@@ -207,7 +207,7 @@ export default class TargetHandler {
 			data: {
 				target: targetWithSubmissions
 			}
-		} satisfies ShowResponseBody
+		} satisfies ShowResponseBody;
 
 		res.status(targetResponse.statusCode).json(response);
 	};

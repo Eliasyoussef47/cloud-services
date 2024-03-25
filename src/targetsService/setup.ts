@@ -29,6 +29,6 @@ export async function setupDependencies() {
 		userRepository: new UserRepository(dbConnection),
 		messageBroker: messageBroker,
 		targetsServiceMessageBroker: targetsServiceMessageBroker
-	}
+	};
 	ServicesRegistry.setupInitial(services);
 }

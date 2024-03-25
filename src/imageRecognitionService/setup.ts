@@ -22,7 +22,7 @@ export async function setupDependencies() {
 	const services: Services = {
 		messageBroker: messageBroker,
 		imageRecognitionServiceMessageBroker: imageRecognitionServiceMessageBroker
-	}
+	};
 
 	ServicesRegistry.setupInitial(services);
 }

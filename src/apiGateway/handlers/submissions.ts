@@ -126,7 +126,7 @@ export default class SubmissionHandler {
 			next(e);
 			return;
 		}
-	}
+	};
 
 	public show: RequestHandler<RouteParameters<"/submissions/:id">, {}, {}, ShowArgs> = async (req, res, next) => {
 		const submissionId = req.params.id;
@@ -151,7 +151,7 @@ export default class SubmissionHandler {
 		} satisfies ShowResponseBody;
 
 		res.status(submissionResponse.statusCode).json(response);
-	}
+	};
 
 	public destroy: RequestHandler = async (req, res, next) => {
 		let fireResult: Response;
@@ -172,5 +172,5 @@ export default class SubmissionHandler {
 			next(e);
 			return;
 		}
-	}
+	};
 }
